@@ -8,7 +8,7 @@ import {
   type QuizAction,
   type QuizState,
 } from "@/lib/quiz";
-import { speak } from "@/lib/speech";
+import { playClip, playPhrase, playSfx } from "@/lib/audio";
 import { Mascot } from "@/components/Mascot";
 import { StarBar } from "@/components/quiz/StarBar";
 import { choiceRenderers } from "@/components/quiz/renderers";
@@ -45,6 +45,8 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
   // 完了後に index が範囲外を指してもクラッシュしないようクランプ
   const currentProblem = lesson.problems[Math.min(state.index, total - 1)];
   const currentSay = state.index < total ? currentProblem.prompt.say : null;
+  // 現在の設問読み上げクリップのパス（フォールバックは currentSay）
+  const currentProblemId = currentProblem.id;
   const choices: Choice[] = currentProblem.choices;
 
   // 保留中の setTimeout をまとめて管理し、unmount 時にクリアして状態更新リークを防ぐ
@@ -63,9 +65,9 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
   // 問題が切り替わるたびに設問を自動で読み上げる（初回含む。完了時は読み上げない）
   useEffect(() => {
     if (currentSay) {
-      speak(currentSay);
+      playClip(`/audio/q/${currentProblemId}.mp3`, currentSay);
     }
-  }, [currentSay]);
+  }, [currentSay, currentProblemId]);
 
   // 完了検知：status==="done" になったら一度だけ onComplete を呼ぶ
   const hasCompletedRef = useRef(false);
@@ -85,7 +87,9 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
     if (correct) {
       dispatch({ type: "answer", correct: true });
       setMascotAnimation("cheer");
-      speak("せいかい じょうず");
+      // 効果音を先に鳴らし、その直後にほめ言葉を再生する
+      playSfx("/audio/sfx/correct.mp3");
+      playPhrase("fb-correct");
       // 演出を見せてから次の問題へ進む
       scheduleTimer(() => {
         setSelectedId(null);
@@ -94,7 +98,7 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
       }, CORRECT_FEEDBACK_MS);
     } else {
       dispatch({ type: "answer", correct: false });
-      speak("おしい もういちど");
+      playPhrase("fb-retry");
       // wobble を見せてから再挑戦可能に戻す（進行はしない）
       scheduleTimer(() => {
         setSelectedId(null);
@@ -146,7 +150,7 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
           animation={mascotAnimation}
           onTap={() => {
             if (currentSay) {
-              speak(currentSay);
+              playClip(`/audio/q/${currentProblemId}.mp3`, currentSay);
             }
           }}
           ariaLabel="もういちど よみあげる"

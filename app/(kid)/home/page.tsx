@@ -4,11 +4,8 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Mascot } from "@/components/Mascot";
 import { ParentLock } from "@/components/ParentLock";
-import { speak } from "@/lib/speech";
+import { playPhrase } from "@/lib/audio";
 import styles from "./home.module.css";
-
-// おうち画面の読み上げ文（マスコットタップ・到達時に発話）
-const HOME_PROMPT = "なにで あそぶ";
 
 /** おうち画面。種目タイルを選んでゲームへ進む（prototype.html の #screen-home） */
 export default function HomePage() {
@@ -16,7 +13,7 @@ export default function HomePage() {
 
   // 画面に来たら問いかけを読み上げる（ログイン直後・ごほうび→おうちの両方を兼ねる）
   useEffect(() => {
-    speak(HOME_PROMPT);
+    playPhrase("home-prompt");
   }, []);
 
   return (
@@ -24,7 +21,7 @@ export default function HomePage() {
       <div className={styles.greet}>
         <Mascot
           size={140}
-          onTap={() => speak(HOME_PROMPT)}
+          onTap={() => playPhrase("home-prompt")}
           ariaLabel="もういちど よみあげる"
         />
         <h1 className={styles.title}>なにで あそぶ？</h1>

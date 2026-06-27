@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Mascot } from "@/components/Mascot";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { unlockAudio } from "@/lib/audio";
 import { SIGN_IN_STEPS, type SignInStep } from "@/lib/auth/mockAuth";
 import styles from "./login.module.css";
 
@@ -39,6 +40,8 @@ export default function LoginPage() {
     if (status === "authenticating") {
       return;
     }
+    // 最初のユーザー操作で音声を解錠する（自動再生ポリシー対策）
+    unlockAudio();
     // 「ログイン中… → 許可リスト確認 → ようこそ」を順に表示する
     SIGN_IN_STEPS.forEach((step) => {
       const timerId = setTimeout(() => setCurrentStep(step), step.atMs);
