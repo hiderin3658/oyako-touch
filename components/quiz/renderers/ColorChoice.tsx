@@ -29,6 +29,8 @@ export function ColorChoice({ choice, state, onSelect }: ColorChoiceProps) {
       onClick={onSelect}
       aria-label={choice.label}
       data-state={state}
+      data-testid="choice"
+      data-correct={choice.correct ? "true" : "false"}
     >
       <span className={styles.disc} style={{ background: choice.color }} />
     </button>

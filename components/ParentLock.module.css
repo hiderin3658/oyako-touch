@@ -1,0 +1,105 @@
+/* 🔒ロックボタン（prototype.html の .lock を移植） */
+.lock {
+  position: fixed;
+  top: 14px;
+  right: 16px;
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .7);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
+  font-size: 20px;
+  cursor: pointer;
+  /* 長押し中に文字選択やコンテキストメニューが出ないようにする */
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 保護者メニューのオーバーレイ（アプリ内・confirm非使用） */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(74, 59, 51, .45);
+  animation: fade .25s ease both;
+}
+
+.panel {
+  width: 100%;
+  max-width: 380px;
+  padding: 26px 24px;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.panelTitle {
+  margin: 0 0 18px;
+  font-size: 20px;
+}
+
+.summary {
+  margin: 0 0 22px;
+}
+
+.summaryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 4px;
+  border-bottom: 1px solid #F0EBE4;
+}
+
+.summaryLabel {
+  margin: 0;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.summaryValue {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--tangerine);
+}
+
+.btnRow {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.signOut,
+.close {
+  flex: 1;
+  border: none;
+  border-radius: 16px;
+  padding: 14px 18px;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform .12s;
+}
+
+.signOut:active,
+.close:active {
+  transform: scale(.96);
+}
+
+.signOut {
+  background: var(--berry);
+  color: #fff;
+}
+
+.close {
+  background: #F0EBE4;
+  color: var(--ink);
+}

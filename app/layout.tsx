@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { M_PLUS_Rounded_1c, Baloo_2 } from "next/font/google";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 import "./globals.css";
 
 // 本文用の丸ゴシック（M PLUS Rounded 1c）。CSS変数として全体に適用する
@@ -36,7 +37,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ja" className={`${mPlusRounded.variable} ${baloo.variable}`}>
-      <body>{children}</body>
+      <body>
+        {/* 認証状態は AuthProvider に集約し、配下の画面で useAuth から参照する */}
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

@@ -1,0 +1,95 @@
+.home {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fade .45s ease both;
+}
+
+.greet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.title {
+  font-size: clamp(22px, 4.5vw, 32px);
+  margin: 6px 0 2px;
+}
+
+.menu {
+  display: flex;
+  gap: 26px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.tile {
+  width: min(40vw, 210px);
+  min-width: 150px;
+  aspect-ratio: 1 / 1;
+  border: none;
+  border-radius: 38px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: inherit;
+  transition: transform .12s;
+}
+
+.tile:active {
+  transform: scale(.95) translateY(2px);
+}
+
+.emoji {
+  font-size: clamp(48px, 9vw, 76px);
+  line-height: 1;
+}
+
+.label {
+  font-size: clamp(20px, 3.6vw, 28px);
+  font-weight: 800;
+}
+
+.color .label {
+  color: var(--berry);
+}
+
+.shape .label {
+  color: var(--sky);
+}
+
+.locked {
+  filter: grayscale(.6) opacity(.6);
+  cursor: default;
+}
+
+.locked:active {
+  transform: none;
+}
+
+.soon {
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.hint {
+  position: fixed;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
