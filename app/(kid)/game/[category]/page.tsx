@@ -8,7 +8,7 @@ import { Mascot } from "@/components/Mascot";
 import { ParentLock } from "@/components/ParentLock";
 import { loadLesson } from "@/lib/problems";
 import { addSticker, recordLessonClear } from "@/lib/progress";
-import { speak } from "@/lib/speech";
+import { playPhrase } from "@/lib/audio";
 import type { Category, Lesson } from "@/lib/types";
 import styles from "./game.module.css";
 
@@ -62,7 +62,7 @@ export default function GamePage() {
   // ごほうび到達時にお祝いの読み上げ
   useEffect(() => {
     if (phase === "reward") {
-      speak("よく できました");
+      playPhrase("reward-done");
     }
   }, [phase]);
 
