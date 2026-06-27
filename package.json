@@ -11,7 +11,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
-    "e2e:ui": "playwright test --ui"
+    "e2e:ui": "playwright test --ui",
+    "gen:audio": "node --env-file=.env scripts/gen-audio.mjs",
+    "gen:audio:dry": "node --env-file=.env scripts/gen-audio.mjs --dry-run"
   },
   "dependencies": {
     "next": "^15.1.0",
