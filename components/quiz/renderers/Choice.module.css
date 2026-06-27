@@ -1,0 +1,44 @@
+.choice {
+  /* タップ領域は最低でも 64px、推奨 80px 以上を確保する */
+  width: clamp(110px, 22vw, 160px);
+  height: clamp(110px, 22vw, 160px);
+  min-width: 80px;
+  min-height: 80px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .12s;
+}
+
+.choice:active {
+  transform: scale(.92);
+}
+
+/* 正解：ぽよん（pop） */
+.right {
+  animation: pop .5s ease;
+}
+
+/* 誤答：ぷるぷる（wobble）。ノーフェイルのため進行は止めない */
+.wrong {
+  animation: wobble .5s ease;
+}
+
+/* いろあわせの円ディスク */
+.disc {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  box-shadow: var(--shadow);
+}
+
+/* かたちはめの図形SVG */
+.shape {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 10px 0 rgba(74, 59, 51, .12)) drop-shadow(0 16px 22px rgba(74, 59, 51, .16));
+}

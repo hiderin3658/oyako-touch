@@ -1,0 +1,20 @@
+.layer {
+  position: absolute;
+  inset: 0;
+  /* 演出はタップを邪魔しない */
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* 中心からの水平位置を決めるアンカー（アニメは内側 spark が担当） */
+.anchor {
+  position: absolute;
+  top: 50%;
+}
+
+/* globals.css の rise を使って上昇しながらフェードアウト */
+.spark {
+  position: absolute;
+  font-size: 30px;
+  animation: rise 1s ease forwards;
+}

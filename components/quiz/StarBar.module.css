@@ -1,0 +1,17 @@
+.stars {
+  display: flex;
+  gap: 8px;
+  font-size: 30px;
+}
+
+/* 未点灯はグレースケールで控えめに */
+.star {
+  filter: grayscale(1) opacity(.35);
+  transition: .3s;
+}
+
+/* 点灯はフルカラー＋ぽよん（pop）アニメ */
+.on {
+  filter: none;
+  animation: pop .5s ease;
+}
