@@ -20,3 +20,24 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+
+  # E2E スモークは独立ジョブで並列実行する（単体テスト/ビルドと相互に待たせない）
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Chromium 本体と OS 依存ライブラリを導入する
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+      # 失敗時の調査用に HTML レポートを保存する
+      - if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
