@@ -11,7 +11,6 @@ import {
 import { speak } from "@/lib/speech";
 import { Mascot } from "@/components/Mascot";
 import { StarBar } from "@/components/quiz/StarBar";
-import { Sparkles } from "@/components/quiz/Sparkles";
 import { choiceRenderers } from "@/components/quiz/renderers";
 import styles from "./QuizEngine.module.css";
 
@@ -22,8 +21,9 @@ export interface QuizEngineProps {
 
 // 正解演出の表示時間（ms）。この後に次の問題へ進む
 const CORRECT_FEEDBACK_MS = 1100;
-// 誤答演出（wobble）の表示時間（ms）。この後に再挑戦できる状態へ戻す
-const WRONG_FEEDBACK_MS = 600;
+// 誤答演出（wobble＋「もういちど！」フキダシ）の表示時間（ms）。
+// フキダシを読めるよう少し長めにし、この後に再挑戦できる状態へ戻す
+const WRONG_FEEDBACK_MS = 1100;
 
 /**
  * 種目に依存しない共通クイズエンジン。
@@ -39,8 +39,6 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
 
   // タップされた選択肢の id（演出対象の特定に使用）
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  // キラキラ演出のトリガ（インクリメントで発火）
-  const [sparkTrigger, setSparkTrigger] = useState(0);
   // マスコットのアニメーション（正解時に cheer）
   const [mascotAnimation, setMascotAnimation] = useState<"bob" | "cheer">("bob");
 
@@ -86,7 +84,6 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
     setSelectedId(choiceId);
     if (correct) {
       dispatch({ type: "answer", correct: true });
-      setSparkTrigger((value) => value + 1);
       setMascotAnimation("cheer");
       speak("せいかい じょうず");
       // 演出を見せてから次の問題へ進む
@@ -121,11 +118,29 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
   };
 
   const ChoiceComponent = choiceRenderers[lesson.category];
+  // 正解時は「せいかい！」、誤答時は「もういちど！」を問題バーの真上に言葉で表示する
+  const showCorrectHint = state.status === "correct";
+  const showRetryHint = state.status === "retry";
 
   return (
     <div className={styles.game}>
-      <Sparkles trigger={sparkTrigger} />
       <div className={styles.qBar}>
+        {showCorrectHint && (
+          <div
+            className={`${styles.feedbackBubble} ${styles.correct}`}
+            role="status"
+          >
+            せいかい！
+          </div>
+        )}
+        {showRetryHint && (
+          <div
+            className={`${styles.feedbackBubble} ${styles.retry}`}
+            role="status"
+          >
+            もういちど！
+          </div>
+        )}
         <Mascot
           size={64}
           animation={mascotAnimation}

@@ -10,6 +10,7 @@
 
 /* 問題文バー（マスコット小＋設問文） */
 .qBar {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -39,4 +40,39 @@
 /* 演出中はタップを無効化して二重発火を防ぐ */
 .choices[data-locked="true"] {
   pointer-events: none;
+}
+
+/*
+ * 正解「せいかい！」・誤答「もういちど！」の言葉フキダシ（共通）。
+ * 問題バーの真上に浮かせ、設問に重ねない。
+ * 音声やアニメが無効でも必ず見えるよう DOM要素として表示する（ノーフェイル）。
+ * × やフェイル表示はしない。
+ */
+.feedbackBubble {
+  position: absolute;
+  /* 問題バーの真上に少し離して浮かせ、設問に重ねない */
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  padding: 12px 28px;
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 800;
+  white-space: nowrap;
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  pointer-events: none;
+  animation: pop .4s ease;
+}
+
+/* 正解：うれしい緑 */
+.correct {
+  background: var(--leaf);
+  color: #fff;
+}
+
+/* 誤答：やさしい黄色（叱らない） */
+.retry {
+  background: var(--sunny);
+  color: var(--ink);
 }

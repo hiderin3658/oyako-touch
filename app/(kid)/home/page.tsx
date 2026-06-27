@@ -37,7 +37,11 @@ export default function HomePage() {
           onClick={() => router.push("/game/color")}
           data-testid="tile-color"
         >
-          <span className={styles.emoji}>🔴🔵🟡</span>
+          <span className={styles.emoji}>
+            <span className={styles.icon}>🔴</span>
+            <span className={styles.icon}>🔵</span>
+            <span className={styles.icon}>🟡</span>
+          </span>
           <span className={styles.label}>いろ</span>
         </button>
 
@@ -47,12 +51,18 @@ export default function HomePage() {
           onClick={() => router.push("/game/shape")}
           data-testid="tile-shape"
         >
-          <span className={styles.emoji}>⭐🔺⬛</span>
+          <span className={styles.emoji}>
+            <span className={styles.icon}>⭐</span>
+            <span className={styles.icon}>🔺</span>
+            <span className={styles.icon}>⬛</span>
+          </span>
           <span className={styles.label}>かたち</span>
         </button>
 
         <div className={`${styles.tile} ${styles.locked}`} aria-disabled="true">
-          <span className={styles.emoji}>🔢</span>
+          <span className={styles.emoji}>
+            <span className={styles.icon}>🔢</span>
+          </span>
           <span className={styles.label}>すうじ</span>
           <span className={styles.soon}>じゅんびちゅう</span>
         </div>

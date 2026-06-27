@@ -33,6 +33,9 @@
   width: min(40vw, 210px);
   min-width: 150px;
   aspect-ratio: 1 / 1;
+  /* 絵文字がタイル端からはみ出さないよう内側に余白を確保する */
+  padding: 18px;
+  overflow: hidden;
   border: none;
   border-radius: 38px;
   background: var(--card);
@@ -51,8 +54,18 @@
   transform: scale(.95) translateY(2px);
 }
 
+/* 絵文字アイコン群。横1行・均等間隔で、タイル内に必ず収める */
 .emoji {
-  font-size: clamp(48px, 9vw, 76px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2px, 0.8vw, 6px);
+  max-width: 100%;
+  line-height: 1;
+}
+
+.icon {
+  font-size: clamp(28px, 5vw, 44px);
   line-height: 1;
 }
 
