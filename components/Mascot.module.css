@@ -1,0 +1,31 @@
+.mascot {
+  display: block;
+  /* 跳ねる・喜ぶ動きの起点を足元に置く */
+  transform-origin: center bottom;
+}
+
+/* globals.css 定義の keyframes を再利用 */
+.bob {
+  animation: bob 2.2s ease-in-out infinite;
+}
+
+.cheer {
+  animation: cheer .6s ease;
+}
+
+.tap {
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tap:active {
+  transform: scale(.95);
+}
+
+.wrap {
+  display: inline-flex;
+}
