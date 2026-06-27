@@ -1,0 +1,31 @@
+.main {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  animation: fade .45s ease both;
+}
+
+.logo {
+  font-family: var(--font-baloo), "Baloo 2", var(--font-rounded), "M PLUS Rounded 1c", sans-serif;
+  font-weight: 800;
+  font-size: clamp(34px, 6vw, 56px);
+  color: var(--tangerine);
+  letter-spacing: .02em;
+  margin: 6px 0 2px;
+  text-shadow: 0 3px 0 #fff, 0 6px 0 rgba(255, 138, 61, .25);
+}
+
+.dot {
+  color: var(--berry);
+}
+
+.tagline {
+  color: var(--ink-soft);
+  font-weight: 700;
+  margin-bottom: 22px;
+}

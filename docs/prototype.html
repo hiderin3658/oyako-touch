@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>おやこタッチ — プロトタイプ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky1:#FFF6E9; --sky2:#FFE6F0; --sky3:#E8F4FF;
+    --ink:#4A3B33; --ink-soft:#8A7A70;
+    --tangerine:#FF8A3D; --berry:#FF5E8A; --grape:#9B6DFF;
+    --sky:#4FC3F7; --sunny:#FFCD3C; --leaf:#66BB6A;
+    --card:#FFFFFF; --shadow:0 10px 0 rgba(74,59,51,.12), 0 18px 30px rgba(74,59,51,.16);
+    --radius:34px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;margin:0;}
+  body{
+    font-family:"M PLUS Rounded 1c",system-ui,sans-serif;
+    color:var(--ink);
+    background:linear-gradient(160deg,var(--sky1),var(--sky2) 55%,var(--sky3));
+    overflow:hidden;-webkit-user-select:none;user-select:none;
+  }
+  .app{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+  .screen.active{display:flex;animation:fade .45s ease both;}
+  @keyframes fade{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:scale(1)}}
+
+  /* ---------- mascot ---------- */
+  .mascot{width:140px;height:140px;display:block;transform-origin:center bottom;}
+  .mascot.bob{animation:bob 2.2s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(2deg)}}
+  .mascot.cheer{animation:cheer .6s ease;}
+  @keyframes cheer{0%{transform:scale(1)}40%{transform:scale(1.15) rotate(-4deg)}70%{transform:scale(1.15) rotate(4deg)}100%{transform:scale(1)}}
+
+  /* ---------- login ---------- */
+  .logo{font-family:"Baloo 2","M PLUS Rounded 1c",sans-serif;font-weight:800;font-size:clamp(34px,6vw,56px);
+        color:var(--tangerine);letter-spacing:.02em;margin:6px 0 2px;text-shadow:0 3px 0 #fff,0 6px 0 rgba(255,138,61,.25);}
+  .logo .dot{color:var(--berry);}
+  .tagline{color:var(--ink-soft);font-weight:700;margin-bottom:22px;}
+  .login-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+        padding:30px 26px;max-width:440px;width:100%;text-align:center;}
+  .login-card h2{margin:8px 0 4px;font-size:22px;}
+  .login-card p{margin:0 0 22px;color:var(--ink-soft);font-weight:500;font-size:15px;}
+  .gbtn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;
+        background:#fff;border:2px solid #E4E0DA;border-radius:18px;padding:16px;font-size:18px;font-weight:700;
+        color:#3c4043;cursor:pointer;transition:transform .12s, box-shadow .12s;}
+  .gbtn:active{transform:scale(.97);}
+  .gbtn:hover{box-shadow:0 6px 16px rgba(0,0,0,.1);}
+  .gicon{width:24px;height:24px;flex:none;}
+  .note{margin-top:16px;font-size:12.5px;color:var(--ink-soft);line-height:1.6;}
+  .note b{color:var(--tangerine);}
+  .status{min-height:24px;margin-top:14px;font-weight:700;color:var(--leaf);}
+
+  /* ---------- kid home ---------- */
+  .greet{display:flex;flex-direction:column;align-items:center;margin-bottom:6px;}
+  .greet h1{font-size:clamp(22px,4.5vw,32px);margin:6px 0 2px;}
+  .menu{display:flex;gap:26px;flex-wrap:wrap;justify-content:center;margin-top:10px;}
+  .tile{width:min(40vw,210px);min-width:150px;aspect-ratio:1/1;border:none;border-radius:38px;
+        background:var(--card);box-shadow:var(--shadow);cursor:pointer;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+        transition:transform .12s;}
+  .tile:active{transform:scale(.95) translateY(2px);}
+  .tile .emoji{font-size:clamp(48px,9vw,76px);line-height:1;}
+  .tile .label{font-size:clamp(20px,3.6vw,28px);font-weight:800;}
+  .tile.locked{filter:grayscale(.6) opacity(.6);cursor:default;}
+  .tile.locked:active{transform:none;}
+  .tile .soon{font-size:13px;color:var(--ink-soft);font-weight:700;}
+  .tile.c-iro .label{color:var(--berry);} .tile.c-kata .label{color:var(--sky);}
+
+  /* ---------- game ---------- */
+  .q-bar{display:flex;align-items:center;gap:14px;background:var(--card);border-radius:30px;
+        box-shadow:var(--shadow);padding:14px 22px;margin-bottom:34px;max-width:560px;}
+  .q-bar .mascot{width:64px;height:64px;flex:none;}
+  .q-text{font-size:clamp(22px,4.2vw,30px);font-weight:800;}
+  .choices{display:flex;gap:clamp(18px,4vw,40px);flex-wrap:wrap;justify-content:center;}
+  .choice{width:clamp(110px,22vw,160px);height:clamp(110px,22vw,160px);border:none;background:transparent;
+        cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .12s;}
+  .choice:active{transform:scale(.92);}
+  .disc{width:100%;height:100%;border-radius:50%;box-shadow:var(--shadow);}
+  .choice.wrong{animation:wobble .5s ease;}
+  @keyframes wobble{0%,100%{transform:rotate(0)}20%{transform:rotate(-9deg)}40%{transform:rotate(8deg)}60%{transform:rotate(-6deg)}80%{transform:rotate(4deg)}}
+  .choice.right{animation:pop .5s ease;}
+  @keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.22)}100%{transform:scale(1)}}
+  svg.shape{width:100%;height:100%;filter:drop-shadow(0 10px 0 rgba(74,59,51,.12)) drop-shadow(0 16px 22px rgba(74,59,51,.16));}
+
+  .stars{position:fixed;top:18px;left:50%;transform:translateX(-50%);display:flex;gap:8px;font-size:30px;}
+  .stars .s{filter:grayscale(1) opacity(.35);transition:.3s;}
+  .stars .s.on{filter:none;animation:pop .5s ease;}
+
+  /* ---------- reward ---------- */
+  .reward h1{font-size:clamp(30px,6vw,46px);color:var(--tangerine);margin:10px 0;text-shadow:0 3px 0 #fff;}
+  .reward .got{font-size:46px;letter-spacing:6px;margin:6px 0 18px;}
+  .btn-row{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;}
+  .big-btn{border:none;border-radius:24px;padding:18px 30px;font-family:inherit;font-weight:800;font-size:20px;
+        color:#fff;cursor:pointer;box-shadow:var(--shadow);transition:transform .12s;}
+  .big-btn:active{transform:scale(.95);}
+  .big-btn.again{background:var(--sunny);color:var(--ink);} .big-btn.home{background:var(--tangerine);}
+
+  /* parent lock */
+  .lock{position:fixed;top:14px;right:16px;width:46px;height:46px;border-radius:50%;border:none;
+        background:rgba(255,255,255,.7);box-shadow:0 4px 10px rgba(0,0,0,.08);font-size:20px;cursor:pointer;}
+  .hint{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);font-size:12px;color:var(--ink-soft);font-weight:600;}
+
+  /* sparkles */
+  .spark{position:fixed;pointer-events:none;font-size:30px;animation:rise 1s ease forwards;}
+  @keyframes rise{0%{opacity:1;transform:translateY(0) scale(.6)}100%{opacity:0;transform:translateY(-120px) scale(1.3)}}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== LOGIN (parent) ===== -->
+  <section id="screen-login" class="screen active">
+    <div class="logo">おやこタッチ<span class="dot">.</span></div>
+    <div class="tagline">3さいの はじめての まなび</div>
+    <div class="login-card">
+      <div id="login-mascot"></div>
+      <h2>保護者の方がログイン</h2>
+      <p>お子さまにわたす前に、おうちの方が認証してください</p>
+      <button class="gbtn" id="googleBtn">
+        <svg class="gicon" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.8-6.8C35.5 2.4 30.1 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.3 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.5 3-2.2 5.5-4.7 7.2l7.3 5.7c4.3-4 6.8-9.8 6.8-17.4z"/><path fill="#FBBC05" d="M10.5 28.3c-.5-1.5-.8-3-.8-4.8s.3-3.3.8-4.8l-7.9-6.1C1 16 0 19.9 0 24s1 8 2.6 11.4l7.9-7.1z"/><path fill="#34A853" d="M24 48c6.1 0 11.3-2 15.1-5.5l-7.3-5.7c-2 1.4-4.6 2.2-7.8 2.2-6.3 0-11.6-3.8-13.5-9.3l-7.9 7.1C6.5 42.6 14.6 48 24 48z"/></svg>
+        Googleでログイン
+      </button>
+      <div class="status" id="loginStatus"></div>
+      <div class="note">
+        ※ プロトタイプのため<b>モック動作</b>です。<br>
+        本番は <b>許可リストに登録したメールだけ</b>がログイン可（DB不使用）。
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== KID HOME ===== -->
+  <section id="screen-home" class="screen">
+    <div class="greet">
+      <div id="home-mascot"></div>
+      <h1>なにで あそぶ？</h1>
+    </div>
+    <div class="menu">
+      <button class="tile c-iro" onclick="startGame('color')">
+        <div class="emoji">🔴🔵🟡</div><div class="label">いろ</div>
+      </button>
+      <button class="tile c-kata" onclick="startGame('shape')">
+        <div class="emoji">⭐🔺⬛</div><div class="label">かたち</div>
+      </button>
+      <div class="tile locked">
+        <div class="emoji">🔢</div><div class="label">すうじ</div><div class="soon">じゅんびちゅう</div>
+      </div>
+    </div>
+    <button class="lock" id="lockBtn" title="保護者メニュー">🔒</button>
+    <div class="hint">マスコットをタップすると もういちど よみあげます</div>
+  </section>
+
+  <!-- ===== GAME ===== -->
+  <section id="screen-game" class="screen">
+    <div class="stars" id="stars"></div>
+    <div class="q-bar">
+      <div id="q-mascot"></div>
+      <div class="q-text" id="qText"></div>
+    </div>
+    <div class="choices" id="choices"></div>
+    <button class="lock" id="lockBtn2" title="保護者メニュー">🔒</button>
+  </section>
+
+  <!-- ===== REWARD ===== -->
+  <section id="screen-reward" class="screen reward">
+    <div id="reward-mascot"></div>
+    <h1>よく できました！</h1>
+    <div class="got" id="rewardStars"></div>
+    <div class="btn-row">
+      <button class="big-btn again" id="againBtn">もういちど</button>
+      <button class="big-btn home" id="homeBtn">おうちに もどる</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ---------- mascot SVG ---------- */
+function mascot(){
+  return `<svg class="mascot bob" viewBox="0 0 120 120" aria-hidden="true">
+    <ellipse cx="36" cy="34" rx="16" ry="18" fill="#FFC98A"/>
+    <ellipse cx="84" cy="34" rx="16" ry="18" fill="#FFC98A"/>
+    <ellipse cx="36" cy="34" rx="8" ry="9" fill="#FFB1C9"/>
+    <ellipse cx="84" cy="34" rx="8" ry="9" fill="#FFB1C9"/>
+    <ellipse cx="60" cy="66" rx="44" ry="42" fill="#FFD9A8"/>
+    <circle cx="42" cy="62" r="8.5" fill="#4A3B33"/>
+    <circle cx="78" cy="62" r="8.5" fill="#4A3B33"/>
+    <circle cx="45" cy="59" r="3" fill="#fff"/>
+    <circle cx="81" cy="59" r="3" fill="#fff"/>
+    <ellipse cx="34" cy="78" rx="8" ry="5" fill="#FF9EBB" opacity=".8"/>
+    <ellipse cx="86" cy="78" rx="8" ry="5" fill="#FF9EBB" opacity=".8"/>
+    <path d="M50 80 Q60 90 70 80" stroke="#4A3B33" stroke-width="4" fill="none" stroke-linecap="round"/>
+  </svg>`;
+}
+['login-mascot','home-mascot','q-mascot','reward-mascot'].forEach(id=>{
+  const el=document.getElementById(id); if(el) el.innerHTML=mascot();
+});
+
+/* ---------- data ---------- */
+const COL={red:'#E5453C',blue:'#3D8BFF',yellow:'#FFC92E',green:'#4CC95E'};
+const colorQ=[
+  {text:'あかいのは どれかな？',say:'あかいのは どれかな',ans:'red',opts:['red','blue','yellow']},
+  {text:'あおいのは どれかな？',say:'あおいのは どれかな',ans:'blue',opts:['green','blue','red']},
+  {text:'きいろいのは どれかな？',say:'きいろいのは どれかな',ans:'yellow',opts:['yellow','red','green']},
+];
+const shapeQ=[
+  {text:'まるは どれかな？',say:'まるは どれかな',ans:'circle',opts:['circle','square','triangle']},
+  {text:'さんかくは どれかな？',say:'さんかくは どれかな',ans:'triangle',opts:['triangle','circle','square']},
+  {text:'しかくは どれかな？',say:'しかくは どれかな',ans:'square',opts:['square','triangle','circle']},
+];
+function shapeSVG(kind){
+  const c='#7FB8E8';
+  if(kind==='circle')   return `<svg class="shape" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="${c}"/></svg>`;
+  if(kind==='square')   return `<svg class="shape" viewBox="0 0 100 100"><rect x="12" y="12" width="76" height="76" rx="12" fill="#F2A65A"/></svg>`;
+  return `<svg class="shape" viewBox="0 0 100 100"><path d="M50 12 L90 86 L10 86 Z" fill="#8FC97F" stroke-linejoin="round"/></svg>`;
+}
+
+/* ---------- state & navigation ---------- */
+const state={game:null,i:0,stars:0};
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function speak(t){try{if(!('speechSynthesis'in window))return;const u=new SpeechSynthesisUtterance(t);u.lang='ja-JP';u.rate=.85;u.pitch=1.2;speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){}}
+
+/* ---------- login (mock) ---------- */
+document.getElementById('googleBtn').addEventListener('click',()=>{
+  const st=document.getElementById('loginStatus');
+  st.textContent='ログイン中…';st.style.color='#8A7A70';
+  setTimeout(()=>{st.textContent='許可リストを確認しています…';},700);
+  setTimeout(()=>{st.textContent='✓ ようこそ！';st.style.color='#66BB6A';},1500);
+  setTimeout(()=>{show('screen-home');speak('なにで あそぶ');},2200);
+});
+
+/* tap mascot to re-read */
+document.getElementById('home-mascot').addEventListener('click',()=>speak('なにで あそぶ'));
+document.getElementById('q-mascot').addEventListener('click',()=>{const q=(state.game==='color'?colorQ:shapeQ)[state.i];if(q)speak(q.say);});
+
+/* ---------- game ---------- */
+function startGame(g){state.game=g;state.i=0;state.stars=0;renderStars();show('screen-game');renderQ();}
+function renderStars(){
+  const wrap=document.getElementById('stars');wrap.innerHTML='';
+  for(let k=0;k<3;k++){const s=document.createElement('span');s.className='s'+(k<state.stars?' on':'');s.textContent='⭐';wrap.appendChild(s);}
+}
+function renderQ(){
+  const q=(state.game==='color'?colorQ:shapeQ)[state.i];
+  document.getElementById('qText').textContent=q.text;
+  const box=document.getElementById('choices');box.innerHTML='';
+  q.opts.forEach(opt=>{
+    const b=document.createElement('button');b.className='choice';
+    b.innerHTML=(state.game==='color')?`<div class="disc" style="background:${COL[opt]}"></div>`:shapeSVG(opt);
+    b.addEventListener('click',e=>onChoice(opt,q.ans,b,e));
+    box.appendChild(b);
+  });
+  setTimeout(()=>speak(q.say),350);
+}
+function onChoice(opt,ans,el,e){
+  if(opt===ans){
+    el.classList.add('right');burst(e.clientX,e.clientY);
+    document.querySelector('#q-mascot .mascot').classList.add('cheer');
+    state.stars++;renderStars();speak('せいかい じょうず');
+    setTimeout(()=>{state.i++;if(state.i>=3){reward();}else{renderQ();}},1100);
+  }else{
+    el.classList.add('wrong');speak('おしい もういちど');
+    setTimeout(()=>el.classList.remove('wrong'),600);
+  }
+}
+function burst(x,y){
+  const e=['⭐','✨','🎉','💛'];
+  for(let k=0;k<8;k++){const s=document.createElement('div');s.className='spark';s.textContent=e[k%e.length];
+    s.style.left=(x-15+(Math.random()*60-30))+'px';s.style.top=(y-10)+'px';
+    document.body.appendChild(s);setTimeout(()=>s.remove(),1000);}
+}
+
+/* ---------- reward ---------- */
+function reward(){
+  document.getElementById('rewardStars').textContent='⭐'.repeat(state.stars||3);
+  document.querySelector('#reward-mascot .mascot').classList.add('cheer');
+  show('screen-reward');speak('よく できました');
+  for(let k=0;k<14;k++)setTimeout(()=>burst(window.innerWidth*Math.random(),120+Math.random()*80),k*80);
+}
+document.getElementById('againBtn').addEventListener('click',()=>startGame(state.game));
+document.getElementById('homeBtn').addEventListener('click',()=>{show('screen-home');speak('なにで あそぶ');});
+
+/* ---------- parent gate (hold to exit) ---------- */
+function holdToExit(btn){
+  let t;const start=()=>{t=setTimeout(()=>{if(confirm('保護者メニュー：ログアウトしますか？'))location.reload();},1400);};
+  const cancel=()=>clearTimeout(t);
+  btn.addEventListener('pointerdown',start);['pointerup','pointerleave','pointercancel'].forEach(ev=>btn.addEventListener(ev,cancel));
+}
+holdToExit(document.getElementById('lockBtn'));
+holdToExit(document.getElementById('lockBtn2'));
+</script>
+</body>
+</html>
