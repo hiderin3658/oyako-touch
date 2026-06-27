@@ -24,6 +24,10 @@ yarn-error.log*
 .env.*
 !.env.example
 
+# Google サービスアカウント鍵（秘密・コミット禁止）
+gcp-tts-key.json
+*-sa-key.json
+
 # TypeScript
 *.tsbuildinfo
 

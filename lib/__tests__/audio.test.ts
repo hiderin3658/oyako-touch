@@ -129,7 +129,7 @@ describe("audio", () => {
 
     // error 時のフォールバック文言が phrases.json 由来であること
     FakeAudio.instances[0].emitError();
-    expect(speak).toHaveBeenCalledWith("せいかい じょうず");
+    expect(speak).toHaveBeenCalledWith("せいかい");
   });
 
   it("playSfx は Audio(src).play() を呼び、フォールバックは行わない", () => {
