@@ -1,14 +1,14 @@
 // 音声一括生成スクリプト（ビルド前に実行するオフライン工程）。
 //
 // 役割:
-//   - 設問読み上げ・固定句のナレーションを ElevenLabs TTS で MP3 生成
-//   - 正解効果音を ElevenLabs Sound Effects で MP3 生成
+//   - 設問読み上げ・固定句のナレーションを Google Cloud Text-to-Speech で MP3 生成
+//   - 正解効果音を ElevenLabs Sound Effects で MP3 生成（任意・既存があればスキップ）
 //   - 生成済みファイルはスキップする差分生成（--force で再生成）
 //
 // 設計方針（設計書 §8/§12 準拠）:
 //   - 本番ランタイムでは使わない。生成済み MP3 は public/ にコミットし CDN 配信する。
-//   - 新規 npm 依存は追加しない。Node 22 のグローバル fetch と --env-file を利用する。
-//   - API キーはログに出さない（存在有無のみ表示）。
+//   - 新規 npm 依存は追加しない。Node 22 のグローバル fetch / 標準 crypto / --env-file を利用。
+//   - 秘密情報（鍵・トークン）はログに出さない（存在有無のみ表示）。
 //
 // 実行方法:
 //   node --env-file=.env scripts/gen-audio.mjs            本番生成
@@ -17,37 +17,34 @@
 
 import { access, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { constants as fsConstants } from "node:fs";
+import crypto from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 // ---------------------------------------------------------------------------
-// ElevenLabs API 設定
-// ※エンドポイント/パラメータに不確実な点があるため、後から実行時に調整できるよう定数化している。
-//   voice_id 確定後・初回実行時に公式ドキュメントで最終確認すること。
+// ナレーション (TTS): Google Cloud Text-to-Speech
+//   REST: POST https://texttospeech.googleapis.com/v1/text:synthesize
+//   ※この API は API キー認証を受け付けず、OAuth2（サービスアカウント）が必須。
+//     環境変数 GOOGLE_APPLICATION_CREDENTIALS にサービスアカウント JSON のパスを指定する。
+//     スクリプトが JWT を署名してアクセストークンを取得し、Bearer 認証で呼ぶ（新規依存なし）。
+//   声/言語/速度は環境変数で可変。従来声(Neural2)は生成のゆらぎが少なく安定。
 // ---------------------------------------------------------------------------
+const GOOGLE_TTS_ENDPOINT =
+  "https://texttospeech.googleapis.com/v1/text:synthesize";
+const GOOGLE_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
+const GOOGLE_TTS_SCOPE = "https://www.googleapis.com/auth/cloud-platform";
+// 既定の声（日本語・女性・自然で安定）。環境変数 GOOGLE_TTS_VOICE で変更可。
+const DEFAULT_GOOGLE_VOICE = "ja-JP-Neural2-B";
+const DEFAULT_GOOGLE_LANGUAGE_CODE = "ja-JP";
+// 3歳児向けにゆっくりめ（0.25〜4.0、1.0が標準）。環境変数 GOOGLE_TTS_SPEAKING_RATE で変更可。
+const DEFAULT_GOOGLE_SPEAKING_RATE = 0.9;
 
-// TTS（Text to Speech）エンドポイント。末尾に voice_id を連結して使う。
-// 参考: POST https://api.elevenlabs.io/v1/text-to-speech/{voice_id}
-const TTS_ENDPOINT = "https://api.elevenlabs.io/v1/text-to-speech";
-
-// Sound Effects（効果音）エンドポイント。
-// 参考: POST https://api.elevenlabs.io/v1/sound-generation
-// ※将来 /v1/sound-effects 等に変わる可能性があるため定数化。実行時に要確認。
+// ---------------------------------------------------------------------------
+// 効果音 (SFX): ElevenLabs Sound Effects（任意）
+//   ※Google TTS は効果音を生成できないため、効果音のみ ElevenLabs を使う。
+//   ELEVENLABS_API_KEY が無い／既存ファイルがある場合はスキップする。
+// ---------------------------------------------------------------------------
 const SFX_ENDPOINT = "https://api.elevenlabs.io/v1/sound-generation";
-
-// TTS モデル。日本語プロソディが自然な multilingual v2 を使用（設計書 §8.2）。
-const TTS_MODEL_ID = "eleven_multilingual_v2";
-
-// TTS の声質設定（設計書 §8.2 の目安: Stability 0.5 / Similarity 0.75 / Style 0 / Speed≈0.9）。
-const TTS_VOICE_SETTINGS = {
-  stability: 0.5,
-  similarity_boost: 0.75,
-  style: 0.0,
-  use_speaker_boost: true,
-  speed: 0.9,
-};
-
-// 効果音生成のプロンプト忠実度（0〜1。低いほど自然さ優先）。
 const SFX_PROMPT_INFLUENCE = 0.3;
 
 // ---------------------------------------------------------------------------
@@ -89,6 +86,82 @@ function summarizeBody(bodyText) {
   const oneLine = bodyText.replace(/\s+/g, " ").trim();
   const MAX = 300;
   return oneLine.length > MAX ? `${oneLine.slice(0, MAX)}…` : oneLine;
+}
+
+/**
+ * .env の値から末尾のインラインコメント（// 以降）を除去して trim する。
+ * ※.env は本来 // コメントを解釈しないため、誤って書かれても拾えるようにする保険。
+ */
+function cleanEnv(value) {
+  return value == null ? "" : String(value).replace(/\/\/.*$/, "").trim();
+}
+
+// ---------------------------------------------------------------------------
+// Google サービスアカウント認証（OAuth2 / JWT）
+// ---------------------------------------------------------------------------
+
+/**
+ * サービスアカウント JSON を読み込んで検証する。
+ * client_email と private_key を含む必要がある。
+ */
+async function readServiceAccount(credsPath) {
+  const absPath = path.isAbsolute(credsPath)
+    ? credsPath
+    : path.resolve(process.cwd(), credsPath);
+  let json;
+  try {
+    json = JSON.parse(await readFile(absPath, "utf8"));
+  } catch (error) {
+    throw new Error(`サービスアカウント JSON を読めません（${absPath}）: ${error.message}`);
+  }
+  if (!json.client_email || !json.private_key) {
+    throw new Error("サービスアカウント JSON に client_email / private_key がありません。");
+  }
+  return json;
+}
+
+/**
+ * サービスアカウントで署名した JWT を OAuth2 トークンエンドポイントに渡し、
+ * アクセストークン（Bearer）を取得する。標準 crypto のみ使用（新規依存なし）。
+ */
+async function getGoogleAccessToken(serviceAccount) {
+  const now = Math.floor(Date.now() / 1000);
+  const tokenUri = serviceAccount.token_uri || GOOGLE_TOKEN_ENDPOINT;
+
+  const header = Buffer.from(JSON.stringify({ alg: "RS256", typ: "JWT" })).toString("base64url");
+  const claims = Buffer.from(
+    JSON.stringify({
+      iss: serviceAccount.client_email,
+      scope: GOOGLE_TTS_SCOPE,
+      aud: tokenUri,
+      iat: now,
+      exp: now + 3600,
+    }),
+  ).toString("base64url");
+
+  const signingInput = `${header}.${claims}`;
+  const signer = crypto.createSign("RSA-SHA256");
+  signer.update(signingInput);
+  const signature = signer.sign(serviceAccount.private_key).toString("base64url");
+  const assertion = `${signingInput}.${signature}`;
+
+  const response = await fetch(tokenUri, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion,
+    }),
+  });
+  if (!response.ok) {
+    const bodyText = await response.text().catch(() => "");
+    throw new Error(`アクセストークン取得に失敗: HTTP ${response.status} ${summarizeBody(bodyText)}`);
+  }
+  const json = await response.json();
+  if (!json.access_token) {
+    throw new Error("トークンレスポンスに access_token がありません。");
+  }
+  return json.access_token;
 }
 
 // ---------------------------------------------------------------------------
@@ -171,22 +244,20 @@ async function collectSfxTargets() {
 // ---------------------------------------------------------------------------
 
 /**
- * TTS で音声バイナリを取得する。
- * HTTP エラー時はステータスと本文要約を含む Error を投げる。
+ * Google Cloud TTS で音声バイナリ（MP3）を取得する。
+ * アクセストークンで Bearer 認証する。HTTP エラー時は Error を投げる。
  */
-async function fetchTts(target, { apiKey, voiceId }) {
-  const url = `${TTS_ENDPOINT}/${voiceId}`;
-  const response = await fetch(url, {
+async function fetchTts(target, { accessToken, voice, languageCode, speakingRate }) {
+  const response = await fetch(GOOGLE_TTS_ENDPOINT, {
     method: "POST",
     headers: {
-      "xi-api-key": apiKey,
+      Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
-      Accept: "audio/mpeg",
     },
     body: JSON.stringify({
-      text: target.text,
-      model_id: TTS_MODEL_ID,
-      voice_settings: TTS_VOICE_SETTINGS,
+      input: { text: target.text },
+      voice: { languageCode, name: voice },
+      audioConfig: { audioEncoding: "MP3", speakingRate },
     }),
   });
 
@@ -194,11 +265,16 @@ async function fetchTts(target, { apiKey, voiceId }) {
     const bodyText = await response.text().catch(() => "");
     throw new Error(`HTTP ${response.status} ${response.statusText}: ${summarizeBody(bodyText)}`);
   }
-  return response.arrayBuffer();
+  const json = await response.json();
+  if (!json.audioContent) {
+    throw new Error("Google TTS のレスポンスに audioContent がありません。");
+  }
+  // audioContent は base64 エンコードされた MP3
+  return Buffer.from(json.audioContent, "base64");
 }
 
 /**
- * 効果音で音声バイナリを取得する。
+ * ElevenLabs で効果音バイナリを取得する。
  * HTTP エラー時はステータスと本文要約を含む Error を投げる。
  */
 async function fetchSfx(target, { apiKey }) {
@@ -231,19 +307,31 @@ async function main() {
   const isDryRun = args.includes("--dry-run");
   const isForce = args.includes("--force");
 
-  const apiKey = process.env.ELEVENLABS_API_KEY;
-  const voiceId = process.env.ELEVENLABS_VOICE_ID;
+  // ナレーション(TTS) = Google Cloud TTS（サービスアカウント認証）
+  // 値は cleanEnv で末尾の // コメント・余分な空白を除去してから使う。
+  const credsPath = cleanEnv(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+  const googleVoice = cleanEnv(process.env.GOOGLE_TTS_VOICE) || DEFAULT_GOOGLE_VOICE;
+  const googleLanguageCode =
+    cleanEnv(process.env.GOOGLE_TTS_LANGUAGE_CODE) || DEFAULT_GOOGLE_LANGUAGE_CODE;
+  const googleSpeakingRate =
+    Number(cleanEnv(process.env.GOOGLE_TTS_SPEAKING_RATE)) || DEFAULT_GOOGLE_SPEAKING_RATE;
+  // 効果音(SFX) = ElevenLabs（任意）
+  const elevenApiKey = process.env.ELEVENLABS_API_KEY;
 
-  // 環境変数の検証（dry-run 時はキー無しでも動く）。
+  // 認証情報の検証＆アクセストークン取得（dry-run では不要）。
+  let googleAccessToken = null;
   if (!isDryRun) {
-    if (!apiKey) {
-      console.error("エラー: 環境変数 ELEVENLABS_API_KEY が未設定です。.env に設定してください。");
+    if (!credsPath) {
+      console.error("エラー: 環境変数 GOOGLE_APPLICATION_CREDENTIALS が未設定です（ナレーション生成に必須）。");
+      console.error("       Google Cloud でサービスアカウントを作成→JSON 鍵をダウンロードし、そのパスを .env に設定してください。");
       console.error("       生成対象の確認だけなら --dry-run を付けて実行できます。");
       process.exit(1);
     }
-    if (!voiceId) {
-      console.error("エラー: 環境変数 ELEVENLABS_VOICE_ID が未設定です（TTS に必須）。");
-      console.error("       ElevenLabs で本番文言を試聴してボイスを確定し、.env に設定してください。");
+    try {
+      const serviceAccount = await readServiceAccount(credsPath);
+      googleAccessToken = await getGoogleAccessToken(serviceAccount);
+    } catch (error) {
+      console.error(`エラー: Google 認証に失敗しました。${error.message}`);
       process.exit(1);
     }
   }
@@ -264,7 +352,10 @@ async function main() {
 
   console.log("=== 音声生成スクリプト ===");
   console.log(`モード: ${isDryRun ? "dry-run（API 非呼び出し）" : "本番生成"}${isForce ? " / force（再生成）" : ""}`);
-  console.log(`ELEVENLABS_API_KEY: ${apiKey ? "設定済み" : "未設定"} / ELEVENLABS_VOICE_ID: ${voiceId ? "設定済み" : "未設定"}`);
+  console.log(
+    `TTS : Google [${googleVoice} / ${googleLanguageCode} / rate ${googleSpeakingRate}]（認証 ${credsPath ? "設定済み" : "未設定"}）`,
+  );
+  console.log(`SFX : ElevenLabs（key ${elevenApiKey ? "設定済み" : "未設定"}）`);
   console.log("");
 
   let generatedCount = 0;
@@ -293,11 +384,23 @@ async function main() {
         continue;
       }
 
+      // 効果音は ElevenLabs キーが無ければスキップ（TTS は止めない）。
+      if (target.kind === "sfx" && !elevenApiKey) {
+        console.warn(`  skip      ${rel}  (効果音用 ELEVENLABS_API_KEY 未設定のためスキップ)`);
+        skippedCount += 1;
+        continue;
+      }
+
       // 実生成。
       try {
         const audio = target.kind === "sfx"
-          ? await fetchSfx(target, { apiKey })
-          : await fetchTts(target, { apiKey, voiceId });
+          ? await fetchSfx(target, { apiKey: elevenApiKey })
+          : await fetchTts(target, {
+              accessToken: googleAccessToken,
+              voice: googleVoice,
+              languageCode: googleLanguageCode,
+              speakingRate: googleSpeakingRate,
+            });
         await writeFile(target.outPath, Buffer.from(audio));
         console.log(`  生成      ${rel}`);
         generatedCount += 1;
