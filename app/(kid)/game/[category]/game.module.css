@@ -1,0 +1,69 @@
+.game {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fade .45s ease both;
+}
+
+/* ごほうび画面（prototype.html の #screen-reward を移植） */
+.reward {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  animation: fade .45s ease both;
+}
+
+.rewardTitle {
+  font-size: clamp(30px, 6vw, 46px);
+  color: var(--tangerine);
+  margin: 10px 0;
+  text-shadow: 0 3px 0 #fff;
+}
+
+.got {
+  font-size: 46px;
+  letter-spacing: 6px;
+  margin: 6px 0 18px;
+}
+
+.btnRow {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.bigBtn {
+  border: none;
+  border-radius: 24px;
+  padding: 18px 30px;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 20px;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .12s;
+}
+
+.bigBtn:active {
+  transform: scale(.95);
+}
+
+.again {
+  background: var(--sunny);
+  color: var(--ink);
+}
+
+.home {
+  background: var(--tangerine);
+}

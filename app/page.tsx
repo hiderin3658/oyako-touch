@@ -1,13 +1,9 @@
-import styles from "./page.module.css";
+import { redirect } from "next/navigation";
 
-// 仮のトップページ。後続Issueで保護者ログイン（/login）へ差し替える前提のプレースホルダ
-export default function Home() {
-  return (
-    <main className={styles.main}>
-      <h1 className={styles.logo}>
-        おやこタッチ<span className={styles.dot}>.</span>
-      </h1>
-      <p className={styles.tagline}>3さいの はじめての まなび</p>
-    </main>
-  );
+/**
+ * ルート（/）。子どもの入口である /home へ送る。
+ * 未認証の場合は /home を保護する RequireAuth が /login へ再誘導する。
+ */
+export default function RootPage(): never {
+  redirect("/home");
 }
