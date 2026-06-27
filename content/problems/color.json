@@ -1,0 +1,42 @@
+{
+  "category": "color",
+  "title": "いろあわせ",
+  "problems": [
+    {
+      "id": "color-001",
+      "category": "color",
+      "type": "select-one",
+      "prompt": { "text": "あかいのは どれかな？", "say": "あかいのは どれかな" },
+      "choices": [
+        { "id": "c1", "label": "あか", "color": "#E5453C", "correct": true },
+        { "id": "c2", "label": "あお", "color": "#3D8BFF", "correct": false },
+        { "id": "c3", "label": "きいろ", "color": "#FFC92E", "correct": false }
+      ],
+      "reward": "sticker-apple"
+    },
+    {
+      "id": "color-002",
+      "category": "color",
+      "type": "select-one",
+      "prompt": { "text": "あおいのは どれかな？", "say": "あおいのは どれかな" },
+      "choices": [
+        { "id": "c1", "label": "みどり", "color": "#4CC95E", "correct": false },
+        { "id": "c2", "label": "あお", "color": "#3D8BFF", "correct": true },
+        { "id": "c3", "label": "あか", "color": "#E5453C", "correct": false }
+      ],
+      "reward": "sticker-fish"
+    },
+    {
+      "id": "color-003",
+      "category": "color",
+      "type": "select-one",
+      "prompt": { "text": "きいろいのは どれかな？", "say": "きいろいのは どれかな" },
+      "choices": [
+        { "id": "c1", "label": "きいろ", "color": "#FFC92E", "correct": true },
+        { "id": "c2", "label": "あか", "color": "#E5453C", "correct": false },
+        { "id": "c3", "label": "みどり", "color": "#4CC95E", "correct": false }
+      ],
+      "reward": "sticker-star"
+    }
+  ]
+}

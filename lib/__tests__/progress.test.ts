@@ -1,0 +1,77 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import {
+  loadProgress,
+  recordLessonClear,
+  addSticker,
+  resetProgress,
+} from "@/lib/progress";
+
+const STORAGE_KEY = "oyako-touch.progress";
+
+describe("progress（localStorage）", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
+  it("保存した内容を loadProgress で取り出せる", () => {
+    recordLessonClear("color", 3);
+    const progress = loadProgress();
+    expect(progress.categories.color.cleared).toBe(1);
+    expect(progress.categories.color.lastStars).toBe(3);
+    expect(progress.categories.shape.cleared).toBe(0);
+  });
+
+  it("recordLessonClear を繰り返すと cleared が加算される", () => {
+    recordLessonClear("shape", 2);
+    const progress = recordLessonClear("shape", 1);
+    expect(progress.categories.shape.cleared).toBe(2);
+    expect(progress.categories.shape.lastStars).toBe(1);
+  });
+
+  it("不正なJSONが保存されていると初期値へ復帰する", () => {
+    window.localStorage.setItem(STORAGE_KEY, "{ こわれた JSON");
+    // 例外を握りつぶさず console.warn でログするので呼び出しを確認
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const progress = loadProgress();
+    expect(progress.categories.color.cleared).toBe(0);
+    expect(progress.stickers).toEqual([]);
+    expect(warnSpy).toHaveBeenCalled();
+    warnSpy.mockRestore();
+  });
+
+  it("addSticker は重複を排除する", () => {
+    addSticker("sticker-apple");
+    const progress = addSticker("sticker-apple");
+    expect(progress.stickers).toEqual(["sticker-apple"]);
+    const progress2 = addSticker("sticker-star");
+    expect(progress2.stickers).toEqual(["sticker-apple", "sticker-star"]);
+  });
+
+  it("resetProgress で保存内容が消える", () => {
+    addSticker("sticker-apple");
+    resetProgress();
+    expect(loadProgress().stickers).toEqual([]);
+  });
+});
+
+describe("progress（SSR：window未定義）", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("window未定義でも loadProgress はクラッシュせず初期値を返す", () => {
+    vi.stubGlobal("window", undefined);
+    const progress = loadProgress();
+    expect(progress.categories.color.cleared).toBe(0);
+    expect(progress.stickers).toEqual([]);
+  });
+
+  it("window未定義でも書き込み系はクラッシュしない（no-op）", () => {
+    vi.stubGlobal("window", undefined);
+    expect(() => {
+      recordLessonClear("color", 3);
+      addSticker("sticker-apple");
+      resetProgress();
+    }).not.toThrow();
+  });
+});

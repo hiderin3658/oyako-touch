@@ -1,0 +1,42 @@
+{
+  "category": "shape",
+  "title": "かたちはめ",
+  "problems": [
+    {
+      "id": "shape-001",
+      "category": "shape",
+      "type": "select-one",
+      "prompt": { "text": "まるは どれかな？", "say": "まるは どれかな" },
+      "choices": [
+        { "id": "s1", "label": "まる", "shape": "circle", "color": "#7FB8E8", "correct": true },
+        { "id": "s2", "label": "しかく", "shape": "square", "color": "#F2A65A", "correct": false },
+        { "id": "s3", "label": "さんかく", "shape": "triangle", "color": "#8FC97F", "correct": false }
+      ],
+      "reward": "sticker-circle"
+    },
+    {
+      "id": "shape-002",
+      "category": "shape",
+      "type": "select-one",
+      "prompt": { "text": "さんかくは どれかな？", "say": "さんかくは どれかな" },
+      "choices": [
+        { "id": "s1", "label": "さんかく", "shape": "triangle", "color": "#8FC97F", "correct": true },
+        { "id": "s2", "label": "まる", "shape": "circle", "color": "#7FB8E8", "correct": false },
+        { "id": "s3", "label": "しかく", "shape": "square", "color": "#F2A65A", "correct": false }
+      ],
+      "reward": "sticker-triangle"
+    },
+    {
+      "id": "shape-003",
+      "category": "shape",
+      "type": "select-one",
+      "prompt": { "text": "しかくは どれかな？", "say": "しかくは どれかな" },
+      "choices": [
+        { "id": "s1", "label": "しかく", "shape": "square", "color": "#F2A65A", "correct": true },
+        { "id": "s2", "label": "さんかく", "shape": "triangle", "color": "#8FC97F", "correct": false },
+        { "id": "s3", "label": "まる", "shape": "circle", "color": "#7FB8E8", "correct": false }
+      ],
+      "reward": "sticker-square"
+    }
+  ]
+}
