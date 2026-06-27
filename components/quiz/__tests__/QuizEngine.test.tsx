@@ -50,9 +50,12 @@ describe("QuizEngine", () => {
     clickChoice(correctLabel(lesson, 0));
     // 星が1に増える
     expect(screen.getByRole("img", { name: /ほし 1/ })).toBeInTheDocument();
+    // 「せいかい！」を言葉で表示する
+    expect(screen.getByText("せいかい！")).toBeInTheDocument();
 
-    // 正解演出後に次の問題へ
+    // 正解演出後に次の問題へ進み、「せいかい！」は消える
     advance(1100);
+    expect(screen.queryByText("せいかい！")).toBeNull();
     expect(screen.getByText(lesson.problems[1].prompt.text)).toBeInTheDocument();
   });
 
@@ -64,14 +67,17 @@ describe("QuizEngine", () => {
     const wrong = (lesson.problems[0].choices as Choice[]).find((choice) => !choice.correct);
     clickChoice(wrong!.label);
 
-    // フェイル表現を出さない
+    // フェイル表現（×・ふせいかい）は出さない
     expect(screen.queryByText("×")).toBeNull();
     expect(screen.queryByText(/ふせいかい/)).toBeNull();
+    // 代わりにやさしい「もういちど！」を表示する
+    expect(screen.getByText("もういちど！")).toBeInTheDocument();
     // 星は増えない
     expect(screen.getByRole("img", { name: /ほし 0/ })).toBeInTheDocument();
 
-    // 誤答演出後も同じ問題のまま・完了もしない
-    advance(600);
+    // 誤答演出後は「もういちど！」が消え、同じ問題のまま・完了もしない
+    advance(1100);
+    expect(screen.queryByText("もういちど！")).toBeNull();
     expect(screen.getByText(lesson.problems[0].prompt.text)).toBeInTheDocument();
     expect(onComplete).not.toHaveBeenCalled();
   });
