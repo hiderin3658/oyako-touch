@@ -82,19 +82,8 @@
   color: var(--sky);
 }
 
-.locked {
-  filter: grayscale(.6) opacity(.6);
-  cursor: default;
-}
-
-.locked:active {
-  transform: none;
-}
-
-.soon {
-  font-size: 13px;
-  color: var(--ink-soft);
-  font-weight: 700;
+.number .label {
+  color: var(--grape);
 }
 
 .hint {
