@@ -24,6 +24,20 @@ vi.mock("next/navigation", () => ({
   useParams: () => paramsRef.current,
 }));
 
+// next-auth/react をモックし、認証済みセッションとして描画する
+// （ParentLock が useAuth＝useSession に依存するため）
+vi.mock("next-auth/react", () => ({
+  SessionProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
+  useSession: () => ({
+    data: { user: { email: "a@example.com" } },
+    status: "authenticated",
+  }),
+  signIn: vi.fn(),
+  signOut: vi.fn(),
+}));
+
 // QuizEngine の演出タイマーを決定的に進めるためフェイクタイマーを使う
 beforeEach(() => {
   vi.useFakeTimers();

@@ -1,82 +1,58 @@
 "use client";
 
+import { createContext, useContext, useMemo } from "react";
 import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import {
-  clearSession,
-  loadSession,
-  saveSession,
-  SIGN_IN_DURATION_MS,
-} from "@/lib/auth/mockAuth";
+  SessionProvider,
+  signIn as nextAuthSignIn,
+  signOut as nextAuthSignOut,
+  useSession,
+} from "next-auth/react";
 
-/** 認証状態。loading は初期判定中、authenticating はログイン演出中 */
-export type AuthStatus =
-  | "loading"
-  | "unauthenticated"
-  | "authenticating"
-  | "authenticated";
+/** 認証状態。loading は初期判定中（セッション取得待ち） */
+export type AuthStatus = "loading" | "unauthenticated" | "authenticated";
 
 interface AuthContextValue {
   status: AuthStatus;
-  /** ログイン演出（約2.2s）を経て authenticated にする */
-  signIn: () => Promise<void>;
-  /** セッションを破棄して unauthenticated にする */
-  signOut: () => void;
+  /** Google でのログインを開始する（next-auth/react の signIn へ委譲） */
+  signIn: typeof nextAuthSignIn;
+  /** ログアウトする（next-auth/react の signOut へ委譲） */
+  signOut: typeof nextAuthSignOut;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 /**
- * 認証状態を提供する Context Provider（モック実装）。
- * 認証の差し替えはこの Provider と lib/auth/mockAuth に閉じる。
+ * 認証状態を提供する Context Provider。
+ * 内部は next-auth の SessionProvider / useSession を裏打ちにし、
+ * 画面側は従来どおり useAuth（status/signIn/signOut）だけを参照すればよい。
  */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [status, setStatus] = useState<AuthStatus>("loading");
-  // ログイン演出の setTimeout を保持し、unmount/signOut 時にクリアする
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // 初回マウントでセッション有無を見て loading を確定させる
-  useEffect(() => {
-    setStatus(loadSession() ? "authenticated" : "unauthenticated");
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    };
-  }, []);
-
-  const signIn = useCallback((): Promise<void> => {
-    return new Promise<void>((resolve) => {
-      setStatus("authenticating");
-      // プロトタイプ演出の時間を経てからセッション保存＋authenticated へ
-      timerRef.current = setTimeout(() => {
-        saveSession({ authenticatedAt: Date.now() });
-        setStatus("authenticated");
-        resolve();
-      }, SIGN_IN_DURATION_MS);
-    });
-  }, []);
-
-  const signOut = useCallback((): void => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-    clearSession();
-    setStatus("unauthenticated");
-  }, []);
-
   return (
-    <AuthContext.Provider value={{ status, signIn, signOut }}>
-      {children}
-    </AuthContext.Provider>
+    <SessionProvider>
+      <AuthStateBridge>{children}</AuthStateBridge>
+    </SessionProvider>
   );
+}
+
+/**
+ * useSession の状態を AuthContext へ橋渡しする内部コンポーネント。
+ * useSession は SessionProvider の内側でしか呼べないため層を分けている。
+ */
+function AuthStateBridge({ children }: { children: React.ReactNode }) {
+  // next-auth の status は "loading" | "authenticated" | "unauthenticated" で
+  // 本アプリの AuthStatus と一致するため、そのまま受け渡す。
+  const { status } = useSession();
+
+  const value = useMemo<AuthContextValue>(
+    () => ({
+      status,
+      signIn: nextAuthSignIn,
+      signOut: nextAuthSignOut,
+    }),
+    [status],
+  );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 /** 認証状態とログイン操作を取得する。AuthProvider の内側でのみ使用可 */

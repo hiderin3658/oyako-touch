@@ -2,25 +2,31 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { ParentLock } from "@/components/ParentLock";
 import { AuthProvider } from "@/components/auth/AuthProvider";
-import { SESSION_STORAGE_KEY } from "@/lib/auth/mockAuth";
 
-const { replaceMock } = vi.hoisted(() => ({ replaceMock: vi.fn() }));
+// next-auth/react をモックする。ParentLock は認証済み前提で開かれるため authenticated を返す。
+const { useSessionMock, signInMock, signOutMock } = vi.hoisted(() => ({
+  useSessionMock: vi.fn(),
+  signInMock: vi.fn(),
+  signOutMock: vi.fn(),
+}));
 
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({
-    push: vi.fn(),
-    replace: replaceMock,
-    prefetch: vi.fn(),
-    back: vi.fn(),
-    forward: vi.fn(),
-    refresh: vi.fn(),
-  }),
+vi.mock("next-auth/react", () => ({
+  SessionProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
+  useSession: () => useSessionMock(),
+  signIn: signInMock,
+  signOut: signOutMock,
 }));
 
 beforeEach(() => {
   vi.useFakeTimers();
   window.localStorage.clear();
-  replaceMock.mockClear();
+  vi.clearAllMocks();
+  useSessionMock.mockReturnValue({
+    data: { user: { email: "a@example.com" } },
+    status: "authenticated",
+  });
 });
 afterEach(() => {
   vi.clearAllTimers();
@@ -66,11 +72,7 @@ describe("ParentLock", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
-  it("ログアウトでセッションを破棄し /login へ遷移する", () => {
-    window.localStorage.setItem(
-      SESSION_STORAGE_KEY,
-      JSON.stringify({ authenticatedAt: Date.now() }),
-    );
+  it("ログアウトで signOut({ redirectTo: '/login' }) を呼ぶ", () => {
     renderLock();
     const lock = screen.getByRole("button", { name: "保護者メニュー" });
 
@@ -78,7 +80,6 @@ describe("ParentLock", () => {
     advance(1400);
     fireEvent.click(screen.getByText("ログアウト"));
 
-    expect(window.localStorage.getItem(SESSION_STORAGE_KEY)).toBeNull();
-    expect(replaceMock).toHaveBeenCalledWith("/login");
+    expect(signOutMock).toHaveBeenCalledWith({ redirectTo: "/login" });
   });
 });

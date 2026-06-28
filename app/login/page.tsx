@@ -1,25 +1,39 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Mascot } from "@/components/Mascot";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { unlockAudio } from "@/lib/audio";
-import { SIGN_IN_STEPS, type SignInStep } from "@/lib/auth/mockAuth";
 import styles from "./login.module.css";
 
+// 許可リスト外などでログインが拒否されたときに表示する文言。
+// Auth.js は signIn コールバックで false を返すと error=AccessDenied で /login に戻す。
+const NOT_ALLOWED_MESSAGE =
+  "このメールアドレスはログインを許可されていません。おうちの方のアカウントでログインしてください。";
+
 /**
- * 保護者ログイン画面（モック）。
- * Googleボタンで signIn() を呼び、許可リスト確認の演出を段階表示する。
- * authenticated になったら /home へ送る。
+ * 保護者ログイン画面。
+ * Google ボタンで signIn("google") を呼ぶと別ページ（Google）へ遷移するため、
+ * 演出は段階表示せず「ログイン中…」の簡易表示＋ボタン無効化に集約する。
+ * 許可リスト外メールで戻された場合は error クエリを読み、案内文を表示する。
+ *
+ * useSearchParams を使うため、Next.js の要件に従い Suspense 境界で包む。
  */
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginScreen />
+    </Suspense>
+  );
+}
+
+function LoginScreen() {
   const { status, signIn } = useAuth();
   const router = useRouter();
-  // 現在表示中のログイン演出ステップ（未開始は null）
-  const [currentStep, setCurrentStep] = useState<SignInStep | null>(null);
-  // 演出メッセージ用の setTimeout を保持し、unmount 時にクリアする
-  const stepTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const searchParams = useSearchParams();
+  // Google へリダイレクト中はボタンを無効化し「ログイン中…」を表示する
+  const [isSigningIn, setIsSigningIn] = useState(false);
 
   // 認証済みならこのページに留まらず /home へ
   useEffect(() => {
@@ -28,27 +42,20 @@ export default function LoginPage() {
     }
   }, [status, router]);
 
-  useEffect(() => {
-    const timers = stepTimersRef.current;
-    return () => {
-      timers.forEach(clearTimeout);
-    };
-  }, []);
+  // Auth.js から戻された error（許可リスト外なら AccessDenied）を案内文に変換する
+  const errorCode = searchParams.get("error");
+  const errorMessage = errorCode ? NOT_ALLOWED_MESSAGE : "";
 
   const handleLogin = (): void => {
     // 二重起動防止
-    if (status === "authenticating") {
+    if (isSigningIn) {
       return;
     }
     // 最初のユーザー操作で音声を解錠する（自動再生ポリシー対策）
     unlockAudio();
-    // 「ログイン中… → 許可リスト確認 → ようこそ」を順に表示する
-    SIGN_IN_STEPS.forEach((step) => {
-      const timerId = setTimeout(() => setCurrentStep(step), step.atMs);
-      stepTimersRef.current.push(timerId);
-    });
-    // 認証完了後の /home 遷移は status を監視する useEffect が担う
-    void signIn();
+    setIsSigningIn(true);
+    // Google の認証ページへ遷移する。成功後は /home へ戻す
+    void signIn("google", { redirectTo: "/home" });
   };
 
   return (
@@ -71,7 +78,7 @@ export default function LoginPage() {
           type="button"
           className={styles.googleBtn}
           onClick={handleLogin}
-          disabled={status === "authenticating"}
+          disabled={isSigningIn}
           data-testid="google-login"
         >
           <svg className={styles.gicon} viewBox="0 0 48 48" aria-hidden="true">
@@ -97,17 +104,15 @@ export default function LoginPage() {
 
         <div
           className={styles.status}
-          data-tone={currentStep?.tone ?? "progress"}
+          data-tone={errorMessage ? "error" : "progress"}
           role="status"
           aria-live="polite"
         >
-          {currentStep?.message ?? ""}
+          {errorMessage || (isSigningIn ? "ログイン中…" : "")}
         </div>
 
         <p className={styles.note}>
-          ※ プロトタイプのため<b>モック動作</b>です。
-          <br />
-          本番は <b>許可リストに登録したメールだけ</b>がログイン可（DB不使用）。
+          ログインできるのは<b>許可リストに登録したメール</b>だけです（DB不使用）。
         </p>
       </div>
     </main>

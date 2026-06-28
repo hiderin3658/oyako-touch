@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { loadProgress, type Progress } from "@/lib/progress";
 import styles from "./ParentLock.module.css";
@@ -15,7 +14,6 @@ const HOLD_THRESHOLD_MS = 1400;
  * native confirm() は使わず、アプリ内オーバーレイで完結させる。
  */
 export function ParentLock() {
-  const router = useRouter();
   const { signOut } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   // メニューを開いた時点の進捗スナップショット
@@ -49,8 +47,8 @@ export function ParentLock() {
 
   const handleSignOut = (): void => {
     setIsMenuOpen(false);
-    signOut();
-    router.replace("/login");
+    // セッション破棄後の /login 遷移は next-auth/react 側の redirectTo に任せる
+    void signOut({ redirectTo: "/login" });
   };
 
   const clearedTotal = progress

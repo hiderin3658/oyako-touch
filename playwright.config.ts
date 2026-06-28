@@ -31,5 +31,13 @@ export default defineConfig({
     // ローカルは既存サーバを再利用、CI は毎回新規起動
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
+    // E2E 専用の認証バイパスを有効化する（実 OAuth を踏まないため）。
+    // E2E_TEST_AUTH=true のときだけテスト用 Credentials provider が登録される。
+    // AUTH_SECRET はテスト用の固定値（本番秘密ではない）。
+    env: {
+      E2E_TEST_AUTH: "true",
+      ALLOWED_EMAILS: "parent@example.com",
+      AUTH_SECRET: "e2e-test-secret-not-for-production",
+    },
   },
 });
