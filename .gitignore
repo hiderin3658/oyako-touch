@@ -28,6 +28,11 @@ yarn-error.log*
 gcp-tts-key.json
 *-sa-key.json
 
+# 音声の比較実験用（Gemini TTS の出力・本番アセットではない）
+/public/audio/_compare/
+# 声の比較サンプル（実験の残骸・本番配信しない）
+/public/audio/sample/
+
 # TypeScript
 *.tsbuildinfo
 
