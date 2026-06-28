@@ -94,6 +94,40 @@ describe("ShapeChoice", () => {
     rerender(<ShapeChoice choice={triangle} state="idle" onSelect={() => {}} />);
     expect(screen.getByRole("button").querySelector("svg path")).toBeInTheDocument();
   });
+
+  it("star / heart は path 要素、ellipse は ellipse 要素を描画する", () => {
+    const star: ShapeChoiceData = {
+      id: "s4",
+      label: "ほし",
+      shape: "star",
+      color: "#FFC92E",
+      correct: true,
+    };
+    const { rerender } = render(
+      <ShapeChoice choice={star} state="idle" onSelect={() => {}} />,
+    );
+    expect(screen.getByRole("button").querySelector("svg path")).toBeInTheDocument();
+
+    const heart: ShapeChoiceData = {
+      id: "s5",
+      label: "ハート",
+      shape: "heart",
+      color: "#FF5E8A",
+      correct: false,
+    };
+    rerender(<ShapeChoice choice={heart} state="idle" onSelect={() => {}} />);
+    expect(screen.getByRole("button").querySelector("svg path")).toBeInTheDocument();
+
+    const ellipse: ShapeChoiceData = {
+      id: "s6",
+      label: "だえん",
+      shape: "ellipse",
+      color: "#4FC3F7",
+      correct: false,
+    };
+    rerender(<ShapeChoice choice={ellipse} state="idle" onSelect={() => {}} />);
+    expect(screen.getByRole("button").querySelector("svg ellipse")).toBeInTheDocument();
+  });
 });
 
 describe("NumberChoice", () => {

@@ -22,9 +22,18 @@ export interface ColorChoice extends ChoiceBase {
   color: string;
 }
 
+/** 図形種別。ほし・ハート・だ円を含む（レンダラと共有する単一情報源） */
+export type ShapeKind =
+  | "circle"
+  | "square"
+  | "triangle"
+  | "star"
+  | "heart"
+  | "ellipse";
+
 /** かたちはめの選択肢（図形＋塗り色） */
 export interface ShapeChoice extends ChoiceBase {
-  shape: "circle" | "square" | "triangle";
+  shape: ShapeKind;
   color: string;
 }
 
