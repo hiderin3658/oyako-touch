@@ -1,9 +1,7 @@
 "use client";
 
-import type { Choice } from "@/lib/types";
+import type { Choice, ShapeKind } from "@/lib/types";
 import styles from "./Choice.module.css";
-
-type ShapeKind = "circle" | "square" | "triangle";
 
 interface ShapeChoiceProps {
   choice: Choice;
@@ -48,6 +46,36 @@ function ShapeFigure({ shape, color }: { shape: ShapeKind; color: string }) {
       </svg>
     );
   }
+  if (shape === "ellipse") {
+    return (
+      <svg className={styles.shape} viewBox="0 0 100 100" aria-hidden="true">
+        <ellipse cx="50" cy="50" rx="44" ry="30" fill={color} />
+      </svg>
+    );
+  }
+  if (shape === "star") {
+    return (
+      <svg className={styles.shape} viewBox="0 0 100 100" aria-hidden="true">
+        <path
+          d="M50 8 L61 38 L93 38 L67 58 L77 90 L50 70 L23 90 L33 58 L7 38 L39 38 Z"
+          fill={color}
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+  if (shape === "heart") {
+    return (
+      <svg className={styles.shape} viewBox="0 0 100 100" aria-hidden="true">
+        <path
+          d="M50 84 C50 84 12 58 12 34 C12 21 22 13 33 13 C41 13 47 18 50 25 C53 18 59 13 67 13 C78 13 88 21 88 34 C88 58 50 84 50 84 Z"
+          fill={color}
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+  // triangle（既定）
   return (
     <svg className={styles.shape} viewBox="0 0 100 100" aria-hidden="true">
       <path d="M50 12 L90 86 L10 86 Z" fill={color} strokeLinejoin="round" />
