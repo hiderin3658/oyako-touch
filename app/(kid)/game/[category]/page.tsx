@@ -6,7 +6,7 @@ import { QuizEngine } from "@/components/quiz/QuizEngine";
 import { Sparkles } from "@/components/quiz/Sparkles";
 import { Mascot } from "@/components/Mascot";
 import { ParentLock } from "@/components/ParentLock";
-import { loadLesson } from "@/lib/problems";
+import { loadLesson, pickProblems, SESSION_QUESTION_COUNT } from "@/lib/problems";
 import { addSticker, recordLessonClear } from "@/lib/progress";
 import { playPhrase } from "@/lib/audio";
 import type { Category, Lesson } from "@/lib/types";
@@ -53,6 +53,16 @@ export default function GamePage() {
   // 「もういちど」で QuizEngine を再マウントするためのキー
   const [playCount, setPlayCount] = useState(0);
 
+  // プールから今回出題する SESSION_QUESTION_COUNT 問を抽出したレッスン。
+  // playCount を依存に含めることで「もういちど」のたびに別の5問が再抽選され、
+  // 1プレイ中は安定する（毎レンダーで選び直さない）。lesson が null なら null。
+  const sessionLesson = useMemo<Lesson | null>(
+    () => (lesson ? pickProblems(lesson, SESSION_QUESTION_COUNT) : null),
+    // playCount は「再抽選トリガ」で値自体は抽出に使わないため exhaustive-deps を無効化する
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [lesson, playCount],
+  );
+
   useEffect(() => {
     if (!isCategory(category)) {
       router.replace("/home");
@@ -68,16 +78,17 @@ export default function GamePage() {
 
   const handleComplete = useCallback(
     (earnedStars: number): void => {
-      if (!lesson) {
+      if (!sessionLesson) {
         return;
       }
-      // 進捗（クリア数・直近星数）とごほうびシールを保存する
-      recordLessonClear(lesson.category, earnedStars);
-      addSticker(resolveRewardId(lesson));
+      // 進捗（クリア数・直近星数）とごほうびシールを保存する。
+      // ごほうびは実際に出題したレッスン（抽出後）から決定する
+      recordLessonClear(sessionLesson.category, earnedStars);
+      addSticker(resolveRewardId(sessionLesson));
       setStars(earnedStars);
       setPhase("reward");
     },
-    [lesson],
+    [sessionLesson],
   );
 
   const handleAgain = useCallback((): void => {
@@ -88,7 +99,7 @@ export default function GamePage() {
   }, []);
 
   // リダイレクト待ち（不正カテゴリ）の間は何も描画しない
-  if (!lesson) {
+  if (!lesson || !sessionLesson) {
     return null;
   }
 
@@ -126,7 +137,11 @@ export default function GamePage() {
 
   return (
     <main className={styles.game}>
-      <QuizEngine key={playCount} lesson={lesson} onComplete={handleComplete} />
+      <QuizEngine
+        key={playCount}
+        lesson={sessionLesson}
+        onComplete={handleComplete}
+      />
       <ParentLock />
     </main>
   );
