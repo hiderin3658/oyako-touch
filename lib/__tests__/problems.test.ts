@@ -22,16 +22,17 @@ function makeValidLesson() {
 }
 
 describe("loadLesson", () => {
-  it("color レッスンを3問読み込める", () => {
+  // 問題数は将来増える可能性があるため、固定値ではなく下限（3問以上）で検証する
+  it("color レッスンを読み込める（3問以上）", () => {
     const lesson = loadLesson("color");
     expect(lesson.category).toBe("color");
-    expect(lesson.problems).toHaveLength(3);
+    expect(lesson.problems.length).toBeGreaterThanOrEqual(3);
   });
 
-  it("shape レッスンを3問読み込める", () => {
+  it("shape レッスンを読み込める（3問以上）", () => {
     const lesson = loadLesson("shape");
     expect(lesson.category).toBe("shape");
-    expect(lesson.problems).toHaveLength(3);
+    expect(lesson.problems.length).toBeGreaterThanOrEqual(3);
   });
 });
 
@@ -78,7 +79,9 @@ describe("validateLesson", () => {
 
   it("category が不正な値なら throw する", () => {
     const lesson = makeValidLesson();
-    lesson.category = "number";
+    // 将来 "number" 種目が valid 化されてもこのテストが壊れないよう、
+    // 恒久的に無効な値を使う
+    lesson.category = "banana";
     expect(() => validateLesson(lesson)).toThrow(/category が不正/);
   });
 
