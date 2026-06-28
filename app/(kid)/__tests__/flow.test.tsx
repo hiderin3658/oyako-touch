@@ -5,6 +5,7 @@ import GamePage from "@/app/(kid)/game/[category]/page";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { loadLesson } from "@/lib/problems";
 import { loadProgress } from "@/lib/progress";
+import type { Lesson } from "@/lib/types";
 
 // next/navigation はテストでモックする（ルーター遷移は副作用呼び出しで検証）
 const { pushMock, replaceMock, paramsRef } = vi.hoisted(() => ({
@@ -62,9 +63,9 @@ function clickCorrectChoice(): void {
   fireEvent.click(correct);
 }
 
-/** 3問すべて正解してごほうび到達まで進める */
-function clearLesson(): void {
-  for (let index = 0; index < 3; index++) {
+/** レッスンの全問を正解してごほうび到達まで進める（問題数に依存しない） */
+function clearLesson(lesson: Lesson): void {
+  for (let index = 0; index < lesson.problems.length; index++) {
     clickCorrectChoice();
     advance(1100);
   }
@@ -90,12 +91,12 @@ describe("おうち画面", () => {
 });
 
 describe("ゲーム画面（color）", () => {
-  it("3問正解でごほうびが表示され、進捗のクリア数が増える", () => {
+  it("全問正解でごほうびが表示され、進捗のクリア数が増える", () => {
     paramsRef.current = { category: "color" };
     expect(loadProgress().categories.color.cleared).toBe(0);
 
     renderWithAuth(<GamePage />);
-    clearLesson();
+    clearLesson(loadLesson("color"));
 
     expect(screen.getByTestId("reward")).toBeInTheDocument();
     expect(screen.getByText("よく できました！")).toBeInTheDocument();
@@ -108,7 +109,7 @@ describe("ゲーム画面（color）", () => {
     const lesson = loadLesson("color");
 
     renderWithAuth(<GamePage />);
-    clearLesson();
+    clearLesson(lesson);
 
     fireEvent.click(screen.getByTestId("reward-again"));
 
@@ -122,7 +123,7 @@ describe("ゲーム画面（color）", () => {
   it("「おうちに もどる」で /home へ遷移する", () => {
     paramsRef.current = { category: "color" };
     renderWithAuth(<GamePage />);
-    clearLesson();
+    clearLesson(loadLesson("color"));
 
     fireEvent.click(screen.getByTestId("reward-home"));
     expect(pushMock).toHaveBeenCalledWith("/home");
@@ -130,12 +131,12 @@ describe("ゲーム画面（color）", () => {
 });
 
 describe("ゲーム画面（shape）", () => {
-  it("3問正解でごほうびが表示され、進捗のクリア数が増える", () => {
+  it("全問正解でごほうびが表示され、進捗のクリア数が増える", () => {
     paramsRef.current = { category: "shape" };
     expect(loadProgress().categories.shape.cleared).toBe(0);
 
     renderWithAuth(<GamePage />);
-    clearLesson();
+    clearLesson(loadLesson("shape"));
 
     expect(screen.getByTestId("reward")).toBeInTheDocument();
     expect(loadProgress().categories.shape.cleared).toBe(1);

@@ -82,16 +82,17 @@ describe("QuizEngine", () => {
     expect(onComplete).not.toHaveBeenCalled();
   });
 
-  it("3問すべて正解すると onComplete(stars) が呼ばれる（color）", () => {
+  it("全問正解すると onComplete(stars=問題数) が呼ばれる（color）", () => {
     const lesson = loadLesson("color");
     const onComplete = vi.fn();
     render(<QuizEngine lesson={lesson} onComplete={onComplete} />);
 
+    // 問題数に依存せず、全問正解で星＝問題数になることを検証する
     for (let index = 0; index < lesson.problems.length; index++) {
       clickChoice(correctLabel(lesson, index));
       advance(1100);
     }
-    expect(onComplete).toHaveBeenCalledWith(3);
+    expect(onComplete).toHaveBeenCalledWith(lesson.problems.length);
   });
 
   it("shape の Lesson でも図形を描画して進行できる", () => {
