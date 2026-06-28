@@ -3,9 +3,7 @@ import { render, screen, fireEvent, act } from "@testing-library/react";
 import HomePage from "@/app/(kid)/home/page";
 import GamePage from "@/app/(kid)/game/[category]/page";
 import { AuthProvider } from "@/components/auth/AuthProvider";
-import { loadLesson } from "@/lib/problems";
 import { loadProgress } from "@/lib/progress";
-import type { Lesson } from "@/lib/types";
 
 // next/navigation はテストでモックする（ルーター遷移は副作用呼び出しで検証）
 const { pushMock, replaceMock, paramsRef } = vi.hoisted(() => ({
@@ -63,12 +61,20 @@ function clickCorrectChoice(): void {
   fireEvent.click(correct);
 }
 
-/** レッスンの全問を正解してごほうび到達まで進める（問題数に依存しない） */
-function clearLesson(lesson: Lesson): void {
-  for (let index = 0; index < lesson.problems.length; index++) {
+/**
+ * ごほうび(reward)が出るまで正解を押し続けて完走する（出題数に依存しない）。
+ * プールから5問抽出されるため固定回数ループは使わず、e2e と同様に到達で判定する。
+ */
+function clearLesson(): void {
+  // 万一ごほうびに到達しない場合の無限ループ防止（プール最大でも十分な上限）
+  for (let guard = 0; guard < 100; guard++) {
+    if (screen.queryByTestId("reward")) {
+      return;
+    }
     clickCorrectChoice();
     advance(1100);
   }
+  throw new Error("ごほうびに到達しませんでした");
 }
 
 describe("おうち画面", () => {
@@ -97,7 +103,7 @@ describe("ゲーム画面（color）", () => {
     expect(loadProgress().categories.color.cleared).toBe(0);
 
     renderWithAuth(<GamePage />);
-    clearLesson(loadLesson("color"));
+    clearLesson();
 
     expect(screen.getByTestId("reward")).toBeInTheDocument();
     expect(screen.getByText("よく できました！")).toBeInTheDocument();
@@ -107,24 +113,23 @@ describe("ゲーム画面（color）", () => {
 
   it("「もういちど」で同種目が最初から再開する", () => {
     paramsRef.current = { category: "color" };
-    const lesson = loadLesson("color");
 
     renderWithAuth(<GamePage />);
-    clearLesson(lesson);
+    clearLesson();
 
     fireEvent.click(screen.getByTestId("reward-again"));
 
-    // 1問目の設問と星0に戻る（QuizEngine 再マウント）
-    expect(
-      screen.getByText(lesson.problems[0].prompt.text),
-    ).toBeInTheDocument();
+    // QuizEngine が再マウントされ、ごほうびが消えて星0の出題中に戻る。
+    // 抽出はランダムなので特定の設問文には依存しない（出題が再開していることを確認）。
+    expect(screen.queryByTestId("reward")).not.toBeInTheDocument();
     expect(screen.getByRole("img", { name: /ほし 0/ })).toBeInTheDocument();
+    expect(screen.getAllByTestId("choice").length).toBeGreaterThan(0);
   });
 
   it("「おうちに もどる」で /home へ遷移する", () => {
     paramsRef.current = { category: "color" };
     renderWithAuth(<GamePage />);
-    clearLesson(loadLesson("color"));
+    clearLesson();
 
     fireEvent.click(screen.getByTestId("reward-home"));
     expect(pushMock).toHaveBeenCalledWith("/home");
@@ -137,7 +142,7 @@ describe("ゲーム画面（shape）", () => {
     expect(loadProgress().categories.shape.cleared).toBe(0);
 
     renderWithAuth(<GamePage />);
-    clearLesson(loadLesson("shape"));
+    clearLesson();
 
     expect(screen.getByTestId("reward")).toBeInTheDocument();
     expect(loadProgress().categories.shape.cleared).toBe(1);
@@ -150,7 +155,7 @@ describe("ゲーム画面（number）", () => {
     expect(loadProgress().categories.number.cleared).toBe(0);
 
     renderWithAuth(<GamePage />);
-    clearLesson(loadLesson("number"));
+    clearLesson();
 
     expect(screen.getByTestId("reward")).toBeInTheDocument();
     expect(loadProgress().categories.number.cleared).toBe(1);

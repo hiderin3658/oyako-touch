@@ -75,8 +75,12 @@ test("誤答してもフェイル表示が出ず同じ問題に留まり、正�
   await loginAndReachHome(page);
   await page.getByTestId("tile-color").click();
 
-  // 1問目（あか）が出ていること。先頭問題の出題順は今後も保持される前提
-  await expect(page.getByText("あかいのは どれかな？")).toBeVisible();
+  // 出題中になってから、いま表示中の設問文を控える。
+  // プールから5問がランダム抽出されるため、特定の設問文には依存しない。
+  await expect(unlockedChoices(page)).toBeVisible();
+  const question = page.locator("p").first();
+  const firstQuestion = (await question.textContent())?.trim() ?? "";
+  expect(firstQuestion.length).toBeGreaterThan(0);
   await expect(correctChoice(page)).toBeVisible();
 
   // 誤答を1つタップ
@@ -88,7 +92,7 @@ test("誤答してもフェイル表示が出ず同じ問題に留まり、正�
   // ごほうびに進んでいないこと
   await expect(page.getByTestId("reward")).toHaveCount(0);
   // 同じ問題に留まっていること（設問そのまま・星は1つも点いていない）
-  await expect(page.getByText("あかいのは どれかな？")).toBeVisible();
+  await expect(question).toHaveText(firstQuestion);
   await expect(page.locator('[data-on="true"]')).toHaveCount(0);
 
   // 誤答演出が明けて再び出題中（ロック解除）になってから正解をタップする
@@ -96,8 +100,8 @@ test("誤答してもフェイル表示が出ず同じ問題に留まり、正�
   await correctChoice(page).click();
   // 正解が反映され星が1つ点く（総数には依存しない）
   await expect(page.locator('[data-on="true"]')).toHaveCount(1);
-  // 次の問題へ前進すること。先頭付近の出題順は今後も保持される前提
-  await expect(page.getByText("あおいのは どれかな？")).toBeVisible();
+  // 次の問題へ前進すること（設問文が変わる）
+  await expect(question).not.toHaveText(firstQuestion);
 });
 
 test("かたちレッスンで1問正解できる", async ({ page }) => {
@@ -106,10 +110,8 @@ test("かたちレッスンで1問正解できる", async ({ page }) => {
   // おうち → かたち
   await page.getByTestId("tile-shape").click();
 
-  // 1問目（まる）が出ていること。先頭問題の出題順は今後も保持される前提
-  await expect(page.getByText("まるは どれかな？")).toBeVisible();
-
-  // 出題中（ロック解除）になってから正解をタップし、星が1つ点くこと（総数には依存しない）
+  // 出題中（ロック解除）になってから正解をタップし、星が1つ点くこと（総数には依存しない）。
+  // プールから5問がランダム抽出されるため、特定の設問文には依存しない。
   await expect(unlockedChoices(page)).toBeVisible();
   await correctChoice(page).click();
   await expect(page.locator('[data-on="true"]')).toHaveCount(1);
