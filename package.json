@@ -15,7 +15,8 @@
     "gen:audio": "node --env-file=.env scripts/gen-audio.mjs",
     "gen:audio:dry": "node --env-file=.env scripts/gen-audio.mjs --dry-run",
     "gen:audio:gemini": "node --env-file=.env scripts/gen-audio-gemini.mjs",
-    "gen:audio:gemini:dry": "node --env-file=.env scripts/gen-audio-gemini.mjs --dry-run"
+    "gen:audio:gemini:dry": "node --env-file=.env scripts/gen-audio-gemini.mjs --dry-run",
+    "gen:audio:gemini:prod": "node --env-file=.env scripts/gen-audio-gemini.mjs --prod --force"
   },
   "dependencies": {
     "next": "^15.1.0",
