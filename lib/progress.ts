@@ -16,6 +16,7 @@ function createInitialProgress(): Progress {
     categories: {
       color: { cleared: 0, lastStars: 0 },
       shape: { cleared: 0, lastStars: 0 },
+      number: { cleared: 0, lastStars: 0 },
     },
     stickers: [],
   };
@@ -33,7 +34,7 @@ function normalizeProgress(parsed: unknown): Progress {
   const obj = parsed as Record<string, unknown>;
 
   const categories = obj.categories as Record<string, unknown> | undefined;
-  for (const category of ["color", "shape"] as Category[]) {
+  for (const category of ["color", "shape", "number"] as Category[]) {
     const entry = categories?.[category] as Record<string, unknown> | undefined;
     if (entry) {
       base.categories[category] = {

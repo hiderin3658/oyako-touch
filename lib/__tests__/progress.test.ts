@@ -28,6 +28,13 @@ describe("progress（localStorage）", () => {
     expect(progress.categories.shape.lastStars).toBe(1);
   });
 
+  it("number カテゴリでもクラッシュせず cleared が増える", () => {
+    expect(() => recordLessonClear("number", 3)).not.toThrow();
+    const progress = loadProgress();
+    expect(progress.categories.number.cleared).toBe(1);
+    expect(progress.categories.number.lastStars).toBe(3);
+  });
+
   it("不正なJSONが保存されていると初期値へ復帰する", () => {
     window.localStorage.setItem(STORAGE_KEY, "{ こわれた JSON");
     // 例外を握りつぶさず console.warn でログするので呼び出しを確認

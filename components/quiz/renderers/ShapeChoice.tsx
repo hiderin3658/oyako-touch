@@ -16,6 +16,11 @@ function resolveShape(choice: Choice): ShapeKind {
   return "shape" in choice ? choice.shape : "circle";
 }
 
+/** choice から塗り色を取り出す（color を持たない場合は transparent にフォールバック） */
+function resolveColor(choice: Choice): string {
+  return "color" in choice ? choice.color : "transparent";
+}
+
 /** 演出状態に応じてクラス名を組み立てる */
 function buildClassName(state: ShapeChoiceProps["state"]): string {
   return [
@@ -53,6 +58,7 @@ function ShapeFigure({ shape, color }: { shape: ShapeKind; color: string }) {
 /** かたちはめの選択肢（図形SVG） */
 export function ShapeChoice({ choice, state, onSelect }: ShapeChoiceProps) {
   const shape = resolveShape(choice);
+  const color = resolveColor(choice);
   return (
     <button
       type="button"
@@ -63,7 +69,7 @@ export function ShapeChoice({ choice, state, onSelect }: ShapeChoiceProps) {
       data-testid="choice"
       data-correct={choice.correct ? "true" : "false"}
     >
-      <ShapeFigure shape={shape} color={choice.color} />
+      <ShapeFigure shape={shape} color={color} />
     </button>
   );
 }

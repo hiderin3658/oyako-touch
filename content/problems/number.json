@@ -1,0 +1,150 @@
+{
+  "category": "number",
+  "title": "すうじ",
+  "problems": [
+    {
+      "id": "number-001",
+      "category": "number",
+      "type": "select-number",
+      "prompt": { "text": "さんは どれかな？", "say": "さんは どれかな" },
+      "choices": [
+        { "id": "n1", "label": "に", "value": 2, "correct": false },
+        { "id": "n2", "label": "さん", "value": 3, "correct": true },
+        { "id": "n3", "label": "ご", "value": 5, "correct": false }
+      ],
+      "reward": "sticker-number"
+    },
+    {
+      "id": "number-002",
+      "category": "number",
+      "type": "select-number",
+      "prompt": { "text": "いちは どれかな？", "say": "いちは どれかな" },
+      "choices": [
+        { "id": "n1", "label": "いち", "value": 1, "correct": true },
+        { "id": "n2", "label": "に", "value": 2, "correct": false },
+        { "id": "n3", "label": "さん", "value": 3, "correct": false }
+      ],
+      "reward": "sticker-number"
+    },
+    {
+      "id": "number-003",
+      "category": "number",
+      "type": "select-number",
+      "prompt": { "text": "ごは どれかな？", "say": "ごは どれかな" },
+      "choices": [
+        { "id": "n1", "label": "よん", "value": 4, "correct": false },
+        { "id": "n2", "label": "ご", "value": 5, "correct": true },
+        { "id": "n3", "label": "いち", "value": 1, "correct": false }
+      ],
+      "reward": "sticker-number"
+    },
+    {
+      "id": "number-004",
+      "category": "number",
+      "type": "select-number",
+      "prompt": { "text": "には どれかな？", "say": "には どれかな" },
+      "choices": [
+        { "id": "n1", "label": "さん", "value": 3, "correct": false },
+        { "id": "n2", "label": "いち", "value": 1, "correct": false },
+        { "id": "n3", "label": "に", "value": 2, "correct": true }
+      ],
+      "reward": "sticker-number"
+    },
+    {
+      "id": "number-005",
+      "category": "number",
+      "type": "select-number",
+      "prompt": { "text": "よんは どれかな？", "say": "よんは どれかな" },
+      "choices": [
+        { "id": "n1", "label": "よん", "value": 4, "correct": true },
+        { "id": "n2", "label": "ご", "value": 5, "correct": false },
+        { "id": "n3", "label": "に", "value": 2, "correct": false }
+      ],
+      "reward": "sticker-number"
+    },
+    {
+      "id": "number-006",
+      "category": "number",
+      "type": "select-number",
+      "prompt": { "text": "いちは どれかな？", "say": "いちは どれかな" },
+      "choices": [
+        { "id": "n1", "label": "ご", "value": 5, "correct": false },
+        { "id": "n2", "label": "よん", "value": 4, "correct": false },
+        { "id": "n3", "label": "いち", "value": 1, "correct": true }
+      ],
+      "reward": "sticker-number"
+    },
+    {
+      "id": "number-007",
+      "category": "number",
+      "type": "select-number",
+      "prompt": { "text": "さんは どれかな？", "say": "さんは どれかな" },
+      "choices": [
+        { "id": "n1", "label": "さん", "value": 3, "correct": true },
+        { "id": "n2", "label": "いち", "value": 1, "correct": false },
+        { "id": "n3", "label": "よん", "value": 4, "correct": false }
+      ],
+      "reward": "sticker-number"
+    },
+    {
+      "id": "number-008",
+      "category": "number",
+      "type": "select-number",
+      "prompt": { "text": "ごは どれかな？", "say": "ごは どれかな" },
+      "choices": [
+        { "id": "n1", "label": "に", "value": 2, "correct": false },
+        { "id": "n2", "label": "ご", "value": 5, "correct": true },
+        { "id": "n3", "label": "さん", "value": 3, "correct": false }
+      ],
+      "reward": "sticker-number"
+    },
+    {
+      "id": "number-009",
+      "category": "number",
+      "type": "select-number",
+      "prompt": { "text": "には どれかな？", "say": "には どれかな" },
+      "choices": [
+        { "id": "n1", "label": "に", "value": 2, "correct": true },
+        { "id": "n2", "label": "よん", "value": 4, "correct": false },
+        { "id": "n3", "label": "ご", "value": 5, "correct": false }
+      ],
+      "reward": "sticker-number"
+    },
+    {
+      "id": "number-010",
+      "category": "number",
+      "type": "select-number",
+      "prompt": { "text": "よんは どれかな？", "say": "よんは どれかな" },
+      "choices": [
+        { "id": "n1", "label": "いち", "value": 1, "correct": false },
+        { "id": "n2", "label": "よん", "value": 4, "correct": true },
+        { "id": "n3", "label": "さん", "value": 3, "correct": false }
+      ],
+      "reward": "sticker-number"
+    },
+    {
+      "id": "number-011",
+      "category": "number",
+      "type": "select-number",
+      "prompt": { "text": "いちは どれかな？", "say": "いちは どれかな" },
+      "choices": [
+        { "id": "n1", "label": "いち", "value": 1, "correct": true },
+        { "id": "n2", "label": "ご", "value": 5, "correct": false },
+        { "id": "n3", "label": "よん", "value": 4, "correct": false }
+      ],
+      "reward": "sticker-number"
+    },
+    {
+      "id": "number-012",
+      "category": "number",
+      "type": "select-number",
+      "prompt": { "text": "ごは どれかな？", "say": "ごは どれかな" },
+      "choices": [
+        { "id": "n1", "label": "ご", "value": 5, "correct": true },
+        { "id": "n2", "label": "いち", "value": 1, "correct": false },
+        { "id": "n3", "label": "に", "value": 2, "correct": false }
+      ],
+      "reward": "sticker-number"
+    }
+  ]
+}

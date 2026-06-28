@@ -1,7 +1,7 @@
 // 問題ドメインの型定義（DOM非依存の純粋な型）
 
-/** 問題カテゴリ。MVPは「いろあわせ」「かたちはめ」の2種目 */
-export type Category = "color" | "shape";
+/** 問題カテゴリ。「いろあわせ」「かたちはめ」「すうじ」の3種目 */
+export type Category = "color" | "shape" | "number";
 
 /** 設問文と読み上げテキスト。audio は将来のElevenLabs音声用（今回未使用） */
 export interface PromptData {
@@ -28,8 +28,13 @@ export interface ShapeChoice extends ChoiceBase {
   color: string;
 }
 
+/** すうじの選択肢（数字グリフ）。value は 1〜10、label は読み（「さん」等） */
+export interface NumberChoice extends ChoiceBase {
+  value: number;
+}
+
 /** 選択肢のユニオン */
-export type Choice = ColorChoice | ShapeChoice;
+export type Choice = ColorChoice | ShapeChoice | NumberChoice;
 
 /** 1問の定義。category により choices の型が決まる判別ユニオン */
 export type Problem =
@@ -47,6 +52,14 @@ export type Problem =
       type: "select-one";
       prompt: PromptData;
       choices: ShapeChoice[];
+      reward?: string;
+    }
+  | {
+      id: string;
+      category: "number";
+      type: "select-number";
+      prompt: PromptData;
+      choices: NumberChoice[];
       reward?: string;
     };
 
