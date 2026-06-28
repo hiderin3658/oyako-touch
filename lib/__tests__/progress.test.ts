@@ -35,6 +35,36 @@ describe("progress（localStorage）", () => {
     expect(progress.categories.number.lastStars).toBe(3);
   });
 
+  it("animal カテゴリでもクラッシュせず cleared が増える", () => {
+    expect(() => recordLessonClear("animal", 5)).not.toThrow();
+    const progress = loadProgress();
+    expect(progress.categories.animal.cleared).toBe(1);
+    expect(progress.categories.animal.lastStars).toBe(5);
+    // 既存カテゴリに影響しないこと
+    expect(progress.categories.color.cleared).toBe(0);
+  });
+
+  it("animal キーが欠けた保存データでも初期値で補完される（normalizeProgress）", () => {
+    // animal カテゴリを含まない旧フォーマットの保存データを用意する
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        categories: {
+          color: { cleared: 2, lastStars: 3 },
+          shape: { cleared: 0, lastStars: 0 },
+          number: { cleared: 0, lastStars: 0 },
+        },
+        stickers: ["sticker-apple"],
+      }),
+    );
+    const progress = loadProgress();
+    // 欠けていた animal が初期値で補完される
+    expect(progress.categories.animal).toEqual({ cleared: 0, lastStars: 0 });
+    // 既存値は保持される
+    expect(progress.categories.color.cleared).toBe(2);
+    expect(progress.stickers).toEqual(["sticker-apple"]);
+  });
+
   it("不正なJSONが保存されていると初期値へ復帰する", () => {
     window.localStorage.setItem(STORAGE_KEY, "{ こわれた JSON");
     // 例外を握りつぶさず console.warn でログするので呼び出しを確認

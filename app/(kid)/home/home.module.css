@@ -86,6 +86,10 @@
   color: var(--grape);
 }
 
+.animal .label {
+  color: var(--leaf);
+}
+
 .hint {
   position: fixed;
   bottom: 14px;

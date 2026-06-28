@@ -109,6 +109,12 @@ describe("おうち画面", () => {
     fireEvent.click(screen.getByTestId("tile-number"));
     expect(pushMock).toHaveBeenCalledWith("/game/number");
   });
+
+  it("「どうぶつ」タイルで /game/animal へ遷移する", () => {
+    renderWithAuth(<HomePage />);
+    fireEvent.click(screen.getByTestId("tile-animal"));
+    expect(pushMock).toHaveBeenCalledWith("/game/animal");
+  });
 });
 
 describe("ゲーム画面（color）", () => {
@@ -173,6 +179,47 @@ describe("ゲーム画面（number）", () => {
 
     expect(screen.getByTestId("reward")).toBeInTheDocument();
     expect(loadProgress().categories.number.cleared).toBe(1);
+  });
+});
+
+describe("ゲーム画面（animal）", () => {
+  it("全問正解でごほうびが表示され、進捗のクリア数とシールが増える", () => {
+    paramsRef.current = { category: "animal" };
+    expect(loadProgress().categories.animal.cleared).toBe(0);
+
+    renderWithAuth(<GamePage />);
+    clearLesson();
+
+    expect(screen.getByTestId("reward")).toBeInTheDocument();
+    expect(screen.getByText("よく できました！")).toBeInTheDocument();
+    // animal のクリアが既存カテゴリと独立して記録される
+    expect(loadProgress().categories.animal.cleared).toBe(1);
+    expect(loadProgress().categories.color.cleared).toBe(0);
+    // ごほうびシール（sticker-<animal>）が付与される
+    expect(loadProgress().stickers.length).toBeGreaterThan(0);
+  });
+
+  it("「もういちど」で animal が最初から再開する", () => {
+    paramsRef.current = { category: "animal" };
+    renderWithAuth(<GamePage />);
+    clearLesson();
+
+    fireEvent.click(screen.getByTestId("reward-again"));
+
+    expect(screen.queryByTestId("reward")).not.toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /ほし 0/ })).toBeInTheDocument();
+    // 画像選択肢が再出題されている
+    expect(screen.getAllByTestId("choice").length).toBeGreaterThan(0);
+    expect(screen.getAllByTestId("choice")[0].querySelector("img")).toBeInTheDocument();
+  });
+
+  it("「おうちに もどる」で /home へ遷移する", () => {
+    paramsRef.current = { category: "animal" };
+    renderWithAuth(<GamePage />);
+    clearLesson();
+
+    fireEvent.click(screen.getByTestId("reward-home"));
+    expect(pushMock).toHaveBeenCalledWith("/home");
   });
 });
 

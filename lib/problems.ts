@@ -3,12 +3,14 @@ import type { Category, Lesson } from "@/lib/types";
 import colorData from "@/content/problems/color.json";
 import shapeData from "@/content/problems/shape.json";
 import numberData from "@/content/problems/number.json";
+import animalData from "@/content/problems/animal.json";
 
 /** カテゴリ → ビルド時importの生データ（カテゴリ追加時はここに追記する） */
 const lessonSources: Record<Category, unknown> = {
   color: colorData,
   shape: shapeData,
   number: numberData,
+  animal: animalData,
 };
 
 /**
@@ -29,11 +31,12 @@ export function validateLesson(raw: unknown): Lesson {
   }
   const lesson = raw as Record<string, unknown>;
 
-  // カテゴリは "color" | "shape" | "number" のみ許可
+  // カテゴリは "color" | "shape" | "number" | "animal" のみ許可
   if (
     lesson.category !== "color" &&
     lesson.category !== "shape" &&
-    lesson.category !== "number"
+    lesson.category !== "number" &&
+    lesson.category !== "animal"
   ) {
     throw new Error(`レッスンの category が不正です: ${String(lesson.category)}`);
   }
@@ -96,6 +99,18 @@ export function validateLesson(raw: unknown): Lesson {
         if (typeof value !== "number") {
           throw new Error(
             `problem(${problem.id}) の choice には number 型の value が必要です`,
+          );
+        }
+      }
+    }
+
+    // どうぶつは各 choice に非空の string 型 image（画像パス）が必須
+    if (category === "animal") {
+      for (const choice of problem.choices) {
+        const image = (choice as Record<string, unknown>).image;
+        if (typeof image !== "string" || image.length === 0) {
+          throw new Error(
+            `problem(${problem.id}) の choice には非空の image が必要です`,
           );
         }
       }
