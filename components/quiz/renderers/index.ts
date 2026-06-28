@@ -2,6 +2,7 @@ import type { Category, Choice } from "@/lib/types";
 import { ColorChoice } from "./ColorChoice";
 import { ShapeChoice } from "./ShapeChoice";
 import { NumberChoice } from "./NumberChoice";
+import { AnimalChoice } from "./AnimalChoice";
 
 /** 選択肢を描画するレンダラの共通シグネチャ（種目に依存しない） */
 export type ChoiceRenderer = (props: {
@@ -15,6 +16,7 @@ export const choiceRenderers: Record<Category, ChoiceRenderer> = {
   color: ColorChoice,
   shape: ShapeChoice,
   number: NumberChoice,
+  animal: AnimalChoice,
 };
 
-export { ColorChoice, ShapeChoice, NumberChoice };
+export { ColorChoice, ShapeChoice, NumberChoice, AnimalChoice };

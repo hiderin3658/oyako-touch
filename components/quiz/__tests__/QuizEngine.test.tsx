@@ -107,4 +107,27 @@ describe("QuizEngine", () => {
     fireEvent.click(correctButton);
     expect(screen.getByRole("img", { name: /ほし 1/ })).toBeInTheDocument();
   });
+
+  it("animal の Lesson でも画像を描画して正解で星が増える", () => {
+    const lesson = loadLesson("animal");
+    const onComplete = vi.fn();
+    render(<QuizEngine lesson={lesson} onComplete={onComplete} />);
+
+    // 1問目の設問・星0が表示される
+    expect(screen.getByText(lesson.problems[0].prompt.text)).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /ほし 0/ })).toBeInTheDocument();
+
+    // 正解選択肢が動物イラスト画像（img）を描画している
+    const correctButton = screen.getByRole("button", { name: correctLabel(lesson, 0) });
+    expect(correctButton.querySelector("img")).toBeInTheDocument();
+
+    fireEvent.click(correctButton);
+    // 星が1に増え、せいかい！演出が出る
+    expect(screen.getByRole("img", { name: /ほし 1/ })).toBeInTheDocument();
+    expect(screen.getByText("せいかい！")).toBeInTheDocument();
+
+    // 演出後に次の問題へ進む
+    advance(1100);
+    expect(screen.getByText(lesson.problems[1].prompt.text)).toBeInTheDocument();
+  });
 });

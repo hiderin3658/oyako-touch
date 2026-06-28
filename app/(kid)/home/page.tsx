@@ -67,6 +67,20 @@ export default function HomePage() {
           </span>
           <span className={styles.label}>すうじ</span>
         </button>
+
+        <button
+          type="button"
+          className={`${styles.tile} ${styles.animal}`}
+          onClick={() => router.push("/game/animal")}
+          data-testid="tile-animal"
+        >
+          <span className={styles.emoji}>
+            <span className={styles.icon}>🐶</span>
+            <span className={styles.icon}>🐱</span>
+            <span className={styles.icon}>🐰</span>
+          </span>
+          <span className={styles.label}>どうぶつ</span>
+        </button>
       </div>
 
       <ParentLock />
