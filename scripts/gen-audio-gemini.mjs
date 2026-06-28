@@ -21,6 +21,8 @@
 //   node --env-file=.env scripts/gen-audio-gemini.mjs --force    既存ファイルも再生成
 //   node --env-file=.env scripts/gen-audio-gemini.mjs --limit=5  設問サンプル件数を変更（既定3／固定句は常に全件）
 //   GEMINI_TTS_FORMAT=wav node --env-file=.env scripts/gen-audio-gemini.mjs  WAV で出力
+//   node --env-file=.env scripts/gen-audio-gemini.mjs --prod --force  本番ナレーション(q/fb)を全件MP3で上書き
+//   node --env-file=.env scripts/gen-audio-gemini.mjs --prod --dry-run 本番生成の対象一覧だけ確認
 
 import { access, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { constants as fsConstants } from "node:fs";
@@ -62,8 +64,11 @@ const DEFAULT_QUESTION_LIMIT = 3;
 
 // 生成のゆらぎ対策。Gemini は生成AIのため、200応答でも音声partを返さないことが稀にある。
 // 同様に 429/5xx の一時エラーも数回までやり直す（Cloud TTS にはない挙動への保険）。
-const MAX_ATTEMPTS = 3;
+const MAX_ATTEMPTS = 5;
 const RETRY_DELAY_MS = 800;
+// 429（レート制限）は短い待ちでは回復しないため、専用に長めの待機を入れる。
+// ループは逐次実行なので、この待ちが後続リクエストのペース配分も兼ねる。
+const RATE_LIMIT_DELAY_MS = 20000;
 
 // ---------------------------------------------------------------------------
 // パス設定
@@ -293,8 +298,13 @@ async function fetchGeminiTtsOnce(spoken, { apiKey, model, voice }) {
   if (!response.ok) {
     const bodyText = await response.text().catch(() => "");
     const error = new Error(`HTTP ${response.status} ${response.statusText}: ${summarizeBody(bodyText)}`);
-    // 429（レート上限）/5xx（サーバ側）は一時的とみなしてやり直す。4xx はキー不正等なので即失敗。
-    error.retryable = response.status === 429 || response.status >= 500;
+    // 日次クォータ（per_day）枯渇は数時間回復しないため、リトライせず即時中断扱いにする。
+    const isDailyQuota = response.status === 429 && /per[_ ]?day/i.test(bodyText);
+    error.dailyQuota = isDailyQuota;
+    // 429（レート上限）/5xx（サーバ側）は一時的とみなしてやり直す。日次枯渇と 4xx は即失敗。
+    error.retryable = !isDailyQuota && (response.status === 429 || response.status >= 500);
+    // 429（分単位）は回復に時間が要るため、長め待機のフラグを立てる。
+    error.rateLimited = error.retryable && response.status === 429;
     throw error;
   }
 
@@ -332,8 +342,10 @@ async function fetchGeminiTts(target, { apiKey, model, voice, style }) {
       lastError = error;
       // やり直し不可、または最終試行なら即座に投げる。
       if (!error.retryable || attempt === MAX_ATTEMPTS) throw error;
-      console.warn(`    retry ${attempt}/${MAX_ATTEMPTS - 1}  (${error.message})`);
-      await sleep(RETRY_DELAY_MS);
+      // 429 はレート制限ウィンドウの回復を待つため長めに、それ以外は短く待つ。
+      const delay = error.rateLimited ? RATE_LIMIT_DELAY_MS : RETRY_DELAY_MS;
+      console.warn(`    retry ${attempt}/${MAX_ATTEMPTS - 1}  (${Math.round(delay / 1000)}s待機: ${error.message})`);
+      await sleep(delay);
     }
   }
   throw lastError;
@@ -347,7 +359,11 @@ async function main() {
   const args = process.argv.slice(2);
   const isDryRun = args.includes("--dry-run");
   const isForce = args.includes("--force");
-  const questionLimit = parseLimit(args);
+  // --prod: 比較用ではなく本番ナレーション（public/audio/q・fb）を生成・上書きする。
+  //   全件対象＋出力先を本番ディレクトリにし、MP3 を必須にする。
+  const isProd = args.includes("--prod");
+  // 本番は全件。比較モードは --limit（既定3）。
+  const questionLimit = isProd ? Number.MAX_SAFE_INTEGER : parseLimit(args);
 
   const apiKey = cleanEnv(process.env.GEMINI_API_KEY);
   const model = cleanEnv(process.env.GEMINI_TTS_MODEL) || DEFAULT_GEMINI_MODEL;
@@ -366,44 +382,74 @@ async function main() {
     process.exit(1);
   }
 
-  // 出力形式を決める（既定 MP3）。MP3 は ffmpeg が要るので、無ければ WAV にフォールバック。
+  // 出力形式を決める（既定 MP3）。MP3 は ffmpeg が要る。
   let format = (cleanEnv(process.env.GEMINI_TTS_FORMAT) || DEFAULT_FORMAT).toLowerCase();
   if (format !== "mp3" && format !== "wav") {
     console.warn(`警告: GEMINI_TTS_FORMAT="${format}" は不正です。mp3 として扱います。`);
     format = "mp3";
   }
+  if (isProd) {
+    // 本番は MP3 固定。WAV を .mp3 パスへ書くと中身と拡張子が不一致になるため許さない。
+    format = "mp3";
+  }
   if (!isDryRun && format === "mp3" && !(await ffmpegAvailable())) {
+    if (isProd) {
+      console.error("エラー: --prod は MP3 が必須ですが ffmpeg が見つかりません（macOS: brew install ffmpeg）。");
+      process.exit(1);
+    }
     console.warn("警告: ffmpeg が見つからないため MP3 変換できません。WAV で出力します。");
     console.warn("       MP3 にするには ffmpeg を入れてください（macOS: brew install ffmpeg）。");
     format = "wav";
   }
   const ext = format;
 
-  // 出力先はモデルごとに分ける（2.5-flash / 3.1-flash / 2.5-pro を並べて比較できる）。
+  // 出力先。比較モードはモデル別フォルダ、本番モード(--prod)は本番ディレクトリ(q/fb)を直接上書き。
   const outDir = path.join(COMPARE_DIR, modelToLabel(model));
 
   if (!isDryRun) {
-    await mkdir(outDir, { recursive: true });
+    await mkdir(isProd ? CLOUD_Q_DIR : outDir, { recursive: true });
+    await mkdir(isProd ? CLOUD_FB_DIR : outDir, { recursive: true });
   }
 
   const sections = [
     { title: "固定句", targets: await collectPhraseTargets(outDir, ext) },
-    { title: `設問読み上げ（先頭${questionLimit}件）`, targets: await collectQuestionTargets(questionLimit, outDir, ext) },
+    {
+      title: isProd ? "設問読み上げ（全件）" : `設問読み上げ（先頭${questionLimit}件）`,
+      targets: await collectQuestionTargets(questionLimit, outDir, ext),
+    },
   ];
 
+  // 本番モードは出力先を本番ファイル（= cloudPath）に切り替える。
+  if (isProd) {
+    for (const section of sections) {
+      for (const target of section.targets) {
+        target.outPath = target.cloudPath;
+      }
+    }
+  }
+
   console.log("=== Gemini TTS 生成スクリプト ===");
-  console.log(`モード: ${isDryRun ? "dry-run（API 非呼び出し）" : "本番生成"}${isForce ? " / force（再生成）" : ""}`);
+  console.log(
+    `モード: ${isDryRun ? "dry-run（API 非呼び出し）" : "本番生成"}${isProd ? " / prod（本番ナレーション上書き）" : ""}${isForce ? " / force（再生成）" : ""}`,
+  );
   console.log(`モデル: ${model} / 声: ${voice} / 形式: ${format.toUpperCase()}（APIキー ${apiKey ? "設定済み" : "未設定"}）`);
   console.log(`スタイル指示: ${style ? `「${style}」` : "なし（素読み）"}`);
-  console.log(`出力先: ${toRelative(outDir)}/  ← Cloud TTS と聴き比べ`);
+  console.log(
+    isProd
+      ? "出力先: public/audio/q/ ・ public/audio/fb/  ← 本番ナレーションを上書き"
+      : `出力先: ${toRelative(outDir)}/  ← Cloud TTS と聴き比べ`,
+  );
   console.log("");
 
   let generatedCount = 0;
   let skippedCount = 0;
   let plannedCount = 0;
   let failedCount = 0;
+  // 日次クォータ枯渇を検知したら以降は全て失敗するため、全体を打ち切る。
+  let abortedByDailyQuota = false;
 
   for (const section of sections) {
+    if (abortedByDailyQuota) break;
     console.log(`▼ ${section.title}  [${section.targets.length}件]`);
     for (const target of section.targets) {
       const rel = toRelative(target.outPath);
@@ -417,7 +463,8 @@ async function main() {
       }
 
       if (isDryRun) {
-        console.log(`  生成予定  ${rel}  ← "${target.text}"  (比較: ${cloudRel})`);
+        const note = isProd ? "" : `  (比較: ${cloudRel})`;
+        console.log(`  生成予定  ${rel}  ← "${target.text}"${note}`);
         plannedCount += 1;
         continue;
       }
@@ -427,15 +474,24 @@ async function main() {
         // 既定は MP3。ffmpeg で WAV→MP3 に変換してから書き出す（WAV 指定時はそのまま）。
         const audio = format === "mp3" ? await wavToMp3(wav) : wav;
         await writeFile(target.outPath, audio);
-        const cloudNote = (await fileExists(target.cloudPath))
-          ? `（比較: ${cloudRel}）`
-          : `（比較先 ${cloudRel} は未生成）`;
-        console.log(`  生成      ${rel}  ${cloudNote}`);
+        // 比較モードのみ Cloud TTS 側との対応を表示（本番モードは出力先＝本番ファイル）。
+        const note = isProd
+          ? ""
+          : (await fileExists(target.cloudPath))
+            ? `  （比較: ${cloudRel}）`
+            : `  （比較先 ${cloudRel} は未生成）`;
+        console.log(`  生成      ${rel}${note}`);
         generatedCount += 1;
       } catch (error) {
         // 1件の失敗で全体を止めず、他は続行する。
         console.error(`  失敗      ${rel}  (${error.message})`);
         failedCount += 1;
+        // 日次クォータ枯渇は当日中は回復しないため、残りを試さず打ち切る。
+        if (error.dailyQuota) {
+          console.error("  ⚠️ 日次クォータ(per_day)枯渇を検知しました。残りの生成を打ち切ります（クォータは太平洋時間の深夜にリセット）。");
+          abortedByDailyQuota = true;
+          break;
+        }
       }
     }
     console.log("");
@@ -446,7 +502,11 @@ async function main() {
     console.log(`生成予定: ${plannedCount}件 / skip: ${skippedCount}件`);
   } else {
     console.log(`生成: ${generatedCount}件 / skip: ${skippedCount}件 / 失敗: ${failedCount}件`);
-    if (generatedCount > 0) {
+    if (generatedCount > 0 && isProd) {
+      console.log("");
+      console.log("▼ 本番ナレーションを更新しました（public/audio/q ・ fb）。");
+      console.log("  ※ 失敗が残っていれば --prod を再実行すると未生成分だけ補完されます。");
+    } else if (generatedCount > 0) {
       console.log("");
       console.log("▼ 聴き比べ方");
       console.log(`  Gemini : ${toRelative(outDir)}/<id>.${ext}`);
