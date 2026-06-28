@@ -2,19 +2,38 @@ import { test, expect, type Page } from "@playwright/test";
 
 /**
  * E2E スモーク。
- * login(モック)→おうち→レッスン→ごほうび がノーフェイルで詰まらず通ることを保証する。
+ * 認証バイパス（テスト専用 Credentials provider）→おうち→レッスン→ごほうび が
+ * ノーフェイルで詰まらず通ることを保証する。実 OAuth（Google）は踏まない。
  * セレクタは実装済みの data-testid / data 属性中心。タイミングは要素待機で吸収する。
  * 問題数（StarBar の総数）には依存せず、「ごほうび到達」をゴールに完走を判定する。
+ *
+ * 前提: dev サーバを E2E_TEST_AUTH=true ＋ ALLOWED_EMAILS に下記 TEST_EMAIL を含めて起動する
+ * （playwright.config.ts の webServer.env で設定済み）。
  */
 
+// テスト専用 Credentials provider で使う許可リスト済みメール（playwright.config と一致させる）
+const TEST_EMAIL = "parent@example.com";
+
 /**
- * ログイン（モック）→ おうち到達までの共通操作。
- * Googleボタン押下後、ログイン演出（約2.2s）を経て「なにで あそぶ？」が出るのを待つ。
+ * テスト専用 Credentials provider（id: "e2e"）でセッション Cookie を確立する。
+ * 実 OAuth を踏まずに「許可リスト済みメールでログイン済み」の状態を作る。
+ * page.request は page と同じ Cookie ジャーを共有するため、以降の page.goto に効く。
  */
+async function loginViaTestProvider(page: Page): Promise<void> {
+  // CSRF トークンを取得（同じ Cookie ジャーで POST するため csrf Cookie も保存される）
+  const csrfRes = await page.request.get("/api/auth/csrf");
+  const { csrfToken } = (await csrfRes.json()) as { csrfToken: string };
+  // Credentials provider のコールバックへ POST してセッションを確立する
+  await page.request.post("/api/auth/callback/e2e", {
+    form: { csrfToken, email: TEST_EMAIL, callbackUrl: "/home" },
+  });
+}
+
+/** ログイン（バイパス）→ おうち到達までの共通操作。 */
 async function loginAndReachHome(page: Page): Promise<void> {
-  await page.goto("/login");
-  await page.getByTestId("google-login").click();
-  // ログイン演出を経ておうちへ。見出しの出現で到達を確認する
+  await loginViaTestProvider(page);
+  await page.goto("/home");
+  // 見出しの出現でおうち到達を確認する
   await expect(page.getByText("なにで あそぶ？")).toBeVisible();
 }
 
@@ -37,6 +56,15 @@ function unlockedChoices(page: Page) {
 function lockedChoices(page: Page) {
   return page.locator('[data-locked="true"]');
 }
+
+test("未認証で /home にアクセスすると middleware が /login へ遮断する", async ({
+  page,
+}) => {
+  // ログイン操作をせずに保護ルートへ直接アクセスする
+  await page.goto("/home");
+  // middleware（サーバ境界）により /login へリダイレクトされる
+  await expect(page).toHaveURL(/\/login/);
+});
 
 test("いろレッスンを完走してごほうびに到達する", async ({ page }) => {
   await loginAndReachHome(page);

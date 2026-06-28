@@ -100,13 +100,13 @@
   font-weight: 700;
 }
 
-/* 進行中はくすんだ色、成功時は緑で表示する */
+/* 進行中はくすんだ色、エラー時は赤系で表示する */
 .status[data-tone="progress"] {
   color: var(--ink-soft);
 }
 
-.status[data-tone="success"] {
-  color: var(--leaf);
+.status[data-tone="error"] {
+  color: var(--berry);
 }
 
 .note {
