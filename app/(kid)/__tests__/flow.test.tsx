@@ -84,9 +84,10 @@ describe("おうち画面", () => {
     expect(pushMock).toHaveBeenCalledWith("/game/shape");
   });
 
-  it("「すうじ」はロック表示で遷移しない", () => {
+  it("「すうじ」タイルで /game/number へ遷移する", () => {
     renderWithAuth(<HomePage />);
-    expect(screen.getByText("じゅんびちゅう")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("tile-number"));
+    expect(pushMock).toHaveBeenCalledWith("/game/number");
   });
 });
 
@@ -140,6 +141,19 @@ describe("ゲーム画面（shape）", () => {
 
     expect(screen.getByTestId("reward")).toBeInTheDocument();
     expect(loadProgress().categories.shape.cleared).toBe(1);
+  });
+});
+
+describe("ゲーム画面（number）", () => {
+  it("全問正解でごほうびが表示され、進捗のクリア数が増える", () => {
+    paramsRef.current = { category: "number" };
+    expect(loadProgress().categories.number.cleared).toBe(0);
+
+    renderWithAuth(<GamePage />);
+    clearLesson(loadLesson("number"));
+
+    expect(screen.getByTestId("reward")).toBeInTheDocument();
+    expect(loadProgress().categories.number.cleared).toBe(1);
   });
 });
 

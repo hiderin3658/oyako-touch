@@ -12,7 +12,7 @@ import { playPhrase } from "@/lib/audio";
 import type { Category, Lesson } from "@/lib/types";
 import styles from "./game.module.css";
 
-const VALID_CATEGORIES: Category[] = ["color", "shape"];
+const VALID_CATEGORIES: Category[] = ["color", "shape", "number"];
 
 /** URLパラメータが対応カテゴリかを判定する型ガード */
 function isCategory(value: unknown): value is Category {

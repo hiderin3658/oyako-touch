@@ -56,13 +56,17 @@ export default function HomePage() {
           <span className={styles.label}>かたち</span>
         </button>
 
-        <div className={`${styles.tile} ${styles.locked}`} aria-disabled="true">
+        <button
+          type="button"
+          className={`${styles.tile} ${styles.number}`}
+          onClick={() => router.push("/game/number")}
+          data-testid="tile-number"
+        >
           <span className={styles.emoji}>
             <span className={styles.icon}>🔢</span>
           </span>
           <span className={styles.label}>すうじ</span>
-          <span className={styles.soon}>じゅんびちゅう</span>
-        </div>
+        </button>
       </div>
 
       <ParentLock />

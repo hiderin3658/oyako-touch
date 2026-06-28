@@ -114,3 +114,31 @@ test("かたちレッスンで1問正解できる", async ({ page }) => {
   await correctChoice(page).click();
   await expect(page.locator('[data-on="true"]')).toHaveCount(1);
 });
+
+test("すうじレッスンを完走してごほうびに到達する", async ({ page }) => {
+  await loginAndReachHome(page);
+
+  // おうち → すうじ
+  await page.getByTestId("tile-number").click();
+
+  // ごほうび（reward）が表示されるまで、各問で正解を押し続ける。
+  // 問題数や StarBar の総数には依存せず、「ごほうび到達」をゴールに繰り返す。
+  const reward = page.getByTestId("reward");
+  const unlocked = unlockedChoices(page);
+  const locked = lockedChoices(page);
+  while (!(await reward.isVisible())) {
+    // 出題中（ロック解除）になるのを待ってから正解を確定させる
+    await expect(unlocked).toBeVisible();
+    await correctChoice(page).click();
+    // クリックが受理されると正解演出に入りロックされる（最終問題ならごほうびへ）
+    await expect(locked.or(reward)).toBeVisible();
+    // 正解演出後、次の出題（ロック解除）かごほうびのどちらかになるまで待つ
+    await expect(unlocked.or(reward)).toBeVisible();
+  }
+
+  // ごほうび到達を assert
+  await expect(reward).toBeVisible();
+  await expect(page.getByText("よく できました！")).toBeVisible();
+  await expect(page.getByTestId("reward-again")).toBeVisible();
+  await expect(page.getByTestId("reward-home")).toBeVisible();
+});
