@@ -3,19 +3,19 @@
 import type { Choice } from "@/lib/types";
 import styles from "./Choice.module.css";
 
-interface ColorChoiceProps {
+interface NumberChoiceProps {
   choice: Choice;
   state: "idle" | "right" | "wrong";
   onSelect: () => void;
 }
 
-/** choice から色を取り出す（color を持たない場合は transparent にフォールバック） */
-function resolveColor(choice: Choice): string {
-  return "color" in choice ? choice.color : "transparent";
+/** choice から数字を取り出す（value を持たない場合は 0 にフォールバック） */
+function resolveValue(choice: Choice): number {
+  return "value" in choice ? choice.value : 0;
 }
 
 /** 演出状態に応じてクラス名を組み立てる */
-function buildClassName(state: ColorChoiceProps["state"]): string {
+function buildClassName(state: NumberChoiceProps["state"]): string {
   return [
     styles.choice,
     state === "right" ? styles.right : "",
@@ -25,8 +25,9 @@ function buildClassName(state: ColorChoiceProps["state"]): string {
     .join(" ");
 }
 
-/** いろあわせの選択肢（色つきの円ディスク） */
-export function ColorChoice({ choice, state, onSelect }: ColorChoiceProps) {
+/** すうじの選択肢（数字グリフをカードで大きく表示） */
+export function NumberChoice({ choice, state, onSelect }: NumberChoiceProps) {
+  const value = resolveValue(choice);
   return (
     <button
       type="button"
@@ -37,7 +38,9 @@ export function ColorChoice({ choice, state, onSelect }: ColorChoiceProps) {
       data-testid="choice"
       data-correct={choice.correct ? "true" : "false"}
     >
-      <span className={styles.disc} style={{ background: resolveColor(choice) }} />
+      <span className={styles.numberCard}>
+        <span className={styles.numberGlyph}>{value}</span>
+      </span>
     </button>
   );
 }

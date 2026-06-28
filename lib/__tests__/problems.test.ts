@@ -34,12 +34,50 @@ describe("loadLesson", () => {
     expect(lesson.category).toBe("shape");
     expect(lesson.problems.length).toBeGreaterThanOrEqual(3);
   });
+
+  it("number レッスンを読み込める（3問以上）", () => {
+    const lesson = loadLesson("number");
+    expect(lesson.category).toBe("number");
+    expect(lesson.problems.length).toBeGreaterThanOrEqual(3);
+  });
 });
+
+// 検証用の最小限の正常な number レッスンを生成するヘルパ
+function makeValidNumberLesson() {
+  return {
+    category: "number",
+    title: "すうじ",
+    problems: [
+      {
+        id: "number-001",
+        category: "number",
+        type: "select-number",
+        prompt: { text: "さんは どれかな？", say: "さんは どれかな" },
+        choices: [
+          { id: "n1", label: "に", value: 2, correct: false },
+          { id: "n2", label: "さん", value: 3, correct: true },
+        ],
+      },
+    ],
+  };
+}
 
 describe("validateLesson", () => {
   it("正常なレッスンはそのまま返す", () => {
     const valid = makeValidLesson();
     expect(() => validateLesson(valid)).not.toThrow();
+  });
+
+  it("正常な number レッスンはそのまま返す", () => {
+    const valid = makeValidNumberLesson();
+    expect(() => validateLesson(valid)).not.toThrow();
+  });
+
+  it("number の choice に value が無ければ throw する", () => {
+    const lesson = makeValidNumberLesson();
+    // value プロパティを欠落させる
+    delete (lesson.problems[0].choices[0] as { value?: number }).value;
+    expect(() => validateLesson(lesson)).toThrow(/value が必要/);
   });
 
   it("correct が0個なら throw する", () => {
