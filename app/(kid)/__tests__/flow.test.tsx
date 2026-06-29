@@ -24,6 +24,14 @@ vi.mock("next/navigation", () => ({
   useParams: () => paramsRef.current,
 }));
 
+// 音声はモックする（演出進行が「ほめ言葉の再生完了」を待つため、即解決の Promise で決定的にする）。
+vi.mock("@/lib/audio", () => ({
+  playClip: vi.fn(() => Promise.resolve()),
+  playPhrase: vi.fn(() => Promise.resolve()),
+  playSfx: vi.fn(),
+  unlockAudio: vi.fn(),
+}));
+
 // next-auth/react をモックし、認証済みセッションとして描画する
 // （ParentLock が useAuth＝useSession に依存するため）
 vi.mock("next-auth/react", () => ({
@@ -56,10 +64,13 @@ function renderWithAuth(ui: React.ReactElement) {
   return render(<AuthProvider>{ui}</AuthProvider>);
 }
 
-/** フェイクタイマーを進めて演出後の状態更新を反映する */
-function advance(ms: number): void {
-  act(() => {
-    vi.advanceTimersByTime(ms);
+/**
+ * フェイクタイマーを進めて演出後の状態更新を反映する。
+ * 演出進行は Promise（再生完了待ち）を挟むため、タイマーとマイクロタスクの両方を消化する非同期版にする。
+ */
+async function advance(ms: number): Promise<void> {
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(ms);
   });
 }
 
@@ -79,14 +90,14 @@ function clickCorrectChoice(): void {
  * ごほうび(reward)が出るまで正解を押し続けて完走する（出題数に依存しない）。
  * プールから5問抽出されるため固定回数ループは使わず、e2e と同様に到達で判定する。
  */
-function clearLesson(): void {
+async function clearLesson(): Promise<void> {
   // 万一ごほうびに到達しない場合の無限ループ防止（プール最大でも十分な上限）
   for (let guard = 0; guard < 100; guard++) {
     if (screen.queryByTestId("reward")) {
       return;
     }
     clickCorrectChoice();
-    advance(1100);
+    await advance(1100);
   }
   throw new Error("ごほうびに到達しませんでした");
 }
@@ -118,12 +129,12 @@ describe("おうち画面", () => {
 });
 
 describe("ゲーム画面（color）", () => {
-  it("全問正解でごほうびが表示され、進捗のクリア数が増える", () => {
+  it("全問正解でごほうびが表示され、進捗のクリア数が増える", async () => {
     paramsRef.current = { category: "color" };
     expect(loadProgress().categories.color.cleared).toBe(0);
 
     renderWithAuth(<GamePage />);
-    clearLesson();
+    await clearLesson();
 
     expect(screen.getByTestId("reward")).toBeInTheDocument();
     expect(screen.getByText("よく できました！")).toBeInTheDocument();
@@ -131,11 +142,11 @@ describe("ゲーム画面（color）", () => {
     expect(loadProgress().stickers.length).toBeGreaterThan(0);
   });
 
-  it("「もういちど」で同種目が最初から再開する", () => {
+  it("「もういちど」で同種目が最初から再開する", async () => {
     paramsRef.current = { category: "color" };
 
     renderWithAuth(<GamePage />);
-    clearLesson();
+    await clearLesson();
 
     fireEvent.click(screen.getByTestId("reward-again"));
 
@@ -146,10 +157,10 @@ describe("ゲーム画面（color）", () => {
     expect(screen.getAllByTestId("choice").length).toBeGreaterThan(0);
   });
 
-  it("「おうちに もどる」で /home へ遷移する", () => {
+  it("「おうちに もどる」で /home へ遷移する", async () => {
     paramsRef.current = { category: "color" };
     renderWithAuth(<GamePage />);
-    clearLesson();
+    await clearLesson();
 
     fireEvent.click(screen.getByTestId("reward-home"));
     expect(pushMock).toHaveBeenCalledWith("/home");
@@ -157,12 +168,12 @@ describe("ゲーム画面（color）", () => {
 });
 
 describe("ゲーム画面（shape）", () => {
-  it("全問正解でごほうびが表示され、進捗のクリア数が増える", () => {
+  it("全問正解でごほうびが表示され、進捗のクリア数が増える", async () => {
     paramsRef.current = { category: "shape" };
     expect(loadProgress().categories.shape.cleared).toBe(0);
 
     renderWithAuth(<GamePage />);
-    clearLesson();
+    await clearLesson();
 
     expect(screen.getByTestId("reward")).toBeInTheDocument();
     expect(loadProgress().categories.shape.cleared).toBe(1);
@@ -170,12 +181,12 @@ describe("ゲーム画面（shape）", () => {
 });
 
 describe("ゲーム画面（number）", () => {
-  it("全問正解でごほうびが表示され、進捗のクリア数が増える", () => {
+  it("全問正解でごほうびが表示され、進捗のクリア数が増える", async () => {
     paramsRef.current = { category: "number" };
     expect(loadProgress().categories.number.cleared).toBe(0);
 
     renderWithAuth(<GamePage />);
-    clearLesson();
+    await clearLesson();
 
     expect(screen.getByTestId("reward")).toBeInTheDocument();
     expect(loadProgress().categories.number.cleared).toBe(1);
@@ -183,12 +194,12 @@ describe("ゲーム画面（number）", () => {
 });
 
 describe("ゲーム画面（animal）", () => {
-  it("全問正解でごほうびが表示され、進捗のクリア数とシールが増える", () => {
+  it("全問正解でごほうびが表示され、進捗のクリア数とシールが増える", async () => {
     paramsRef.current = { category: "animal" };
     expect(loadProgress().categories.animal.cleared).toBe(0);
 
     renderWithAuth(<GamePage />);
-    clearLesson();
+    await clearLesson();
 
     expect(screen.getByTestId("reward")).toBeInTheDocument();
     expect(screen.getByText("よく できました！")).toBeInTheDocument();
@@ -199,10 +210,10 @@ describe("ゲーム画面（animal）", () => {
     expect(loadProgress().stickers.length).toBeGreaterThan(0);
   });
 
-  it("「もういちど」で animal が最初から再開する", () => {
+  it("「もういちど」で animal が最初から再開する", async () => {
     paramsRef.current = { category: "animal" };
     renderWithAuth(<GamePage />);
-    clearLesson();
+    await clearLesson();
 
     fireEvent.click(screen.getByTestId("reward-again"));
 
@@ -213,10 +224,10 @@ describe("ゲーム画面（animal）", () => {
     expect(screen.getAllByTestId("choice")[0].querySelector("img")).toBeInTheDocument();
   });
 
-  it("「おうちに もどる」で /home へ遷移する", () => {
+  it("「おうちに もどる」で /home へ遷移する", async () => {
     paramsRef.current = { category: "animal" };
     renderWithAuth(<GamePage />);
-    clearLesson();
+    await clearLesson();
 
     fireEvent.click(screen.getByTestId("reward-home"));
     expect(pushMock).toHaveBeenCalledWith("/home");
