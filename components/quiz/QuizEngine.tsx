@@ -19,11 +19,11 @@ export interface QuizEngineProps {
   onComplete: (stars: number) => void;
 }
 
-// 正解演出の表示時間（ms）。この後に次の問題へ進む
-const CORRECT_FEEDBACK_MS = 1100;
-// 誤答演出（wobble＋「もういちど！」フキダシ）の表示時間（ms）。
-// フキダシを読めるよう少し長めにし、この後に再挑戦できる状態へ戻す
-const WRONG_FEEDBACK_MS = 1100;
+// 正解/誤答の演出は「ほめ言葉（fb-correct / fb-retry）が鳴り終わってから」次へ進む。
+// 音声の長さに依存して途切れないよう、固定待ちではなく再生完了を待つ（lib/audio の Promise）。
+// ただし演出が一瞬で消えないよう最小表示時間を、音声が長すぎ/失敗してもハングしないよう上限を設ける。
+const MIN_FEEDBACK_MS = 800;
+const MAX_FEEDBACK_MS = 4000;
 
 /**
  * 種目に依存しない共通クイズエンジン。
@@ -51,16 +51,22 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
 
   // 保留中の setTimeout をまとめて管理し、unmount 時にクリアして状態更新リークを防ぐ
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  // unmount 後に非同期コールバックで状態更新しないためのガード。
+  const isMountedRef = useRef(true);
   useEffect(() => {
+    isMountedRef.current = true;
     const timers = timersRef.current;
     return () => {
+      isMountedRef.current = false;
       timers.forEach(clearTimeout);
     };
   }, []);
-  const scheduleTimer = (callback: () => void, ms: number): void => {
-    const timerId = setTimeout(callback, ms);
-    timersRef.current.push(timerId);
-  };
+  // unmount 時にクリアされる setTimeout ベースの遅延 Promise。
+  const delay = (ms: number): Promise<void> =>
+    new Promise((resolve) => {
+      const timerId = setTimeout(resolve, ms);
+      timersRef.current.push(timerId);
+    });
 
   // 問題が切り替わるたびに設問を自動で読み上げる（初回含む。完了時は読み上げない）
   useEffect(() => {
@@ -78,6 +84,22 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
     }
   }, [state.status, state.stars, onComplete]);
 
+  /**
+   * ほめ言葉の再生完了を待ってから次のアクションを実行する。
+   * 「音声が鳴り終わる」かつ「最小表示時間が経過」した時点（上限でキャップ）で進める。
+   * これにより音声の長さに依存せず、途切れず・止まらずに遷移できる。
+   */
+  const afterFeedback = (phrase: Promise<void>, onDone: () => void): void => {
+    void Promise.race([
+      Promise.all([phrase, delay(MIN_FEEDBACK_MS)]),
+      delay(MAX_FEEDBACK_MS),
+    ]).then(() => {
+      if (isMountedRef.current) {
+        onDone();
+      }
+    });
+  };
+
   const handleSelect = (choiceId: string, correct: boolean): void => {
     // 演出中（playing 以外）の再タップは無視して二重発火を防ぐ
     if (state.status !== "playing") {
@@ -89,21 +111,21 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
       setMascotAnimation("cheer");
       // 効果音を先に鳴らし、その直後にほめ言葉を再生する
       playSfx("/audio/sfx/correct.mp3");
-      playPhrase("fb-correct");
-      // 演出を見せてから次の問題へ進む
-      scheduleTimer(() => {
+      const praise = playPhrase("fb-correct");
+      // ほめ言葉が鳴り終わってから次の問題へ進む（途切れ防止）
+      afterFeedback(praise, () => {
         setSelectedId(null);
         setMascotAnimation("bob");
         dispatch({ type: "advance" });
-      }, CORRECT_FEEDBACK_MS);
+      });
     } else {
       dispatch({ type: "answer", correct: false });
-      playPhrase("fb-retry");
-      // wobble を見せてから再挑戦可能に戻す（進行はしない）
-      scheduleTimer(() => {
+      const retry = playPhrase("fb-retry");
+      // 「もういちど！」が鳴り終わってから再挑戦可能に戻す（進行はしない）
+      afterFeedback(retry, () => {
         setSelectedId(null);
         dispatch({ type: "retryAck" });
-      }, WRONG_FEEDBACK_MS);
+      });
     }
   };
 

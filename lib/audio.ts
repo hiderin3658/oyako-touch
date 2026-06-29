@@ -16,6 +16,8 @@ const SILENT_MP3 =
 
 // 現在再生中のクリップ。新しいクリップを鳴らす前に止めるため保持する。
 let currentClip: HTMLAudioElement | null = null;
+// 現在のクリップの「再生終了 Promise」を解決する関数。停止時にも解決して待ち手をハングさせない。
+let currentResolve: (() => void) | null = null;
 // グローバルな解錠リスナを二重に張らないためのフラグ。
 let isUnlockListenerAttached = false;
 
@@ -34,17 +36,23 @@ function isNotAllowedError(error: unknown): boolean {
   );
 }
 
-/** 直前のクリップ再生を止める。 */
+/** 直前のクリップ再生を止める。停止したクリップの再生終了 Promise も解決する。 */
 function stopCurrentClip(): void {
-  if (!currentClip) {
-    return;
-  }
-  try {
-    currentClip.pause();
-  } catch {
-    // すでに破棄済み等で pause に失敗しても問題ない
-  }
+  const clip = currentClip;
+  const resolve = currentResolve;
   currentClip = null;
+  currentResolve = null;
+  if (clip) {
+    try {
+      clip.pause();
+    } catch {
+      // すでに破棄済み等で pause に失敗しても問題ない
+    }
+  }
+  // 待ち手（ほめ言葉の再生完了待ち等）をハングさせないよう解決する。
+  if (resolve) {
+    resolve();
+  }
 }
 
 /**
@@ -87,61 +95,109 @@ export function unlockAudio(): void {
  * （自動再生ブロックを除く）では fallbackText を Web Speech で読み上げる。
  * SSR / Audio 非対応環境では何もしない。
  *
+ * 戻り値は「再生がひと区切りついた」ときに解決する Promise。
+ *   - 自然な再生終了（ended）
+ *   - 読み込み失敗→フォールバック開始時
+ *   - 自動再生ブロック / 同期例外
+ *   - 次のクリップ再生などで途中停止されたとき
+ * いずれの場合も必ず解決するため、呼び出し側（ほめ言葉の鳴り終わりを待って進行する等）は
+ * await してもハングしない。Web Speech フォールバックの読み上げ完了は待たない。
+ *
  * @param src 再生する MP3 のパス（例: /audio/q/color-001.mp3）
  * @param fallbackText MP3 が使えないときに読み上げる文言
  */
-export function playClip(src: string, fallbackText: string): void {
+export function playClip(src: string, fallbackText: string): Promise<void> {
   if (!isAudioAvailable()) {
-    return;
+    return Promise.resolve();
   }
   // 初回利用時に解錠リスナを張っておく（以降のクリップが鳴りやすくなる）
   unlockAudio();
-  try {
-    stopCurrentClip();
-
-    const clip = new Audio(src);
-    currentClip = clip;
-
-    // フォールバックの二重発火を防ぐガード。
-    // 新しいクリップに置き換わっている場合（意図的な停止による reject 等）も鳴らさない。
-    let hasFallenBack = false;
-    const fallback = (): void => {
-      if (hasFallenBack || clip !== currentClip) {
+  return new Promise<void>((resolve) => {
+    let settled = false;
+    const settle = (): void => {
+      if (settled) {
         return;
       }
-      hasFallenBack = true;
-      speak(fallbackText);
+      settled = true;
+      resolve();
     };
+    try {
+      stopCurrentClip();
 
-    // 読み込み失敗（404 等の error イベント）で Web Speech にフォールバック
-    clip.addEventListener("error", fallback, { once: true });
+      const clip = new Audio(src);
+      currentClip = clip;
+      // 停止（stopCurrentClip）された場合もこの settle が呼ばれて解決される。
+      currentResolve = settle;
 
-    const played = clip.play();
-    if (played && typeof played.then === "function") {
-      played.catch((error: unknown) => {
-        // 自動再生ブロックはフォールバックしても同様にブロックされるため、無理に鳴らさない
-        if (isNotAllowedError(error)) {
+      // このクリップが現在のものなら共有参照を片付ける。
+      const clearIfCurrent = (): void => {
+        if (clip === currentClip) {
+          currentClip = null;
+          currentResolve = null;
+        }
+      };
+
+      // フォールバックの二重発火を防ぐガード。
+      // 新しいクリップに置き換わっている場合（意図的な停止による reject 等）も鳴らさない。
+      let hasFallenBack = false;
+      const fallback = (): void => {
+        if (hasFallenBack || clip !== currentClip) {
           return;
         }
-        fallback();
-      });
+        hasFallenBack = true;
+        speak(fallbackText);
+      };
+
+      // 自然な再生終了で解決する。
+      clip.addEventListener(
+        "ended",
+        () => {
+          clearIfCurrent();
+          settle();
+        },
+        { once: true },
+      );
+      // 読み込み失敗（404 等の error イベント）で Web Speech にフォールバックして解決する。
+      clip.addEventListener(
+        "error",
+        () => {
+          fallback();
+          clearIfCurrent();
+          settle();
+        },
+        { once: true },
+      );
+
+      const played = clip.play();
+      if (played && typeof played.then === "function") {
+        played.catch((error: unknown) => {
+          // 自動再生ブロックはフォールバックしても同様にブロックされるため、無理に鳴らさない
+          if (!isNotAllowedError(error)) {
+            fallback();
+          }
+          clearIfCurrent();
+          settle();
+        });
+      }
+    } catch (error) {
+      // new Audio や play() の同期例外時もフォールバックを試みる
+      console.debug("クリップ再生の開始に失敗しました。フォールバックします。", error);
+      speak(fallbackText);
+      settle();
     }
-  } catch (error) {
-    // new Audio や play() の同期例外時もフォールバックを試みる
-    console.debug("クリップ再生の開始に失敗しました。フォールバックします。", error);
-    speak(fallbackText);
-  }
+  });
 }
 
 /**
  * 固定句クリップ（/audio/fb/<key>.mp3）を再生する。
  * フォールバック文言は phrases.json の text を用いる。
+ * 戻り値は playClip と同じく「再生がひと区切りついた」ときに解決する Promise。
  *
  * @param key 固定句キー（fb-correct / fb-retry / reward-done / home-prompt）
  */
-export function playPhrase(key: string): void {
+export function playPhrase(key: string): Promise<void> {
   const fallbackText = PHRASES[key]?.text ?? "";
-  playClip(`/audio/fb/${key}.mp3`, fallbackText);
+  return playClip(`/audio/fb/${key}.mp3`, fallbackText);
 }
 
 /**
