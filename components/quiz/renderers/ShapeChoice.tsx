@@ -46,13 +46,6 @@ function ShapeFigure({ shape, color }: { shape: ShapeKind; color: string }) {
       </svg>
     );
   }
-  if (shape === "ellipse") {
-    return (
-      <svg className={styles.shape} viewBox="0 0 100 100" aria-hidden="true">
-        <ellipse cx="50" cy="50" rx="44" ry="30" fill={color} />
-      </svg>
-    );
-  }
   if (shape === "star") {
     return (
       <svg className={styles.shape} viewBox="0 0 100 100" aria-hidden="true">
