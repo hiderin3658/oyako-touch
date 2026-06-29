@@ -104,7 +104,7 @@ describe("ShapeChoice", () => {
     expect(screen.getByRole("button").querySelector("svg path")).toBeInTheDocument();
   });
 
-  it("star / heart は path 要素、ellipse は ellipse 要素を描画する", () => {
+  it("star / heart は path 要素を描画する", () => {
     const star: ShapeChoiceData = {
       id: "s4",
       label: "ほし",
@@ -126,16 +126,6 @@ describe("ShapeChoice", () => {
     };
     rerender(<ShapeChoice choice={heart} state="idle" onSelect={() => {}} />);
     expect(screen.getByRole("button").querySelector("svg path")).toBeInTheDocument();
-
-    const ellipse: ShapeChoiceData = {
-      id: "s6",
-      label: "だえん",
-      shape: "ellipse",
-      color: "#4FC3F7",
-      correct: false,
-    };
-    rerender(<ShapeChoice choice={ellipse} state="idle" onSelect={() => {}} />);
-    expect(screen.getByRole("button").querySelector("svg ellipse")).toBeInTheDocument();
   });
 });
 

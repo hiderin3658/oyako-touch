@@ -58,21 +58,9 @@
       "choices": [
         { "id": "s1", "label": "ハート", "shape": "heart", "color": "#FF5E8A", "correct": true },
         { "id": "s2", "label": "さんかく", "shape": "triangle", "color": "#8FC97F", "correct": false },
-        { "id": "s3", "label": "だえん", "shape": "ellipse", "color": "#4FC3F7", "correct": false }
+        { "id": "s3", "label": "まる", "shape": "circle", "color": "#7FB8E8", "correct": false }
       ],
       "reward": "sticker-heart"
-    },
-    {
-      "id": "shape-006",
-      "category": "shape",
-      "type": "select-one",
-      "prompt": { "text": "だえんは どれかな？", "say": "だえんは どれかな" },
-      "choices": [
-        { "id": "s1", "label": "だえん", "shape": "ellipse", "color": "#4FC3F7", "correct": true },
-        { "id": "s2", "label": "ほし", "shape": "star", "color": "#FFC92E", "correct": false },
-        { "id": "s3", "label": "ハート", "shape": "heart", "color": "#FF5E8A", "correct": false }
-      ],
-      "reward": "sticker-ellipse"
     },
     {
       "id": "shape-007",
@@ -82,7 +70,7 @@
       "choices": [
         { "id": "s1", "label": "ほし", "shape": "star", "color": "#FFC92E", "correct": true },
         { "id": "s2", "label": "ハート", "shape": "heart", "color": "#FF5E8A", "correct": false },
-        { "id": "s3", "label": "だえん", "shape": "ellipse", "color": "#4FC3F7", "correct": false }
+        { "id": "s3", "label": "しかく", "shape": "square", "color": "#F2A65A", "correct": false }
       ],
       "reward": "sticker-star"
     },
@@ -97,18 +85,6 @@
         { "id": "s3", "label": "まる", "shape": "circle", "color": "#7FB8E8", "correct": false }
       ],
       "reward": "sticker-heart"
-    },
-    {
-      "id": "shape-009",
-      "category": "shape",
-      "type": "select-one",
-      "prompt": { "text": "だえんは どれかな？", "say": "だえんは どれかな" },
-      "choices": [
-        { "id": "s1", "label": "だえん", "shape": "ellipse", "color": "#4FC3F7", "correct": true },
-        { "id": "s2", "label": "しかく", "shape": "square", "color": "#F2A65A", "correct": false },
-        { "id": "s3", "label": "さんかく", "shape": "triangle", "color": "#8FC97F", "correct": false }
-      ],
-      "reward": "sticker-ellipse"
     },
     {
       "id": "shape-010",
