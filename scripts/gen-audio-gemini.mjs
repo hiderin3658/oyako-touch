@@ -69,6 +69,9 @@ const RETRY_DELAY_MS = 800;
 // 429（レート制限）は短い待ちでは回復しないため、専用に長めの待機を入れる。
 // ループは逐次実行なので、この待ちが後続リクエストのペース配分も兼ねる。
 const RATE_LIMIT_DELAY_MS = 20000;
+// 分単位(RPM)制限を踏まないための事前ペーシング。各 API 生成の前に空ける間隔（最初の1件は待たない）。
+// 既定 8 秒（約7.5 RPM 相当）。GEMINI_TTS_PACING_MS で変更可（0 で無効）。
+const DEFAULT_PACING_MS = 8000;
 
 // ---------------------------------------------------------------------------
 // パス設定
@@ -373,6 +376,11 @@ async function main() {
     process.env.GEMINI_TTS_STYLE != null
       ? cleanEnv(process.env.GEMINI_TTS_STYLE)
       : DEFAULT_GEMINI_STYLE;
+  // リクエスト間ペーシング（ms）。未設定なら既定値。
+  const pacingMs =
+    process.env.GEMINI_TTS_PACING_MS != null
+      ? Math.max(0, Number(cleanEnv(process.env.GEMINI_TTS_PACING_MS)) || 0)
+      : DEFAULT_PACING_MS;
 
   // APIキー検証（dry-run では不要）。
   if (!isDryRun && !apiKey) {
@@ -447,6 +455,8 @@ async function main() {
   let failedCount = 0;
   // 日次クォータ枯渇を検知したら以降は全て失敗するため、全体を打ち切る。
   let abortedByDailyQuota = false;
+  // 実際に API を呼んだ回数。2件目以降の前にペーシングを入れて RPM 制限を避ける。
+  let apiCallCount = 0;
 
   for (const section of sections) {
     if (abortedByDailyQuota) break;
@@ -468,6 +478,12 @@ async function main() {
         plannedCount += 1;
         continue;
       }
+
+      // 直前の生成から一定間隔を空ける（最初の1件は待たない）。
+      if (pacingMs > 0 && apiCallCount > 0) {
+        await sleep(pacingMs);
+      }
+      apiCallCount += 1;
 
       try {
         const wav = await fetchGeminiTts(target, { apiKey, model, voice, style });
