@@ -1,7 +1,7 @@
 // 問題ドメインの型定義（DOM非依存の純粋な型）
 
-/** 問題カテゴリ。「いろあわせ」「かたちはめ」「すうじ」「どうぶつ」の4種目 */
-export type Category = "color" | "shape" | "number" | "animal";
+/** 問題カテゴリ。「いろあわせ」「かたちはめ」「すうじ」「どうぶつ」「おおきさ」の5種目 */
+export type Category = "color" | "shape" | "number" | "animal" | "size";
 
 /** 設問文と読み上げテキスト。audio は将来のElevenLabs音声用（今回未使用） */
 export interface PromptData {
@@ -46,8 +46,20 @@ export interface AnimalChoice extends ChoiceBase {
   image: string;
 }
 
+/** おおきさの選択肢（同一図形をサイズ違いで描画） */
+export interface SizeChoice extends ChoiceBase {
+  shape: ShapeKind;
+  color: string;
+  size: "large" | "medium" | "small";
+}
+
 /** 選択肢のユニオン */
-export type Choice = ColorChoice | ShapeChoice | NumberChoice | AnimalChoice;
+export type Choice =
+  | ColorChoice
+  | ShapeChoice
+  | NumberChoice
+  | AnimalChoice
+  | SizeChoice;
 
 /** 1問の定義。category により choices の型が決まる判別ユニオン */
 export type Problem =
@@ -81,6 +93,14 @@ export type Problem =
       type: "select-one";
       prompt: PromptData;
       choices: AnimalChoice[];
+      reward?: string;
+    }
+  | {
+      id: string;
+      category: "size";
+      type: "select-one";
+      prompt: PromptData;
+      choices: SizeChoice[];
       reward?: string;
     };
 

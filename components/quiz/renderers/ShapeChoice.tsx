@@ -31,7 +31,7 @@ function buildClassName(state: ShapeChoiceProps["state"]): string {
 }
 
 /** 図形SVG。prototype.html の shapeSVG() を移植（色は choice.color を使用） */
-function ShapeFigure({ shape, color }: { shape: ShapeKind; color: string }) {
+export function ShapeFigure({ shape, color }: { shape: ShapeKind; color: string }) {
   if (shape === "circle") {
     return (
       <svg className={styles.shape} viewBox="0 0 100 100" aria-hidden="true">

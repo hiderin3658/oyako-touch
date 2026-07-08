@@ -69,6 +69,22 @@
   line-height: 1;
 }
 
+/* おおきさタイル：同一絵文字を大中小で並べてサイズ差を表す */
+.iconLarge {
+  font-size: clamp(30px, 5.4vw, 48px);
+  line-height: 1;
+}
+
+.iconMedium {
+  font-size: clamp(22px, 3.9vw, 35px);
+  line-height: 1;
+}
+
+.iconSmall {
+  font-size: clamp(15px, 2.7vw, 24px);
+  line-height: 1;
+}
+
 .label {
   font-size: clamp(20px, 3.6vw, 28px);
   font-weight: 800;
@@ -88,6 +104,10 @@
 
 .animal .label {
   color: var(--leaf);
+}
+
+.size .label {
+  color: var(--tangerine);
 }
 
 .hint {
