@@ -132,6 +132,12 @@ describe("おうち画面", () => {
     fireEvent.click(screen.getByTestId("tile-size"));
     expect(pushMock).toHaveBeenCalledWith("/game/size");
   });
+
+  it("「かず」タイルで /game/count へ遷移する", () => {
+    renderWithAuth(<HomePage />);
+    fireEvent.click(screen.getByTestId("tile-count"));
+    expect(pushMock).toHaveBeenCalledWith("/game/count");
+  });
 });
 
 describe("ゲーム画面（color）", () => {
@@ -274,6 +280,47 @@ describe("ゲーム画面（size）", () => {
 
   it("「おうちに もどる」で /home へ遷移する（I5）", async () => {
     paramsRef.current = { category: "size" };
+    renderWithAuth(<GamePage />);
+    await clearLesson();
+
+    fireEvent.click(screen.getByTestId("reward-home"));
+    expect(pushMock).toHaveBeenCalledWith("/home");
+  });
+});
+
+describe("ゲーム画面（count）", () => {
+  it("完走でごほうびが表示され、count のクリア数とシールが増え、他カテゴリは不変", async () => {
+    paramsRef.current = { category: "count" };
+    expect(loadProgress().categories.count.cleared).toBe(0);
+
+    renderWithAuth(<GamePage />);
+    await clearLesson();
+
+    expect(screen.getByTestId("reward")).toBeInTheDocument();
+    expect(screen.getByText("よく できました！")).toBeInTheDocument();
+    // count のクリアが既存カテゴリと独立して記録される
+    expect(loadProgress().categories.count.cleared).toBe(1);
+    expect(loadProgress().categories.color.cleared).toBe(0);
+    // ごほうびシール（sticker-count）が付与される
+    expect(loadProgress().stickers.length).toBeGreaterThan(0);
+  });
+
+  it("「もういちど」で count が星0から再開し、選択肢が再描画される", async () => {
+    paramsRef.current = { category: "count" };
+    renderWithAuth(<GamePage />);
+    await clearLesson();
+
+    fireEvent.click(screen.getByTestId("reward-again"));
+
+    expect(screen.queryByTestId("reward")).not.toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /ほし 0/ })).toBeInTheDocument();
+    // 画像選択肢が再出題されている
+    expect(screen.getAllByTestId("choice").length).toBeGreaterThan(0);
+    expect(screen.getAllByTestId("choice")[0].querySelector("img")).toBeInTheDocument();
+  });
+
+  it("「おうちに もどる」で /home へ遷移する", async () => {
+    paramsRef.current = { category: "count" };
     renderWithAuth(<GamePage />);
     await clearLesson();
 

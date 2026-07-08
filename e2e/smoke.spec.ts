@@ -205,18 +205,19 @@ test("おおきさレッスンを完走してごほうびに到達する（I7）
   await expect(page.getByTestId("reward-home")).toBeVisible();
 });
 
-test("おうちに種目タイル（size 含む）がすべて表示されクリックできる（I10）", async ({
+test("おうちに種目タイル（size / count 含む）がすべて表示されクリックできる（I10）", async ({
   page,
 }) => {
   await loginAndReachHome(page);
 
-  // 現状の 5 タイル（color/shape/number/animal/size）がすべて可視である
+  // 現状の 6 タイル（color/shape/number/animal/size/count）がすべて可視である
   for (const testId of [
     "tile-color",
     "tile-shape",
     "tile-number",
     "tile-animal",
     "tile-size",
+    "tile-count",
   ]) {
     await expect(page.getByTestId(testId)).toBeVisible();
   }
@@ -233,6 +234,38 @@ test("どうぶつレッスンを完走してごほうびに到達する", async
   await page.getByTestId("tile-animal").click();
 
   // 最初の出題で動物イラスト画像（選択肢内の img）が描画されていることを確認する
+  await expect(unlockedChoices(page)).toBeVisible();
+  await expect(page.locator('[data-testid="choice"] img').first()).toBeVisible();
+
+  // ごほうび（reward）が表示されるまで、各問で正解を押し続ける。
+  // 問題数や StarBar の総数には依存せず、「ごほうび到達」をゴールに繰り返す。
+  const reward = page.getByTestId("reward");
+  const unlocked = unlockedChoices(page);
+  const locked = lockedChoices(page);
+  while (!(await reward.isVisible())) {
+    // 出題中（ロック解除）になるのを待ってから正解を確定させる
+    await expect(unlocked).toBeVisible();
+    await correctChoice(page).click();
+    // クリックが受理されると正解演出に入りロックされる（最終問題ならごほうびへ）
+    await expect(locked.or(reward)).toBeVisible();
+    // 正解演出後、次の出題（ロック解除）かごほうびのどちらかになるまで待つ
+    await expect(unlocked.or(reward)).toBeVisible();
+  }
+
+  // ごほうび到達を assert
+  await expect(reward).toBeVisible();
+  await expect(page.getByText("よく できました！")).toBeVisible();
+  await expect(page.getByTestId("reward-again")).toBeVisible();
+  await expect(page.getByTestId("reward-home")).toBeVisible();
+});
+
+test("かずレッスンを完走してごほうびに到達する", async ({ page }) => {
+  await loginAndReachHome(page);
+
+  // おうち → かず
+  await page.getByTestId("tile-count").click();
+
+  // 最初の出題でお皿画像（選択肢内の img）が描画されていることを確認する
   await expect(unlockedChoices(page)).toBeVisible();
   await expect(page.locator('[data-testid="choice"] img').first()).toBeVisible();
 
