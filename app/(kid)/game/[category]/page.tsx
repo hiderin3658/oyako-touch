@@ -18,6 +18,7 @@ const VALID_CATEGORIES: Category[] = [
   "number",
   "animal",
   "size",
+  "count",
 ];
 
 /** URLパラメータが対応カテゴリかを判定する型ガード */

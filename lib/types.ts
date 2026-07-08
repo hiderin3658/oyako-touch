@@ -1,7 +1,7 @@
 // 問題ドメインの型定義（DOM非依存の純粋な型）
 
-/** 問題カテゴリ。「いろあわせ」「かたちはめ」「すうじ」「どうぶつ」「おおきさ」の5種目 */
-export type Category = "color" | "shape" | "number" | "animal" | "size";
+/** 問題カテゴリ。「いろあわせ」「かたちはめ」「すうじ」「どうぶつ」「おおきさ」「かず」の6種目 */
+export type Category = "color" | "shape" | "number" | "animal" | "size" | "count";
 
 /** 設問文と読み上げテキスト。audio は将来のElevenLabs音声用（今回未使用） */
 export interface PromptData {
@@ -46,6 +46,13 @@ export interface AnimalChoice extends ChoiceBase {
   image: string;
 }
 
+/** かずの選択肢（お皿＋果物n個の完成画像）。fruit/count は検証・テスト用メタ */
+export interface CountChoice extends ChoiceBase {
+  image: string;   // /images/plates/{fruit}-{count}.png
+  fruit: string;   // strawberry|orange|apple|grape|banana
+  count: number;   // 1〜5
+}
+
 /** おおきさの選択肢（同一図形をサイズ違いで描画） */
 export interface SizeChoice extends ChoiceBase {
   shape: ShapeKind;
@@ -59,7 +66,8 @@ export type Choice =
   | ShapeChoice
   | NumberChoice
   | AnimalChoice
-  | SizeChoice;
+  | SizeChoice
+  | CountChoice;
 
 /** 1問の定義。category により choices の型が決まる判別ユニオン */
 export type Problem =
@@ -101,6 +109,14 @@ export type Problem =
       type: "select-one";
       prompt: PromptData;
       choices: SizeChoice[];
+      reward?: string;
+    }
+  | {
+      id: string;
+      category: "count";
+      type: "select-one";
+      prompt: PromptData;
+      choices: CountChoice[];
       reward?: string;
     };
 

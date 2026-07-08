@@ -54,6 +54,41 @@ describe("progress（localStorage）", () => {
     expect(progress.categories.animal.cleared).toBe(0);
   });
 
+  it("count カテゴリでもクラッシュせず cleared が増え、他カテゴリは不変", () => {
+    expect(() => recordLessonClear("count", 4)).not.toThrow();
+    const progress = loadProgress();
+    expect(progress.categories.count.cleared).toBe(1);
+    expect(progress.categories.count.lastStars).toBe(4);
+    // 既存カテゴリに影響しないこと
+    expect(progress.categories.color.cleared).toBe(0);
+    expect(progress.categories.size.cleared).toBe(0);
+  });
+
+  it("count キーが欠けた旧フォーマットでも初期値で補完される（normalizeProgress）", () => {
+    // count カテゴリを含まない旧フォーマットの保存データを用意する
+    // （normalizeProgress のループ配列に count 追記漏れがあると補完されず検知できる）
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        categories: {
+          color: { cleared: 2, lastStars: 3 },
+          shape: { cleared: 0, lastStars: 0 },
+          number: { cleared: 0, lastStars: 0 },
+          animal: { cleared: 1, lastStars: 2 },
+          size: { cleared: 0, lastStars: 0 },
+        },
+        stickers: ["sticker-apple"],
+      }),
+    );
+    const progress = loadProgress();
+    // 欠けていた count が初期値で補完される
+    expect(progress.categories.count).toEqual({ cleared: 0, lastStars: 0 });
+    // 既存値は保持される
+    expect(progress.categories.color.cleared).toBe(2);
+    expect(progress.categories.animal.cleared).toBe(1);
+    expect(progress.stickers).toEqual(["sticker-apple"]);
+  });
+
   it("size キーが欠けた旧フォーマットでも初期値で補完される（U23・normalizeProgress）", () => {
     // size カテゴリを含まない旧フォーマットの保存データを用意する
     // （normalizeProgress のループ配列に size 追記漏れがあると補完されず検知できる）

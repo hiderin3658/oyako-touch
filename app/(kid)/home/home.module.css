@@ -110,6 +110,10 @@
   color: var(--tangerine);
 }
 
+.count .label {
+  color: var(--sunny);
+}
+
 .hint {
   position: fixed;
   bottom: 14px;

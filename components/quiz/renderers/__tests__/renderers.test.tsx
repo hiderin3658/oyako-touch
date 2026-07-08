@@ -7,6 +7,7 @@ import {
   NumberChoice,
   AnimalChoice,
   SizeChoice,
+  CountChoice,
   choiceRenderers,
 } from "@/components/quiz/renderers";
 import type {
@@ -15,6 +16,7 @@ import type {
   NumberChoice as NumberChoiceData,
   AnimalChoice as AnimalChoiceData,
   SizeChoice as SizeChoiceData,
+  CountChoice as CountChoiceData,
 } from "@/lib/types";
 
 const colorChoice: ColorChoiceData = {
@@ -52,6 +54,15 @@ const largeSizeChoice: SizeChoiceData = {
   shape: "circle",
   color: "#7FB8E8",
   size: "large",
+  correct: true,
+};
+
+const countChoice: CountChoiceData = {
+  id: "k1",
+  label: "いちご いつつ",
+  image: "/images/plates/strawberry-5.png",
+  fruit: "strawberry",
+  count: 5,
   correct: true,
 };
 
@@ -272,6 +283,57 @@ describe("SizeChoice", () => {
   });
 });
 
+describe("CountChoice", () => {
+  it("label を aria-label に持つボタンと、src が choice.image・alt 空の画像を描画する", () => {
+    render(<CountChoice choice={countChoice} state="idle" onSelect={() => {}} />);
+    const button = screen.getByRole("button", { name: "いちご いつつ" });
+    expect(button).toBeInTheDocument();
+
+    // 画像は装飾扱い。src は choice.image そのまま、alt は空文字
+    const img = button.querySelector("img");
+    expect(img).toBeInTheDocument();
+    expect(img?.getAttribute("src")).toBe(countChoice.image);
+    expect(img?.getAttribute("alt")).toBe("");
+  });
+
+  it("data-correct に正誤が反映される", () => {
+    const { rerender } = render(
+      <CountChoice choice={countChoice} state="idle" onSelect={() => {}} />,
+    );
+    expect(screen.getByRole("button")).toHaveAttribute("data-correct", "true");
+
+    const wrong: CountChoiceData = {
+      id: "k2",
+      label: "りんご ひとつ",
+      image: "/images/plates/apple-1.png",
+      fruit: "apple",
+      count: 1,
+      correct: false,
+    };
+    rerender(<CountChoice choice={wrong} state="idle" onSelect={() => {}} />);
+    expect(screen.getByRole("button")).toHaveAttribute("data-correct", "false");
+  });
+
+  it("クリックで onSelect が1回だけ発火する", async () => {
+    const onSelect = vi.fn();
+    const user = userEvent.setup();
+    render(<CountChoice choice={countChoice} state="idle" onSelect={onSelect} />);
+
+    await user.click(screen.getByRole("button", { name: "いちご いつつ" }));
+    expect(onSelect).toHaveBeenCalledTimes(1);
+  });
+
+  it("state に応じて data-state が変わる", () => {
+    const { rerender } = render(
+      <CountChoice choice={countChoice} state="right" onSelect={() => {}} />,
+    );
+    expect(screen.getByRole("button")).toHaveAttribute("data-state", "right");
+
+    rerender(<CountChoice choice={countChoice} state="wrong" onSelect={() => {}} />);
+    expect(screen.getByRole("button")).toHaveAttribute("data-state", "wrong");
+  });
+});
+
 describe("choiceRenderers", () => {
   it("カテゴリごとにレンダラが対応している", () => {
     expect(choiceRenderers.color).toBe(ColorChoice);
@@ -279,5 +341,6 @@ describe("choiceRenderers", () => {
     expect(choiceRenderers.number).toBe(NumberChoice);
     expect(choiceRenderers.animal).toBe(AnimalChoice);
     expect(choiceRenderers.size).toBe(SizeChoice);
+    expect(choiceRenderers.count).toBe(CountChoice);
   });
 });

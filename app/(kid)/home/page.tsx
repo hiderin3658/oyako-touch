@@ -95,6 +95,20 @@ export default function HomePage() {
           </span>
           <span className={styles.label}>おおきさ</span>
         </button>
+
+        <button
+          type="button"
+          className={`${styles.tile} ${styles.count}`}
+          onClick={() => router.push("/game/count")}
+          data-testid="tile-count"
+        >
+          <span className={styles.emoji}>
+            <span className={styles.icon}>🍓</span>
+            <span className={styles.icon}>🍊</span>
+            <span className={styles.icon}>🍎</span>
+          </span>
+          <span className={styles.label}>かず</span>
+        </button>
       </div>
 
       <ParentLock />

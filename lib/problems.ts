@@ -5,6 +5,7 @@ import shapeData from "@/content/problems/shape.json";
 import numberData from "@/content/problems/number.json";
 import animalData from "@/content/problems/animal.json";
 import sizeData from "@/content/problems/size.json";
+import countData from "@/content/problems/count.json";
 
 /** カテゴリ → ビルド時importの生データ（カテゴリ追加時はここに追記する） */
 const lessonSources: Record<Category, unknown> = {
@@ -13,6 +14,7 @@ const lessonSources: Record<Category, unknown> = {
   number: numberData,
   animal: animalData,
   size: sizeData,
+  count: countData,
 };
 
 /**
@@ -33,13 +35,14 @@ export function validateLesson(raw: unknown): Lesson {
   }
   const lesson = raw as Record<string, unknown>;
 
-  // カテゴリは "color" | "shape" | "number" | "animal" | "size" のみ許可
+  // カテゴリは "color" | "shape" | "number" | "animal" | "size" | "count" のみ許可
   if (
     lesson.category !== "color" &&
     lesson.category !== "shape" &&
     lesson.category !== "number" &&
     lesson.category !== "animal" &&
-    lesson.category !== "size"
+    lesson.category !== "size" &&
+    lesson.category !== "count"
   ) {
     throw new Error(`レッスンの category が不正です: ${String(lesson.category)}`);
   }
@@ -127,6 +130,20 @@ export function validateLesson(raw: unknown): Lesson {
           throw new Error(
             `problem(${problem.id}) の choice には size(large|medium|small) が必要です`,
           );
+        }
+      }
+    }
+
+    // かずは各 choice に非空の image と number 型の count が必須
+    if (category === "count") {
+      for (const choice of problem.choices) {
+        const image = (choice as Record<string, unknown>).image;
+        if (typeof image !== "string" || image.length === 0) {
+          throw new Error(`problem(${problem.id}) の choice には非空の image が必要です`);
+        }
+        const count = (choice as Record<string, unknown>).count;
+        if (typeof count !== "number") {
+          throw new Error(`problem(${problem.id}) の choice には number 型の count が必要です`);
         }
       }
     }

@@ -4,6 +4,7 @@ import { ShapeChoice } from "./ShapeChoice";
 import { NumberChoice } from "./NumberChoice";
 import { AnimalChoice } from "./AnimalChoice";
 import { SizeChoice } from "./SizeChoice";
+import { CountChoice } from "./CountChoice";
 
 /** 選択肢を描画するレンダラの共通シグネチャ（種目に依存しない） */
 export type ChoiceRenderer = (props: {
@@ -19,6 +20,14 @@ export const choiceRenderers: Record<Category, ChoiceRenderer> = {
   number: NumberChoice,
   animal: AnimalChoice,
   size: SizeChoice,
+  count: CountChoice,
 };
 
-export { ColorChoice, ShapeChoice, NumberChoice, AnimalChoice, SizeChoice };
+export {
+  ColorChoice,
+  ShapeChoice,
+  NumberChoice,
+  AnimalChoice,
+  SizeChoice,
+  CountChoice,
+};
