@@ -6,6 +6,7 @@ import {
   ShapeChoice,
   NumberChoice,
   AnimalChoice,
+  SizeChoice,
   choiceRenderers,
 } from "@/components/quiz/renderers";
 import type {
@@ -13,6 +14,7 @@ import type {
   ShapeChoice as ShapeChoiceData,
   NumberChoice as NumberChoiceData,
   AnimalChoice as AnimalChoiceData,
+  SizeChoice as SizeChoiceData,
 } from "@/lib/types";
 
 const colorChoice: ColorChoiceData = {
@@ -41,6 +43,15 @@ const animalChoice: AnimalChoiceData = {
   id: "a1",
   label: "いぬ",
   image: "/images/animals/dog.png",
+  correct: true,
+};
+
+const largeSizeChoice: SizeChoiceData = {
+  id: "z1",
+  label: "おおきい",
+  shape: "circle",
+  color: "#7FB8E8",
+  size: "large",
   correct: true,
 };
 
@@ -207,11 +218,66 @@ describe("AnimalChoice", () => {
   });
 });
 
+describe("SizeChoice", () => {
+  it("large は label 名のボタン・内部に図形SVG・ラッパに sizeLarge クラスを描画する（U16）", () => {
+    render(<SizeChoice choice={largeSizeChoice} state="idle" onSelect={() => {}} />);
+    const button = screen.getByRole("button", { name: "おおきい" });
+    expect(button).toBeInTheDocument();
+    // 内部に図形 SVG（circle）が描画される
+    expect(button.querySelector("svg")).toBeInTheDocument();
+    expect(button.querySelector("svg circle")).toBeInTheDocument();
+    // サイズ別ラッパのクラスに sizeLarge 相当が付く（CSS Modules のハッシュ名を部分一致で確認）
+    const wrapper = button.querySelector("span");
+    expect(wrapper?.getAttribute("class")).toMatch(/sizeLarge/);
+  });
+
+  it("medium / small はそれぞれ sizeMedium / sizeSmall のラッパで描画する（U17）", () => {
+    const medium: SizeChoiceData = { ...largeSizeChoice, id: "z2", size: "medium" };
+    const { rerender } = render(
+      <SizeChoice choice={medium} state="idle" onSelect={() => {}} />,
+    );
+    expect(
+      screen.getByRole("button").querySelector("span")?.getAttribute("class"),
+    ).toMatch(/sizeMedium/);
+
+    const small: SizeChoiceData = { ...largeSizeChoice, id: "z3", size: "small" };
+    rerender(<SizeChoice choice={small} state="idle" onSelect={() => {}} />);
+    expect(
+      screen.getByRole("button").querySelector("span")?.getAttribute("class"),
+    ).toMatch(/sizeSmall/);
+  });
+
+  it("クリックで onSelect が1回発火し、data-state / data-correct が反映される（U18）", async () => {
+    const onSelect = vi.fn();
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <SizeChoice choice={largeSizeChoice} state="idle" onSelect={onSelect} />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "おおきい" }));
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    // 正解選択肢は data-correct="true"
+    expect(screen.getByRole("button")).toHaveAttribute("data-correct", "true");
+
+    // state に応じて data-state が right / wrong に変化する
+    rerender(<SizeChoice choice={largeSizeChoice} state="right" onSelect={onSelect} />);
+    expect(screen.getByRole("button")).toHaveAttribute("data-state", "right");
+    rerender(<SizeChoice choice={largeSizeChoice} state="wrong" onSelect={onSelect} />);
+    expect(screen.getByRole("button")).toHaveAttribute("data-state", "wrong");
+
+    // 誤答選択肢は data-correct="false"
+    const wrong: SizeChoiceData = { ...largeSizeChoice, correct: false };
+    rerender(<SizeChoice choice={wrong} state="idle" onSelect={onSelect} />);
+    expect(screen.getByRole("button")).toHaveAttribute("data-correct", "false");
+  });
+});
+
 describe("choiceRenderers", () => {
   it("カテゴリごとにレンダラが対応している", () => {
     expect(choiceRenderers.color).toBe(ColorChoice);
     expect(choiceRenderers.shape).toBe(ShapeChoice);
     expect(choiceRenderers.number).toBe(NumberChoice);
     expect(choiceRenderers.animal).toBe(AnimalChoice);
+    expect(choiceRenderers.size).toBe(SizeChoice);
   });
 });

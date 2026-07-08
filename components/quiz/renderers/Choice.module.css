@@ -64,6 +64,33 @@
   line-height: 1;
 }
 
+/* おおきさ：図形を中央に置き、サイズ別クラスで拡大縮小するラッパ */
+.sizeWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* 大：領域いっぱい */
+.sizeLarge {
+  width: 100%;
+  height: 100%;
+}
+
+/* 中：66% */
+.sizeMedium {
+  width: 66%;
+  height: 66%;
+}
+
+/* 小：45% */
+.sizeSmall {
+  width: 45%;
+  height: 45%;
+}
+
 /* どうぶつのイラスト画像（正方領域に収め、縦横比を保って表示） */
 .animalImage {
   width: 100%;
