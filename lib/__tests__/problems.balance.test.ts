@@ -9,7 +9,13 @@ import type { Category } from "@/lib/types";
 // 正解位置バランス（4:4:4）を検証する対象カテゴリ。
 // 問題数のハードコードは避け、length/3 による均等分割で検証する。
 // 将来 size/count を追加した際は、この配列に追記すれば自動で対象になる。
-const balancedCategories: Category[] = ["color", "shape", "number", "animal"];
+const balancedCategories: Category[] = [
+  "color",
+  "shape",
+  "number",
+  "animal",
+  "size",
+];
 
 describe("正解位置の 4:4:4 バランス（U12）", () => {
   for (const category of balancedCategories) {
@@ -65,6 +71,25 @@ describe("number は 1〜10 を網羅する（U13）", () => {
     for (let value = 1; value <= 10; value += 1) {
       expect(correctValues.has(value), `${value} が正解に含まれない`).toBe(true);
     }
+  });
+});
+
+describe("size の設問方向が混在する（U14）", () => {
+  const lesson = loadLesson("size");
+
+  it("prompt.text に「おおきい」6問・「ちいさい」6問が含まれる", () => {
+    let bigger = 0;
+    let smaller = 0;
+    for (const problem of lesson.problems) {
+      if (problem.prompt.text.includes("おおきい")) {
+        bigger += 1;
+      }
+      if (problem.prompt.text.includes("ちいさい")) {
+        smaller += 1;
+      }
+    }
+    expect(bigger, "おおきい 設問数").toBe(6);
+    expect(smaller, "ちいさい 設問数").toBe(6);
   });
 });
 

@@ -173,6 +173,59 @@ test("すうじレッスンを完走してごほうびに到達する", async ({
   await expect(page.getByTestId("reward-home")).toBeVisible();
 });
 
+test("おおきさレッスンを完走してごほうびに到達する（I7）", async ({ page }) => {
+  await loginAndReachHome(page);
+
+  // おうち → おおきさ
+  await page.getByTestId("tile-size").click();
+
+  // 最初の出題で図形 SVG（選択肢内の svg）が描画されていることを確認する
+  await expect(unlockedChoices(page)).toBeVisible();
+  await expect(page.locator('[data-testid="choice"] svg').first()).toBeVisible();
+
+  // ごほうび（reward）が表示されるまで、各問で正解を押し続ける。
+  // 問題数や StarBar の総数には依存せず、「ごほうび到達」をゴールに繰り返す。
+  const reward = page.getByTestId("reward");
+  const unlocked = unlockedChoices(page);
+  const locked = lockedChoices(page);
+  while (!(await reward.isVisible())) {
+    // 出題中（ロック解除）になるのを待ってから正解を確定させる
+    await expect(unlocked).toBeVisible();
+    await correctChoice(page).click();
+    // クリックが受理されると正解演出に入りロックされる（最終問題ならごほうびへ）
+    await expect(locked.or(reward)).toBeVisible();
+    // 正解演出後、次の出題（ロック解除）かごほうびのどちらかになるまで待つ
+    await expect(unlocked.or(reward)).toBeVisible();
+  }
+
+  // ごほうび到達を assert
+  await expect(reward).toBeVisible();
+  await expect(page.getByText("よく できました！")).toBeVisible();
+  await expect(page.getByTestId("reward-again")).toBeVisible();
+  await expect(page.getByTestId("reward-home")).toBeVisible();
+});
+
+test("おうちに種目タイル（size 含む）がすべて表示されクリックできる（I10）", async ({
+  page,
+}) => {
+  await loginAndReachHome(page);
+
+  // 現状の 5 タイル（color/shape/number/animal/size）がすべて可視である
+  for (const testId of [
+    "tile-color",
+    "tile-shape",
+    "tile-number",
+    "tile-animal",
+    "tile-size",
+  ]) {
+    await expect(page.getByTestId(testId)).toBeVisible();
+  }
+
+  // size タイルはクリックでき、ゲーム画面（出題中の選択肢）へ進む
+  await page.getByTestId("tile-size").click();
+  await expect(unlockedChoices(page)).toBeVisible();
+});
+
 test("どうぶつレッスンを完走してごほうびに到達する", async ({ page }) => {
   await loginAndReachHome(page);
 
