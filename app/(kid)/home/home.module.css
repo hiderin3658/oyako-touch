@@ -21,17 +21,25 @@
   margin: 6px 0 2px;
 }
 
+/* 種目タイルは3列固定グリッド（6個なら横3×縦2）。
+   タイルが増えても3列で折り返す。狭い画面では2列に落とす。 */
 .menu {
-  display: flex;
-  gap: 26px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, min(28vw, 210px));
+  gap: clamp(16px, 2.4vw, 26px);
   justify-content: center;
   margin-top: 10px;
 }
 
+@media (max-width: 560px) {
+  .menu {
+    grid-template-columns: repeat(2, min(42vw, 210px));
+  }
+}
+
 .tile {
-  width: min(40vw, 210px);
-  min-width: 150px;
+  width: 100%;
+  min-width: 0;
   aspect-ratio: 1 / 1;
   /* 絵文字がタイル端からはみ出さないよう内側に余白を確保する */
   padding: 18px;
