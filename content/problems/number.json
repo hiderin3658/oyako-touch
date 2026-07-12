@@ -9,8 +9,8 @@
       "prompt": { "text": "いちは どれかな？", "say": "いち、は どれかな" },
       "choices": [
         { "id": "n1", "label": "いち", "value": 1, "correct": true },
-        { "id": "n2", "label": "に", "value": 2, "correct": false },
-        { "id": "n3", "label": "さん", "value": 3, "correct": false }
+        { "id": "n2", "label": "ご", "value": 5, "correct": false },
+        { "id": "n3", "label": "はち", "value": 8, "correct": false }
       ],
       "reward": "sticker-number"
     },
@@ -20,9 +20,9 @@
       "type": "select-number",
       "prompt": { "text": "には どれかな？", "say": "に、は どれかな" },
       "choices": [
-        { "id": "n1", "label": "いち", "value": 1, "correct": false },
+        { "id": "n1", "label": "ろく", "value": 6, "correct": false },
         { "id": "n2", "label": "に", "value": 2, "correct": true },
-        { "id": "n3", "label": "さん", "value": 3, "correct": false }
+        { "id": "n3", "label": "きゅう", "value": 9, "correct": false }
       ],
       "reward": "sticker-number"
     },
@@ -32,8 +32,8 @@
       "type": "select-number",
       "prompt": { "text": "さんは どれかな？", "say": "さん、は どれかな" },
       "choices": [
-        { "id": "n1", "label": "に", "value": 2, "correct": false },
-        { "id": "n2", "label": "よん", "value": 4, "correct": false },
+        { "id": "n1", "label": "なな", "value": 7, "correct": false },
+        { "id": "n2", "label": "じゅう", "value": 10, "correct": false },
         { "id": "n3", "label": "さん", "value": 3, "correct": true }
       ],
       "reward": "sticker-number"
@@ -45,8 +45,8 @@
       "prompt": { "text": "よんは どれかな？", "say": "よん、は どれかな" },
       "choices": [
         { "id": "n1", "label": "よん", "value": 4, "correct": true },
-        { "id": "n2", "label": "さん", "value": 3, "correct": false },
-        { "id": "n3", "label": "ご", "value": 5, "correct": false }
+        { "id": "n2", "label": "はち", "value": 8, "correct": false },
+        { "id": "n3", "label": "いち", "value": 1, "correct": false }
       ],
       "reward": "sticker-number"
     },
@@ -56,9 +56,9 @@
       "type": "select-number",
       "prompt": { "text": "ごは どれかな？", "say": "ご、は どれかな" },
       "choices": [
-        { "id": "n1", "label": "よん", "value": 4, "correct": false },
+        { "id": "n1", "label": "いち", "value": 1, "correct": false },
         { "id": "n2", "label": "ご", "value": 5, "correct": true },
-        { "id": "n3", "label": "ろく", "value": 6, "correct": false }
+        { "id": "n3", "label": "きゅう", "value": 9, "correct": false }
       ],
       "reward": "sticker-number"
     },
@@ -68,8 +68,8 @@
       "type": "select-number",
       "prompt": { "text": "ろくは どれかな？", "say": "ろく、は どれかな" },
       "choices": [
-        { "id": "n1", "label": "ご", "value": 5, "correct": false },
-        { "id": "n2", "label": "なな", "value": 7, "correct": false },
+        { "id": "n1", "label": "に", "value": 2, "correct": false },
+        { "id": "n2", "label": "じゅう", "value": 10, "correct": false },
         { "id": "n3", "label": "ろく", "value": 6, "correct": true }
       ],
       "reward": "sticker-number"
@@ -81,8 +81,8 @@
       "prompt": { "text": "ななは どれかな？", "say": "なな、は どれかな" },
       "choices": [
         { "id": "n1", "label": "なな", "value": 7, "correct": true },
-        { "id": "n2", "label": "ろく", "value": 6, "correct": false },
-        { "id": "n3", "label": "はち", "value": 8, "correct": false }
+        { "id": "n2", "label": "さん", "value": 3, "correct": false },
+        { "id": "n3", "label": "じゅう", "value": 10, "correct": false }
       ],
       "reward": "sticker-number"
     },
@@ -92,9 +92,9 @@
       "type": "select-number",
       "prompt": { "text": "はちは どれかな？", "say": "はち、は どれかな" },
       "choices": [
-        { "id": "n1", "label": "なな", "value": 7, "correct": false },
+        { "id": "n1", "label": "よん", "value": 4, "correct": false },
         { "id": "n2", "label": "はち", "value": 8, "correct": true },
-        { "id": "n3", "label": "きゅう", "value": 9, "correct": false }
+        { "id": "n3", "label": "いち", "value": 1, "correct": false }
       ],
       "reward": "sticker-number"
     },
@@ -104,8 +104,8 @@
       "type": "select-number",
       "prompt": { "text": "きゅうは どれかな？", "say": "きゅう、は どれかな" },
       "choices": [
-        { "id": "n1", "label": "はち", "value": 8, "correct": false },
-        { "id": "n2", "label": "じゅう", "value": 10, "correct": false },
+        { "id": "n1", "label": "ご", "value": 5, "correct": false },
+        { "id": "n2", "label": "に", "value": 2, "correct": false },
         { "id": "n3", "label": "きゅう", "value": 9, "correct": true }
       ],
       "reward": "sticker-number"
@@ -117,8 +117,8 @@
       "prompt": { "text": "じゅうは どれかな？", "say": "じゅう、は どれかな" },
       "choices": [
         { "id": "n1", "label": "じゅう", "value": 10, "correct": true },
-        { "id": "n2", "label": "はち", "value": 8, "correct": false },
-        { "id": "n3", "label": "きゅう", "value": 9, "correct": false }
+        { "id": "n2", "label": "ろく", "value": 6, "correct": false },
+        { "id": "n3", "label": "さん", "value": 3, "correct": false }
       ],
       "reward": "sticker-number"
     },
@@ -128,9 +128,9 @@
       "type": "select-number",
       "prompt": { "text": "ろくは どれかな？", "say": "ろく、は どれかな" },
       "choices": [
-        { "id": "n1", "label": "ご", "value": 5, "correct": false },
+        { "id": "n1", "label": "いち", "value": 1, "correct": false },
         { "id": "n2", "label": "ろく", "value": 6, "correct": true },
-        { "id": "n3", "label": "なな", "value": 7, "correct": false }
+        { "id": "n3", "label": "きゅう", "value": 9, "correct": false }
       ],
       "reward": "sticker-number"
     },
@@ -140,8 +140,8 @@
       "type": "select-number",
       "prompt": { "text": "さんは どれかな？", "say": "さん、は どれかな" },
       "choices": [
-        { "id": "n1", "label": "いち", "value": 1, "correct": false },
-        { "id": "n2", "label": "に", "value": 2, "correct": false },
+        { "id": "n1", "label": "ろく", "value": 6, "correct": false },
+        { "id": "n2", "label": "きゅう", "value": 9, "correct": false },
         { "id": "n3", "label": "さん", "value": 3, "correct": true }
       ],
       "reward": "sticker-number"
