@@ -21,8 +21,8 @@
   margin: 6px 0 2px;
 }
 
-/* 種目タイルは3列固定グリッド（6個なら横3×縦2）。
-   タイルが増えても3列で折り返す。狭い画面では2列に落とす。 */
+/* 種目タイルは3列固定グリッド（7個なら横3×縦2＋1）。
+   タイルが増えても3列で折り返し、崩れない。狭い画面では2列に落とす。 */
 .menu {
   display: grid;
   grid-template-columns: repeat(3, min(28vw, 210px));
@@ -120,6 +120,10 @@
 
 .count .label {
   color: var(--sunny);
+}
+
+.katahame .label {
+  color: var(--mint);
 }
 
 .hint {

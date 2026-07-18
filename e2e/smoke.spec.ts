@@ -259,6 +259,103 @@ test("どうぶつレッスンを完走してごほうびに到達する", async
   await expect(page.getByTestId("reward-home")).toBeVisible();
 });
 
+test("おうちに『かたはめ』を含む7タイルが表示され、クリックで盤面へ到達する（I2）", async ({
+  page,
+}) => {
+  await loginAndReachHome(page);
+
+  // 現状の 7 タイル（既存6 ＋ katahame）がすべて可視である
+  for (const testId of [
+    "tile-color",
+    "tile-shape",
+    "tile-number",
+    "tile-animal",
+    "tile-size",
+    "tile-count",
+    "tile-katahame",
+  ]) {
+    await expect(page.getByTestId(testId)).toBeVisible();
+  }
+
+  // かたはめタイルはクリックでき、盤面（穴＋ピース）へ進む
+  await page.getByTestId("tile-katahame").click();
+  await expect(page.getByTestId("hole")).toBeVisible();
+  await expect(page.locator('[data-testid="piece"]').first()).toBeVisible();
+});
+
+test("かたはめで正解ピースを穴へドラッグすると星が1つ点く（I5）", async ({
+  page,
+}) => {
+  await loginAndReachHome(page);
+  await page.getByTestId("tile-katahame").click();
+
+  // 出題中（ロック解除）になってから穴・正解ピースを解決する
+  await expect(unlockedChoices(page)).toBeVisible();
+  const hole = page.getByTestId("hole");
+  const piece = page
+    .locator('[data-testid="piece"][data-correct="true"]')
+    .first();
+  await expect(hole).toBeVisible();
+  await expect(piece).toBeVisible();
+
+  const holeBox = await hole.boundingBox();
+  const pieceBox = await piece.boundingBox();
+  if (!holeBox || !pieceBox) {
+    throw new Error("bounding box を取得できません");
+  }
+
+  // ピース中心 → 穴中心へドラッグ（down→move→up）。
+  // Chromium はマウス操作で pointer イベントを発火するため、実ドラッグ経路を検証できる。
+  await page.mouse.move(
+    pieceBox.x + pieceBox.width / 2,
+    pieceBox.y + pieceBox.height / 2,
+  );
+  await page.mouse.down();
+  await page.mouse.move(
+    holeBox.x + holeBox.width / 2,
+    holeBox.y + holeBox.height / 2,
+    { steps: 8 },
+  );
+  await page.mouse.up();
+
+  // 正解が反映され星が1つ点く（総数には依存しない）
+  await expect(page.locator('[data-on="true"]')).toHaveCount(1);
+});
+
+test("かたはめを完走してごほうびに到達する（I6）", async ({ page }) => {
+  await loginAndReachHome(page);
+
+  // おうち → かたはめ
+  await page.getByTestId("tile-katahame").click();
+
+  // 最初の出題で穴（差し込み口）が描画されていることを確認する
+  await expect(unlockedChoices(page)).toBeVisible();
+  await expect(page.getByTestId("hole")).toBeVisible();
+
+  // ごほうび（reward）が表示されるまで、各問で正解ピースをタップ設置し続ける。
+  // クリック＝タップ設置（穴中心で判定＝正解）。問題数には依存せず到達で判定する。
+  const reward = page.getByTestId("reward");
+  const unlocked = unlockedChoices(page);
+  const locked = lockedChoices(page);
+  while (!(await reward.isVisible())) {
+    await expect(unlocked).toBeVisible();
+    await page
+      .locator('[data-testid="piece"][data-correct="true"]')
+      .first()
+      .click();
+    // クリックが受理されると正解演出に入りロックされる（最終問題ならごほうびへ）
+    await expect(locked.or(reward)).toBeVisible();
+    // 正解演出後、次の出題（ロック解除）かごほうびのどちらかになるまで待つ
+    await expect(unlocked.or(reward)).toBeVisible();
+  }
+
+  // 既存と同一ゴール（reward-again / reward-home）へ到達する
+  await expect(reward).toBeVisible();
+  await expect(page.getByText("よく できました！")).toBeVisible();
+  await expect(page.getByTestId("reward-again")).toBeVisible();
+  await expect(page.getByTestId("reward-home")).toBeVisible();
+});
+
 test("かずレッスンを完走してごほうびに到達する", async ({ page }) => {
   await loginAndReachHome(page);
 

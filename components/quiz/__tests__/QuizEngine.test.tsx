@@ -244,4 +244,122 @@ describe("QuizEngine", () => {
     // 2問目でも読み上げが発火し、size-001.mp3 が計2回鳴る（修正前は1回のまま＝無音）
     expect(callsForSize001()).toBe(2);
   });
+
+  it("katahame Lesson で正解ピースをタップ設置すると星+1・せいかい！・演出後に次問（U23）", async () => {
+    const lesson = loadLesson("katahame");
+    render(<QuizEngine lesson={lesson} onComplete={vi.fn()} />);
+
+    // 盤面（ピース）が描画され、設問文・星0が表示される
+    const pieces = screen.getAllByTestId("piece");
+    expect(pieces.length).toBeGreaterThan(0);
+    expect(screen.getByText(lesson.problems[0].prompt.text)).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /ほし 0/ })).toBeInTheDocument();
+
+    // 正解ピースをタップ設置（無移動＝穴中心で判定＝正解）
+    const correct = pieces.find(
+      (p) => p.getAttribute("data-correct") === "true",
+    );
+    fireEvent.pointerDown(correct!);
+    fireEvent.pointerUp(correct!);
+
+    // 星が1に増え、せいかい！が出る
+    expect(screen.getByRole("img", { name: /ほし 1/ })).toBeInTheDocument();
+    expect(screen.getByText("せいかい！")).toBeInTheDocument();
+
+    // 演出後に次の問題へ進む
+    await advance(1100);
+    expect(screen.queryByText("せいかい！")).toBeNull();
+    expect(screen.getByText(lesson.problems[1].prompt.text)).toBeInTheDocument();
+  });
+
+  it("katahame で誤ピースをタップしても × やふせいかいを出さず同問に留まる（U24）", async () => {
+    const lesson = loadLesson("katahame");
+    render(<QuizEngine lesson={lesson} onComplete={vi.fn()} />);
+
+    const wrong = screen
+      .getAllByTestId("piece")
+      .find((p) => p.getAttribute("data-correct") === "false");
+    fireEvent.pointerDown(wrong!);
+    fireEvent.pointerUp(wrong!);
+
+    // フェイル表現は出さず、やさしい「もういちど！」を表示する
+    expect(screen.queryByText("×")).toBeNull();
+    expect(screen.queryByText(/ふせいかい/)).toBeNull();
+    expect(screen.getByText("もういちど！")).toBeInTheDocument();
+    // 星は増えない
+    expect(screen.getByRole("img", { name: /ほし 0/ })).toBeInTheDocument();
+
+    // 演出後は同じ問題のまま
+    await advance(1100);
+    expect(screen.queryByText("もういちど！")).toBeNull();
+    expect(screen.getByText(lesson.problems[0].prompt.text)).toBeInTheDocument();
+  });
+
+  it("katahame は prompt.audio があれば参照先の音声を再利用する（U25）", () => {
+    // katahame-009 は katahame-004 の音声を共有する（自身の音声は使わない）。
+    const lesson: Lesson = {
+      category: "katahame",
+      title: "かたはめ",
+      problems: [
+        {
+          id: "katahame-009",
+          category: "katahame",
+          type: "shape-fit",
+          prompt: {
+            text: "ほしを はめてね",
+            say: "ほしを はめてね",
+            audio: "katahame-004",
+          },
+          target: "star",
+          choices: [
+            { id: "p1", label: "ほし", shape: "star", color: "#7FB8E8", correct: true },
+            { id: "p2", label: "さんかく", shape: "triangle", color: "#7FB8E8", correct: false },
+          ],
+        },
+      ],
+    } as unknown as Lesson;
+
+    vi.mocked(playClip).mockClear();
+    render(<QuizEngine lesson={lesson} onComplete={vi.fn()} />);
+    // 問題IDの katahame-009.mp3 ではなく、参照先 katahame-004.mp3 を再生する
+    expect(playClip).toHaveBeenCalledWith(
+      "/audio/q/katahame-004.mp3",
+      "ほしを はめてね",
+    );
+  });
+
+  it("shape Lesson は従来どおり per-choice 描画で盤面ピースは出さない（U26・既存デグレ）", () => {
+    const lesson = loadLesson("shape");
+    render(<QuizEngine lesson={lesson} onComplete={vi.fn()} />);
+    // 従来の choice が描画され、board のピースは存在しない
+    expect(screen.getAllByTestId("choice").length).toBeGreaterThan(0);
+    expect(screen.queryAllByTestId("piece").length).toBe(0);
+  });
+
+  it("katahame は正解設置後の演出中ロックで再設置しても星が二重加算されず同問に留まる（I8）", () => {
+    const lesson = loadLesson("katahame");
+    render(<QuizEngine lesson={lesson} onComplete={vi.fn()} />);
+    const firstPrompt = lesson.problems[0].prompt.text;
+
+    // 正解ピースをタップ設置 → 星が1に増え演出中（盤面 locked）になる
+    const correct = screen
+      .getAllByTestId("piece")
+      .find((p) => p.getAttribute("data-correct") === "true");
+    fireEvent.pointerDown(correct!);
+    fireEvent.pointerUp(correct!);
+    expect(screen.getByRole("img", { name: /ほし 1/ })).toBeInTheDocument();
+
+    // advance せず演出（ロック）窓の内側で再設置しても、盤面が locked のため
+    // onPlace が発火せず、星は二重加算されない・早送りで次問へ進まない（afterFeedback/data-locked を board が共有）
+    const again = screen
+      .getAllByTestId("piece")
+      .find((p) => p.getAttribute("data-correct") === "true");
+    fireEvent.pointerDown(again!);
+    fireEvent.pointerUp(again!);
+
+    expect(screen.getByRole("img", { name: /ほし 1/ })).toBeInTheDocument();
+    expect(screen.queryByRole("img", { name: /ほし 2/ })).toBeNull();
+    // ほめ言葉完了前（advance 前）は同じ問題に留まる
+    expect(screen.getByText(firstPrompt)).toBeInTheDocument();
+  });
 });

@@ -8,7 +8,10 @@ import {
   AnimalChoice,
   SizeChoice,
   CountChoice,
+  ShapeFitBoard,
   choiceRenderers,
+  boardRenderers,
+  isTapCategory,
 } from "@/components/quiz/renderers";
 import type {
   ColorChoice as ColorChoiceData,
@@ -342,5 +345,29 @@ describe("choiceRenderers", () => {
     expect(choiceRenderers.animal).toBe(AnimalChoice);
     expect(choiceRenderers.size).toBe(SizeChoice);
     expect(choiceRenderers.count).toBe(CountChoice);
+  });
+});
+
+describe("boardRenderers / isTapCategory（U20）", () => {
+  it("katahame は boardRenderers に ShapeFitBoard として登録されている", () => {
+    expect(boardRenderers.katahame).toBe(ShapeFitBoard);
+  });
+
+  it("choiceRenderers に katahame は含まれない（盤面描画のため）", () => {
+    expect(Object.keys(choiceRenderers)).not.toContain("katahame");
+  });
+
+  it("isTapCategory は katahame のみ false、他のタップ種目は true", () => {
+    expect(isTapCategory("katahame")).toBe(false);
+    for (const category of [
+      "color",
+      "shape",
+      "number",
+      "animal",
+      "size",
+      "count",
+    ] as const) {
+      expect(isTapCategory(category), category).toBe(true);
+    }
   });
 });

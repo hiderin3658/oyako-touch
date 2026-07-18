@@ -64,6 +64,42 @@ describe("progress（localStorage）", () => {
     expect(progress.categories.size.cleared).toBe(0);
   });
 
+  it("katahame カテゴリでもクラッシュせず cleared が増え、他カテゴリは不変（U21）", () => {
+    expect(() => recordLessonClear("katahame", 5)).not.toThrow();
+    const progress = loadProgress();
+    expect(progress.categories.katahame.cleared).toBe(1);
+    expect(progress.categories.katahame.lastStars).toBe(5);
+    // 既存カテゴリに影響しないこと
+    expect(progress.categories.color.cleared).toBe(0);
+    expect(progress.categories.count.cleared).toBe(0);
+  });
+
+  it("katahame キーが欠けた旧フォーマットでも初期値で補完される（U22・normalizeProgress）", () => {
+    // katahame カテゴリを含まない旧フォーマットの保存データを用意する
+    // （normalizeProgress のループ配列に katahame 追記漏れがあると補完されず検知できる）
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        categories: {
+          color: { cleared: 2, lastStars: 3 },
+          shape: { cleared: 0, lastStars: 0 },
+          number: { cleared: 0, lastStars: 0 },
+          animal: { cleared: 1, lastStars: 2 },
+          size: { cleared: 0, lastStars: 0 },
+          count: { cleared: 0, lastStars: 0 },
+        },
+        stickers: ["sticker-apple"],
+      }),
+    );
+    const progress = loadProgress();
+    // 欠けていた katahame が初期値で補完される
+    expect(progress.categories.katahame).toEqual({ cleared: 0, lastStars: 0 });
+    // 既存値は保持される
+    expect(progress.categories.color.cleared).toBe(2);
+    expect(progress.categories.animal.cleared).toBe(1);
+    expect(progress.stickers).toEqual(["sticker-apple"]);
+  });
+
   it("count キーが欠けた旧フォーマットでも初期値で補完される（normalizeProgress）", () => {
     // count カテゴリを含まない旧フォーマットの保存データを用意する
     // （normalizeProgress のループ配列に count 追記漏れがあると補完されず検知できる）

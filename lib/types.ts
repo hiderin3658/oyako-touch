@@ -1,7 +1,14 @@
 // 問題ドメインの型定義（DOM非依存の純粋な型）
 
-/** 問題カテゴリ。「いろあわせ」「かたちはめ」「すうじ」「どうぶつ」「おおきさ」「かず」の6種目 */
-export type Category = "color" | "shape" | "number" | "animal" | "size" | "count";
+/** 問題カテゴリ。「いろあわせ」「かたちはめ」「すうじ」「どうぶつ」「おおきさ」「かず」「かたはめ」の7種目 */
+export type Category =
+  | "color"
+  | "shape"
+  | "number"
+  | "animal"
+  | "size"
+  | "count"
+  | "katahame";
 
 /** 設問文と読み上げテキスト。audio は将来のElevenLabs音声用（今回未使用） */
 export interface PromptData {
@@ -60,6 +67,12 @@ export interface SizeChoice extends ChoiceBase {
   size: "large" | "medium" | "small";
 }
 
+/** かたはめのピース（塗り図形）。1問内は全ピース同色（形だけで判別させる） */
+export interface KatahameChoice extends ChoiceBase {
+  shape: ShapeKind;
+  color: string;
+}
+
 /** 選択肢のユニオン */
 export type Choice =
   | ColorChoice
@@ -67,7 +80,8 @@ export type Choice =
   | NumberChoice
   | AnimalChoice
   | SizeChoice
-  | CountChoice;
+  | CountChoice
+  | KatahameChoice;
 
 /** 1問の定義。category により choices の型が決まる判別ユニオン */
 export type Problem =
@@ -117,6 +131,15 @@ export type Problem =
       type: "select-one";
       prompt: PromptData;
       choices: CountChoice[];
+      reward?: string;
+    }
+  | {
+      id: string;
+      category: "katahame";
+      type: "shape-fit";
+      prompt: PromptData;
+      target: ShapeKind; // 穴の形。正解ピースの shape と一致する
+      choices: KatahameChoice[]; // ピース2〜3個（正解1＋ダミー1〜2）
       reward?: string;
     };
 

@@ -11,7 +11,7 @@ import {
 import { playClip, playPhrase, playSfx } from "@/lib/audio";
 import { Mascot } from "@/components/Mascot";
 import { StarBar } from "@/components/quiz/StarBar";
-import { choiceRenderers } from "@/components/quiz/renderers";
+import { boardRenderers, choiceRenderers, isTapCategory } from "@/components/quiz/renderers";
 import styles from "./QuizEngine.module.css";
 
 export interface QuizEngineProps {
@@ -148,7 +148,11 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
     return "idle";
   };
 
-  const ChoiceComponent = choiceRenderers[lesson.category];
+  const category = lesson.category;
+  // 盤面レンダラ（かたはめ等）があればボードへ委譲。無ければ従来の per-choice 描画。
+  const BoardComponent = boardRenderers[category];
+  // タップ系カテゴリの選択肢レンダラ（盤面カテゴリでは null）。
+  const ChoiceComponent = isTapCategory(category) ? choiceRenderers[category] : null;
   // 正解時は「せいかい！」、誤答時は「もういちど！」を問題バーの真上に言葉で表示する
   const showCorrectHint = state.status === "correct";
   const showRetryHint = state.status === "retry";
@@ -186,14 +190,25 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
       </div>
       <StarBar count={state.stars} total={total} />
       <div className={styles.choices} data-locked={state.status !== "playing"}>
-        {choices.map((choice) => (
-          <ChoiceComponent
-            key={choice.id}
-            choice={choice}
-            state={choiceFeedback(choice.id)}
-            onSelect={() => handleSelect(choice.id, choice.correct)}
+        {BoardComponent ? (
+          // 盤面カテゴリ：次問（id変化）で盤面を再マウントして位置をリセットする
+          <BoardComponent
+            key={currentProblem.id}
+            problem={currentProblem}
+            locked={state.status !== "playing"}
+            onPlace={handleSelect}
           />
-        ))}
+        ) : (
+          ChoiceComponent &&
+          choices.map((choice) => (
+            <ChoiceComponent
+              key={choice.id}
+              choice={choice}
+              state={choiceFeedback(choice.id)}
+              onSelect={() => handleSelect(choice.id, choice.correct)}
+            />
+          ))
+        )}
       </div>
     </div>
   );
