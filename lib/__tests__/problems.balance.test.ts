@@ -32,6 +32,8 @@ describe("正解位置の 4:4:4 バランス（U12）", () => {
         // choices の並び位置（0=左 / 1=中 / 2=右）で決まる。
         const counts = [0, 0, 0];
         for (const problem of lesson.problems) {
+          // なぞりは選択肢を持たず 4:4:4 対象外（balancedCategories にも含めない）。
+          if (problem.category === "nazori") continue;
           const correctIndex = problem.choices.findIndex(
             (choice) => choice.correct,
           );
@@ -120,6 +122,8 @@ describe("4:4:4 対象カテゴリの整合（横断）", () => {
     it(`${category}: 各問の correct はちょうど1つ`, () => {
       const lesson = loadLesson(category);
       for (const problem of lesson.problems) {
+        // なぞりは選択肢を持たない（balancedCategories には含めないため実データ上は現れない）。
+        if (problem.category === "nazori") continue;
         const correctCount = problem.choices.filter(
           (choice) => choice.correct,
         ).length;

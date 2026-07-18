@@ -9,6 +9,7 @@ import {
   SizeChoice,
   CountChoice,
   ShapeFitBoard,
+  TraceBoard,
   choiceRenderers,
   boardRenderers,
   isTapCategory,
@@ -358,6 +359,31 @@ describe("boardRenderers / isTapCategory（U20）", () => {
   });
 
   it("isTapCategory は katahame のみ false、他のタップ種目は true", () => {
+    expect(isTapCategory("katahame")).toBe(false);
+    for (const category of [
+      "color",
+      "shape",
+      "number",
+      "animal",
+      "size",
+      "count",
+    ] as const) {
+      expect(isTapCategory(category), category).toBe(true);
+    }
+  });
+});
+
+describe("boardRenderers / isTapCategory（nazori・NU25）", () => {
+  it("nazori は boardRenderers に TraceBoard として登録されている", () => {
+    expect(boardRenderers.nazori).toBe(TraceBoard);
+  });
+
+  it("choiceRenderers に nazori は含まれない（盤面描画のため）", () => {
+    expect(Object.keys(choiceRenderers)).not.toContain("nazori");
+  });
+
+  it("isTapCategory は nazori・katahame が false、既存6種目は true", () => {
+    expect(isTapCategory("nazori")).toBe(false);
     expect(isTapCategory("katahame")).toBe(false);
     for (const category of [
       "color",

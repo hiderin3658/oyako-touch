@@ -6,9 +6,10 @@ import { AnimalChoice } from "./AnimalChoice";
 import { SizeChoice } from "./SizeChoice";
 import { CountChoice } from "./CountChoice";
 import { ShapeFitBoard } from "./ShapeFitBoard";
+import { TraceBoard } from "./TraceBoard";
 
-/** タップ3択で描画するカテゴリ（盤面描画の katahame を除く）。 */
-export type TapCategory = Exclude<Category, "katahame">;
+/** タップ3択で描画するカテゴリ（盤面描画の katahame・nazori を除く）。 */
+export type TapCategory = Exclude<Category, "katahame" | "nazori">;
 
 /** 選択肢を描画するレンダラの共通シグネチャ（種目に依存しない） */
 export type ChoiceRenderer = (props: {
@@ -40,11 +41,12 @@ export type BoardRenderer = (props: {
 /** 盤面描画が必要なカテゴリのレンダラ（登録が無いカテゴリは従来の per-choice 描画）。 */
 export const boardRenderers: Partial<Record<Category, BoardRenderer>> = {
   katahame: ShapeFitBoard,
+  nazori: TraceBoard,
 };
 
 /** タップ系カテゴリ（盤面描画でない）かを判定する型ガード。 */
 export function isTapCategory(category: Category): category is TapCategory {
-  return category !== "katahame";
+  return category !== "katahame" && category !== "nazori";
 }
 
 export {
@@ -55,4 +57,5 @@ export {
   SizeChoice,
   CountChoice,
   ShapeFitBoard,
+  TraceBoard,
 };

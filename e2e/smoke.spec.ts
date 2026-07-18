@@ -356,6 +356,115 @@ test("かたはめを完走してごほうびに到達する（I6）", async ({ 
   await expect(page.getByTestId("reward-home")).toBeVisible();
 });
 
+/**
+ * 表示中のなぞり盤面を実際にマウスでなぞる。
+ * ブラウザ内で道ガイドの幾何を等間隔サンプリングし、道ガイド矩形を使って client 座標へ写像してから、
+ * mouse down→move→up で実ドラッグ経路をたどる（許容半径内を順に消化させる）。
+ */
+async function traceCurrentBoard(page: Page): Promise<void> {
+  await expect(page.getByTestId("trace-board")).toBeVisible();
+  const path = await page.evaluate(() => {
+    const stage = document.querySelector('[data-testid="trace-board"]');
+    const guide = stage?.querySelector("[data-shape]");
+    const geo = guide?.querySelector("circle, rect, path") as
+      | SVGGeometryElement
+      | null;
+    if (!guide || !geo || typeof geo.getTotalLength !== "function") {
+      return [] as { x: number; y: number }[];
+    }
+    const rect = guide.getBoundingClientRect();
+    const total = geo.getTotalLength();
+    const count = 24;
+    const points: { x: number; y: number }[] = [];
+    for (let i = 0; i < count; i += 1) {
+      const p = geo.getPointAtLength((total * i) / (count - 1));
+      // viewBox(0..100) → 道ガイドの client 座標へ写像
+      points.push({
+        x: rect.left + (p.x / 100) * rect.width,
+        y: rect.top + (p.y / 100) * rect.height,
+      });
+    }
+    return points;
+  });
+  if (path.length === 0) {
+    throw new Error("道サンプルを取得できません");
+  }
+  await page.mouse.move(path[0].x, path[0].y);
+  await page.mouse.down();
+  for (const point of path) {
+    await page.mouse.move(point.x, point.y, { steps: 2 });
+  }
+  await page.mouse.up();
+}
+
+test("おうちに『なぞり』を含む8タイルが表示され、クリックで盤面へ到達する（NI2）", async ({
+  page,
+}) => {
+  await loginAndReachHome(page);
+
+  // 既存7 ＋ nazori の 8 タイルがすべて可視である
+  for (const testId of [
+    "tile-color",
+    "tile-shape",
+    "tile-number",
+    "tile-animal",
+    "tile-size",
+    "tile-count",
+    "tile-katahame",
+    "tile-nazori",
+  ]) {
+    await expect(page.getByTestId(testId)).toBeVisible();
+  }
+
+  // なぞりタイルはクリックでき、道ガイド盤面へ進む
+  await page.getByTestId("tile-nazori").click();
+  await expect(page.getByTestId("trace-board")).toBeVisible();
+  await expect(page.getByTestId("trace-start")).toBeVisible();
+});
+
+test("なぞりで道を実際になぞると星が1つ点く（NI5）", async ({ page }) => {
+  await loginAndReachHome(page);
+  await page.getByTestId("tile-nazori").click();
+
+  // 出題中（ロック解除）になってから道をなぞる
+  await expect(unlockedChoices(page)).toBeVisible();
+  await traceCurrentBoard(page);
+
+  // 完成が反映され星が1つ点く（総数には依存しない）
+  await expect(page.locator('[data-on="true"]')).toHaveCount(1);
+});
+
+test("なぞりを完走してごほうびに到達する（NI6）", async ({ page }) => {
+  await loginAndReachHome(page);
+
+  // おうち → なぞり
+  await page.getByTestId("tile-nazori").click();
+
+  // 最初の出題で道ガイドが描画されていることを確認する
+  await expect(unlockedChoices(page)).toBeVisible();
+  await expect(page.getByTestId("trace-board")).toBeVisible();
+
+  // ごほうび（reward）が表示されるまで、各問で道をなぞり続ける。
+  // 問題数には依存せず、「ごほうび到達」をゴールに繰り返す。
+  const reward = page.getByTestId("reward");
+  const unlocked = unlockedChoices(page);
+  const locked = lockedChoices(page);
+  while (!(await reward.isVisible())) {
+    await expect(unlocked).toBeVisible();
+    await traceCurrentBoard(page);
+    // 完成が受理されると演出に入りロックされる（最終問題ならごほうびへ）
+    await expect(locked.or(reward)).toBeVisible();
+    // 演出後、次の出題（ロック解除）かごほうびのどちらかになるまで待つ
+    await expect(unlocked.or(reward)).toBeVisible();
+  }
+
+  // 既存と同一ゴール（reward-again / reward-home）へ到達する
+  await expect(reward).toBeVisible();
+  await expect(page.getByText("よく できました！")).toBeVisible();
+  await expect(page.getByTestId("reward-again")).toBeVisible();
+  await expect(page.getByTestId("reward-home")).toBeVisible();
+});
+
 test("かずレッスンを完走してごほうびに到達する", async ({ page }) => {
   await loginAndReachHome(page);
 

@@ -1,0 +1,102 @@
+{
+  "category": "nazori",
+  "title": "なぞり",
+  "problems": [
+    {
+      "id": "nazori-001",
+      "category": "nazori",
+      "type": "trace",
+      "prompt": { "text": "まるを なぞってね", "say": "まるを なぞってね" },
+      "target": "circle",
+      "reward": "sticker-circle"
+    },
+    {
+      "id": "nazori-002",
+      "category": "nazori",
+      "type": "trace",
+      "prompt": { "text": "さんかくを なぞってね", "say": "さんかくを なぞってね" },
+      "target": "triangle",
+      "reward": "sticker-triangle"
+    },
+    {
+      "id": "nazori-003",
+      "category": "nazori",
+      "type": "trace",
+      "prompt": { "text": "しかくを なぞってね", "say": "しかくを なぞってね" },
+      "target": "square",
+      "reward": "sticker-square"
+    },
+    {
+      "id": "nazori-004",
+      "category": "nazori",
+      "type": "trace",
+      "prompt": { "text": "ほしを なぞってね", "say": "ほしを なぞってね" },
+      "target": "star",
+      "reward": "sticker-star"
+    },
+    {
+      "id": "nazori-005",
+      "category": "nazori",
+      "type": "trace",
+      "prompt": { "text": "ハートを なぞってね", "say": "ハートを なぞってね" },
+      "target": "heart",
+      "reward": "sticker-heart"
+    },
+    {
+      "id": "nazori-006",
+      "category": "nazori",
+      "type": "trace",
+      "prompt": { "text": "まるを なぞってね", "say": "まるを なぞってね", "audio": "nazori-001" },
+      "target": "circle",
+      "reward": "sticker-circle"
+    },
+    {
+      "id": "nazori-007",
+      "category": "nazori",
+      "type": "trace",
+      "prompt": { "text": "さんかくを なぞってね", "say": "さんかくを なぞってね", "audio": "nazori-002" },
+      "target": "triangle",
+      "reward": "sticker-triangle"
+    },
+    {
+      "id": "nazori-008",
+      "category": "nazori",
+      "type": "trace",
+      "prompt": { "text": "しかくを なぞってね", "say": "しかくを なぞってね", "audio": "nazori-003" },
+      "target": "square",
+      "reward": "sticker-square"
+    },
+    {
+      "id": "nazori-009",
+      "category": "nazori",
+      "type": "trace",
+      "prompt": { "text": "ほしを なぞってね", "say": "ほしを なぞってね", "audio": "nazori-004" },
+      "target": "star",
+      "reward": "sticker-star"
+    },
+    {
+      "id": "nazori-010",
+      "category": "nazori",
+      "type": "trace",
+      "prompt": { "text": "ハートを なぞってね", "say": "ハートを なぞってね", "audio": "nazori-005" },
+      "target": "heart",
+      "reward": "sticker-heart"
+    },
+    {
+      "id": "nazori-011",
+      "category": "nazori",
+      "type": "trace",
+      "prompt": { "text": "まるを なぞってね", "say": "まるを なぞってね", "audio": "nazori-001" },
+      "target": "circle",
+      "reward": "sticker-circle"
+    },
+    {
+      "id": "nazori-012",
+      "category": "nazori",
+      "type": "trace",
+      "prompt": { "text": "さんかくを なぞってね", "say": "さんかくを なぞってね", "audio": "nazori-002" },
+      "target": "triangle",
+      "reward": "sticker-triangle"
+    }
+  ]
+}

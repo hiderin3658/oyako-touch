@@ -21,6 +21,7 @@ function createInitialProgress(): Progress {
       size: { cleared: 0, lastStars: 0 },
       count: { cleared: 0, lastStars: 0 },
       katahame: { cleared: 0, lastStars: 0 },
+      nazori: { cleared: 0, lastStars: 0 },
     },
     stickers: [],
   };
@@ -46,6 +47,7 @@ function normalizeProgress(parsed: unknown): Progress {
     "size",
     "count",
     "katahame",
+    "nazori",
   ] as Category[]) {
     const entry = categories?.[category] as Record<string, unknown> | undefined;
     if (entry) {
