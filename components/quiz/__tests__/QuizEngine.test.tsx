@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { QuizEngine } from "@/components/quiz/QuizEngine";
 import { loadLesson } from "@/lib/problems";
-import { playPhrase } from "@/lib/audio";
+import { playClip, playPhrase } from "@/lib/audio";
 import type { Choice, Lesson } from "@/lib/types";
 
 // 音声はモックする（演出の進行は「ほめ言葉の再生完了」を待つため、即解決の Promise にして決定的にする）。
@@ -165,5 +165,36 @@ describe("QuizEngine", () => {
     await advance(0);
     expect(screen.queryByText("せいかい！")).toBeNull();
     expect(screen.getByText(lesson.problems[1].prompt.text)).toBeInTheDocument();
+  });
+
+  it("prompt.audio があれば参照先の音声を再利用して読み上げる", () => {
+    // size-003 は size-001 の音声を共有する（自身の size-003.mp3 は使わない）。
+    const lesson: Lesson = {
+      category: "size",
+      title: "おおきさ",
+      problems: [
+        {
+          id: "size-003",
+          category: "size",
+          type: "select-one",
+          prompt: {
+            text: "いちばん おおきいのは どれ？",
+            say: "いちばん おおきいのは どれ",
+            audio: "size-001",
+          },
+          choices: [
+            { id: "z1", label: "おおきい", shape: "circle", color: "#7FB8E8", size: "large", correct: true },
+            { id: "z2", label: "ちいさい", shape: "circle", color: "#7FB8E8", size: "small", correct: false },
+          ],
+        },
+      ],
+    } as unknown as Lesson;
+
+    render(<QuizEngine lesson={lesson} onComplete={vi.fn()} />);
+    // 問題IDの size-003.mp3 ではなく、参照先 size-001.mp3 を再生する
+    expect(playClip).toHaveBeenCalledWith(
+      "/audio/q/size-001.mp3",
+      "いちばん おおきいのは どれ",
+    );
   });
 });

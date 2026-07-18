@@ -47,6 +47,8 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
   const currentSay = state.index < total ? currentProblem.prompt.say : null;
   // 現在の設問読み上げクリップのパス（フォールバックは currentSay）
   const currentProblemId = currentProblem.id;
+  // audio 指定があれば既存音声を再利用、無ければ問題 ID の音声（従来どおり）
+  const currentAudioName = currentProblem.prompt.audio ?? currentProblemId;
   const choices: Choice[] = currentProblem.choices;
 
   // 保留中の setTimeout をまとめて管理し、unmount 時にクリアして状態更新リークを防ぐ
@@ -71,9 +73,9 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
   // 問題が切り替わるたびに設問を自動で読み上げる（初回含む。完了時は読み上げない）
   useEffect(() => {
     if (currentSay) {
-      playClip(`/audio/q/${currentProblemId}.mp3`, currentSay);
+      playClip(`/audio/q/${currentAudioName}.mp3`, currentSay);
     }
-  }, [currentSay, currentProblemId]);
+  }, [currentSay, currentAudioName]);
 
   // 完了検知：status==="done" になったら一度だけ onComplete を呼ぶ
   const hasCompletedRef = useRef(false);
@@ -172,7 +174,7 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
           animation={mascotAnimation}
           onTap={() => {
             if (currentSay) {
-              playClip(`/audio/q/${currentProblemId}.mp3`, currentSay);
+              playClip(`/audio/q/${currentAudioName}.mp3`, currentSay);
             }
           }}
           ariaLabel="もういちど よみあげる"
