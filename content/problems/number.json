@@ -54,7 +54,7 @@
       "id": "number-005",
       "category": "number",
       "type": "select-number",
-      "prompt": { "text": "ごは どれかな？", "say": "ご、は どれかな" },
+      "prompt": { "text": "ごは どれかな？", "say": "5、は どれかな" },
       "choices": [
         { "id": "n1", "label": "いち", "value": 1, "correct": false },
         { "id": "n2", "label": "ご", "value": 5, "correct": true },
@@ -126,7 +126,7 @@
       "id": "number-011",
       "category": "number",
       "type": "select-number",
-      "prompt": { "text": "ろくは どれかな？", "say": "ろく、は どれかな" },
+      "prompt": { "text": "ろくは どれかな？", "say": "ろく、は どれかな", "audio": "number-006" },
       "choices": [
         { "id": "n1", "label": "いち", "value": 1, "correct": false },
         { "id": "n2", "label": "ろく", "value": 6, "correct": true },
@@ -138,7 +138,7 @@
       "id": "number-012",
       "category": "number",
       "type": "select-number",
-      "prompt": { "text": "さんは どれかな？", "say": "さん、は どれかな" },
+      "prompt": { "text": "さんは どれかな？", "say": "さん、は どれかな", "audio": "number-003" },
       "choices": [
         { "id": "n1", "label": "ろく", "value": 6, "correct": false },
         { "id": "n2", "label": "きゅう", "value": 9, "correct": false },

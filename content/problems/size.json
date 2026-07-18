@@ -30,7 +30,7 @@
       "id": "size-003",
       "category": "size",
       "type": "select-one",
-      "prompt": { "text": "いちばん おおきいのは どれ？", "say": "いちばん おおきいのは どれ" },
+      "prompt": { "text": "いちばん おおきいのは どれ？", "say": "いちばん おおきいのは どれ", "audio": "size-001" },
       "choices": [
         { "id": "z1", "label": "ちいさい", "shape": "triangle", "color": "#8FC97F", "size": "small", "correct": false },
         { "id": "z2", "label": "ちゅうくらい", "shape": "triangle", "color": "#8FC97F", "size": "medium", "correct": false },
@@ -42,7 +42,7 @@
       "id": "size-004",
       "category": "size",
       "type": "select-one",
-      "prompt": { "text": "いちばん ちいさいのは どれ？", "say": "いちばん ちいさいのは どれ" },
+      "prompt": { "text": "いちばん ちいさいのは どれ？", "say": "いちばん ちいさいのは どれ", "audio": "size-002" },
       "choices": [
         { "id": "z1", "label": "ちいさい", "shape": "star", "color": "#FFC92E", "size": "small", "correct": true },
         { "id": "z2", "label": "おおきい", "shape": "star", "color": "#FFC92E", "size": "large", "correct": false },
@@ -54,7 +54,7 @@
       "id": "size-005",
       "category": "size",
       "type": "select-one",
-      "prompt": { "text": "いちばん おおきいのは どれ？", "say": "いちばん おおきいのは どれ" },
+      "prompt": { "text": "いちばん おおきいのは どれ？", "say": "いちばん おおきいのは どれ", "audio": "size-001" },
       "choices": [
         { "id": "z1", "label": "ちいさい", "shape": "heart", "color": "#FF5E8A", "size": "small", "correct": false },
         { "id": "z2", "label": "おおきい", "shape": "heart", "color": "#FF5E8A", "size": "large", "correct": true },
@@ -66,7 +66,7 @@
       "id": "size-006",
       "category": "size",
       "type": "select-one",
-      "prompt": { "text": "いちばん ちいさいのは どれ？", "say": "いちばん ちいさいのは どれ" },
+      "prompt": { "text": "いちばん ちいさいのは どれ？", "say": "いちばん ちいさいのは どれ", "audio": "size-002" },
       "choices": [
         { "id": "z1", "label": "おおきい", "shape": "circle", "color": "#FF8A3D", "size": "large", "correct": false },
         { "id": "z2", "label": "ちゅうくらい", "shape": "circle", "color": "#FF8A3D", "size": "medium", "correct": false },
@@ -78,7 +78,7 @@
       "id": "size-007",
       "category": "size",
       "type": "select-one",
-      "prompt": { "text": "いちばん おおきいのは どれ？", "say": "いちばん おおきいのは どれ" },
+      "prompt": { "text": "いちばん おおきいのは どれ？", "say": "いちばん おおきいのは どれ", "audio": "size-001" },
       "choices": [
         { "id": "z1", "label": "おおきい", "shape": "square", "color": "#9B6DFF", "size": "large", "correct": true },
         { "id": "z2", "label": "ちいさい", "shape": "square", "color": "#9B6DFF", "size": "small", "correct": false },
@@ -90,7 +90,7 @@
       "id": "size-008",
       "category": "size",
       "type": "select-one",
-      "prompt": { "text": "いちばん ちいさいのは どれ？", "say": "いちばん ちいさいのは どれ" },
+      "prompt": { "text": "いちばん ちいさいのは どれ？", "say": "いちばん ちいさいのは どれ", "audio": "size-002" },
       "choices": [
         { "id": "z1", "label": "ちゅうくらい", "shape": "triangle", "color": "#E5453C", "size": "medium", "correct": false },
         { "id": "z2", "label": "ちいさい", "shape": "triangle", "color": "#E5453C", "size": "small", "correct": true },
@@ -102,7 +102,7 @@
       "id": "size-009",
       "category": "size",
       "type": "select-one",
-      "prompt": { "text": "いちばん おおきいのは どれ？", "say": "いちばん おおきいのは どれ" },
+      "prompt": { "text": "いちばん おおきいのは どれ？", "say": "いちばん おおきいのは どれ", "audio": "size-001" },
       "choices": [
         { "id": "z1", "label": "ちゅうくらい", "shape": "star", "color": "#3D8BFF", "size": "medium", "correct": false },
         { "id": "z2", "label": "ちいさい", "shape": "star", "color": "#3D8BFF", "size": "small", "correct": false },
@@ -114,7 +114,7 @@
       "id": "size-010",
       "category": "size",
       "type": "select-one",
-      "prompt": { "text": "いちばん ちいさいのは どれ？", "say": "いちばん ちいさいのは どれ" },
+      "prompt": { "text": "いちばん ちいさいのは どれ？", "say": "いちばん ちいさいのは どれ", "audio": "size-002" },
       "choices": [
         { "id": "z1", "label": "ちいさい", "shape": "heart", "color": "#4CC95E", "size": "small", "correct": true },
         { "id": "z2", "label": "ちゅうくらい", "shape": "heart", "color": "#4CC95E", "size": "medium", "correct": false },
@@ -126,7 +126,7 @@
       "id": "size-011",
       "category": "size",
       "type": "select-one",
-      "prompt": { "text": "いちばん おおきいのは どれ？", "say": "いちばん おおきいのは どれ" },
+      "prompt": { "text": "いちばん おおきいのは どれ？", "say": "いちばん おおきいのは どれ", "audio": "size-001" },
       "choices": [
         { "id": "z1", "label": "ちゅうくらい", "shape": "circle", "color": "#FFC92E", "size": "medium", "correct": false },
         { "id": "z2", "label": "おおきい", "shape": "circle", "color": "#FFC92E", "size": "large", "correct": true },
@@ -138,7 +138,7 @@
       "id": "size-012",
       "category": "size",
       "type": "select-one",
-      "prompt": { "text": "いちばん ちいさいのは どれ？", "say": "いちばん ちいさいのは どれ" },
+      "prompt": { "text": "いちばん ちいさいのは どれ？", "say": "いちばん ちいさいのは どれ", "audio": "size-002" },
       "choices": [
         { "id": "z1", "label": "ちゅうくらい", "shape": "square", "color": "#7FB8E8", "size": "medium", "correct": false },
         { "id": "z2", "label": "おおきい", "shape": "square", "color": "#7FB8E8", "size": "large", "correct": false },

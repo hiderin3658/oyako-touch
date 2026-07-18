@@ -257,6 +257,8 @@ async function collectQuestionTargets(limit, outDir, ext) {
       await readFile(path.join(PROBLEMS_DIR, fileName), "utf8"),
     );
     for (const problem of lesson.problems ?? []) {
+      // audio 指定がある問題は既存音声を再利用するため生成しない（参照先が別途生成される）
+      if (problem.prompt?.audio) continue;
       const text = problem.prompt?.say ?? problem.prompt?.text;
       if (!text) continue;
       targets.push({

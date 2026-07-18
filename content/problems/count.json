@@ -30,7 +30,7 @@
       "id": "count-003",
       "category": "count",
       "type": "select-one",
-      "prompt": { "text": "いちばん おおいのは どれ？", "say": "いちばん おおいのは どれ" },
+      "prompt": { "text": "いちばん おおいのは どれ？", "say": "いちばん おおいのは どれ", "audio": "count-001" },
       "choices": [
         { "id": "k1", "label": "みかん ひとつ", "image": "/images/plates/orange-1.png", "fruit": "orange", "count": 1, "correct": false },
         { "id": "k2", "label": "りんご みっつ", "image": "/images/plates/apple-3.png", "fruit": "apple", "count": 3, "correct": false },
@@ -42,7 +42,7 @@
       "id": "count-004",
       "category": "count",
       "type": "select-one",
-      "prompt": { "text": "いちばん すくないのは どれ？", "say": "いちばん すくないのは どれ" },
+      "prompt": { "text": "いちばん すくないのは どれ？", "say": "いちばん すくないのは どれ", "audio": "count-002" },
       "choices": [
         { "id": "k1", "label": "バナナ ひとつ", "image": "/images/plates/banana-1.png", "fruit": "banana", "count": 1, "correct": true },
         { "id": "k2", "label": "いちご よっつ", "image": "/images/plates/strawberry-4.png", "fruit": "strawberry", "count": 4, "correct": false },
@@ -54,7 +54,7 @@
       "id": "count-005",
       "category": "count",
       "type": "select-one",
-      "prompt": { "text": "いちばん おおいのは どれ？", "say": "いちばん おおいのは どれ" },
+      "prompt": { "text": "いちばん おおいのは どれ？", "say": "いちばん おおいのは どれ", "audio": "count-001" },
       "choices": [
         { "id": "k1", "label": "りんご ふたつ", "image": "/images/plates/apple-2.png", "fruit": "apple", "count": 2, "correct": false },
         { "id": "k2", "label": "ぶどう いつつ", "image": "/images/plates/grape-5.png", "fruit": "grape", "count": 5, "correct": true },
@@ -66,7 +66,7 @@
       "id": "count-006",
       "category": "count",
       "type": "select-one",
-      "prompt": { "text": "いちばん すくないのは どれ？", "say": "いちばん すくないのは どれ" },
+      "prompt": { "text": "いちばん すくないのは どれ？", "say": "いちばん すくないのは どれ", "audio": "count-002" },
       "choices": [
         { "id": "k1", "label": "いちご よっつ", "image": "/images/plates/strawberry-4.png", "fruit": "strawberry", "count": 4, "correct": false },
         { "id": "k2", "label": "みかん いつつ", "image": "/images/plates/orange-5.png", "fruit": "orange", "count": 5, "correct": false },
@@ -78,7 +78,7 @@
       "id": "count-007",
       "category": "count",
       "type": "select-one",
-      "prompt": { "text": "いちばん おおいのは どれ？", "say": "いちばん おおいのは どれ" },
+      "prompt": { "text": "いちばん おおいのは どれ？", "say": "いちばん おおいのは どれ", "audio": "count-001" },
       "choices": [
         { "id": "k1", "label": "ぶどう いつつ", "image": "/images/plates/grape-5.png", "fruit": "grape", "count": 5, "correct": true },
         { "id": "k2", "label": "バナナ ふたつ", "image": "/images/plates/banana-2.png", "fruit": "banana", "count": 2, "correct": false },
@@ -90,7 +90,7 @@
       "id": "count-008",
       "category": "count",
       "type": "select-one",
-      "prompt": { "text": "いちばん すくないのは どれ？", "say": "いちばん すくないのは どれ" },
+      "prompt": { "text": "いちばん すくないのは どれ？", "say": "いちばん すくないのは どれ", "audio": "count-002" },
       "choices": [
         { "id": "k1", "label": "みかん みっつ", "image": "/images/plates/orange-3.png", "fruit": "orange", "count": 3, "correct": false },
         { "id": "k2", "label": "りんご ひとつ", "image": "/images/plates/apple-1.png", "fruit": "apple", "count": 1, "correct": true },
@@ -102,7 +102,7 @@
       "id": "count-009",
       "category": "count",
       "type": "select-one",
-      "prompt": { "text": "いちばん おおいのは どれ？", "say": "いちばん おおいのは どれ" },
+      "prompt": { "text": "いちばん おおいのは どれ？", "say": "いちばん おおいのは どれ", "audio": "count-001" },
       "choices": [
         { "id": "k1", "label": "バナナ ひとつ", "image": "/images/plates/banana-1.png", "fruit": "banana", "count": 1, "correct": false },
         { "id": "k2", "label": "いちご ふたつ", "image": "/images/plates/strawberry-2.png", "fruit": "strawberry", "count": 2, "correct": false },
@@ -114,7 +114,7 @@
       "id": "count-010",
       "category": "count",
       "type": "select-one",
-      "prompt": { "text": "いちばん すくないのは どれ？", "say": "いちばん すくないのは どれ" },
+      "prompt": { "text": "いちばん すくないのは どれ？", "say": "いちばん すくないのは どれ", "audio": "count-002" },
       "choices": [
         { "id": "k1", "label": "りんご ひとつ", "image": "/images/plates/apple-1.png", "fruit": "apple", "count": 1, "correct": true },
         { "id": "k2", "label": "ぶどう みっつ", "image": "/images/plates/grape-3.png", "fruit": "grape", "count": 3, "correct": false },
@@ -126,7 +126,7 @@
       "id": "count-011",
       "category": "count",
       "type": "select-one",
-      "prompt": { "text": "いちばん おおいのは どれ？", "say": "いちばん おおいのは どれ" },
+      "prompt": { "text": "いちばん おおいのは どれ？", "say": "いちばん おおいのは どれ", "audio": "count-001" },
       "choices": [
         { "id": "k1", "label": "いちご ふたつ", "image": "/images/plates/strawberry-2.png", "fruit": "strawberry", "count": 2, "correct": false },
         { "id": "k2", "label": "みかん よっつ", "image": "/images/plates/orange-4.png", "fruit": "orange", "count": 4, "correct": true },
@@ -138,7 +138,7 @@
       "id": "count-012",
       "category": "count",
       "type": "select-one",
-      "prompt": { "text": "いちばん すくないのは どれ？", "say": "いちばん すくないのは どれ" },
+      "prompt": { "text": "いちばん すくないのは どれ？", "say": "いちばん すくないのは どれ", "audio": "count-002" },
       "choices": [
         { "id": "k1", "label": "ぶどう よっつ", "image": "/images/plates/grape-4.png", "fruit": "grape", "count": 4, "correct": false },
         { "id": "k2", "label": "バナナ いつつ", "image": "/images/plates/banana-5.png", "fruit": "banana", "count": 5, "correct": false },
