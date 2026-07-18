@@ -223,4 +223,26 @@ describe("ShapeFitBoard ロック・安全性（U11・U12）", () => {
     // タップ設置フォールバックで正解として成立する
     expect(onPlace).toHaveBeenCalledWith("p1", true);
   });
+
+  it("pointercancel で中断されたら onPlace を呼ばず、ドラッグ状態がクリアされ再操作できる（レビュー修正の回帰）", () => {
+    const onPlace = vi.fn();
+    render(
+      <ShapeFitBoard problem={makeProblem()} locked={false} onPlace={onPlace} />,
+    );
+    const hole = screen.getByTestId("hole");
+    stubRect(hole, { left: 100, top: 0, width: 80, height: 80 });
+    const piece = correctPiece();
+    stubRect(piece, { left: 100, top: 200, width: 60, height: 60 });
+
+    // ドラッグ開始→移動→中断（pointercancel）。onPlace は呼ばれない。
+    firePointer(piece, "pointerdown", 130, 230);
+    firePointer(piece, "pointermove", 140, 40);
+    fireEvent(piece, new MouseEvent("pointercancel", { bubbles: true }));
+    expect(onPlace).not.toHaveBeenCalled();
+
+    // 中断後に改めてタップ設置すると正解として成立する（状態が残っていない）。
+    fireEvent.pointerDown(piece);
+    fireEvent.pointerUp(piece);
+    expect(onPlace).toHaveBeenCalledWith("p1", true);
+  });
 });

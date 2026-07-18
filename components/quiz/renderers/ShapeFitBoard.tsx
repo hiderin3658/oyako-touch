@@ -84,7 +84,9 @@ export function ShapeFitBoard({ problem, locked, onPlace }: ShapeFitBoardProps) 
     event: React.PointerEvent<HTMLButtonElement>,
     pieceId: string,
   ): void => {
-    if (locked) {
+    // ロック中、または既にドラッグ中のポインタがある場合は無視する
+    // （多点タッチで2本目の指が dragStateRef を上書きし、1本目の判定が壊れるのを防ぐ）。
+    if (locked || dragStateRef.current) {
       return;
     }
     const info = measure(event.currentTarget);
@@ -179,6 +181,17 @@ export function ShapeFitBoard({ problem, locked, onPlace }: ShapeFitBoardProps) 
     }
   };
 
+  // ドラッグが中断（pointercancel：OSジェスチャ・パーム誤タッチ等）されたときの後始末。
+  // pointerup が来ないため、ここで状態をクリアしてピースを元位置へ戻す（ノーフェイル・onPlace は呼ばない）。
+  const handlePointerCancel = (): void => {
+    const state = dragStateRef.current;
+    dragStateRef.current = null;
+    setDragTranslate(null);
+    if (state) {
+      setReturningId(state.pieceId);
+    }
+  };
+
   return (
     <div className={styles.board}>
       <div className={styles.holeZone}>
@@ -219,6 +232,7 @@ export function ShapeFitBoard({ problem, locked, onPlace }: ShapeFitBoardProps) 
               onPointerUp={(event) =>
                 handlePointerUp(event, choice.id, choice.shape, choice.correct)
               }
+              onPointerCancel={handlePointerCancel}
             >
               <ShapeFigure shape={choice.shape} color={choice.color} />
             </button>
