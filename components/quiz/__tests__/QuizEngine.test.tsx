@@ -197,4 +197,51 @@ describe("QuizEngine", () => {
       "いちばん おおきいのは どれ",
     );
   });
+
+  it("同じ音声を共有する問題が連続しても各問題で読み上げが発火する（無音バグ回帰）", async () => {
+    // 2問とも読み上げ・参照先音声が同一（どちらも size-001 を鳴らす）。
+    // 依存配列を currentAudioName だけにすると2問目で再発火せず無音になっていた。
+    const lesson: Lesson = {
+      category: "size",
+      title: "おおきさ",
+      problems: [
+        {
+          id: "size-001",
+          category: "size",
+          type: "select-one",
+          prompt: { text: "いちばん おおきいのは どれ？", say: "いちばん おおきいのは どれ" },
+          choices: [
+            { id: "z1", label: "おおきい", shape: "circle", color: "#7FB8E8", size: "large", correct: true },
+            { id: "z2", label: "ちいさい", shape: "circle", color: "#7FB8E8", size: "small", correct: false },
+          ],
+        },
+        {
+          id: "size-005",
+          category: "size",
+          type: "select-one",
+          prompt: { text: "いちばん おおきいのは どれ？", say: "いちばん おおきいのは どれ", audio: "size-001" },
+          choices: [
+            { id: "z1", label: "おおきい", shape: "triangle", color: "#8FC97F", size: "large", correct: true },
+            { id: "z2", label: "ちいさい", shape: "triangle", color: "#8FC97F", size: "small", correct: false },
+          ],
+        },
+      ],
+    } as unknown as Lesson;
+
+    // このファイルは mock をテスト間でクリアしないため、カウント検証前にクリアする。
+    vi.mocked(playClip).mockClear();
+    render(<QuizEngine lesson={lesson} onComplete={vi.fn()} />);
+    const callsForSize001 = () =>
+      vi.mocked(playClip).mock.calls.filter((c) => c[0] === "/audio/q/size-001.mp3").length;
+
+    // 1問目で size-001.mp3 が1回鳴る
+    expect(callsForSize001()).toBe(1);
+
+    // 正解して2問目へ（2問目も size-001 を共有）
+    clickChoice(correctLabel(lesson, 0));
+    await advance(1100);
+
+    // 2問目でも読み上げが発火し、size-001.mp3 が計2回鳴る（修正前は1回のまま＝無音）
+    expect(callsForSize001()).toBe(2);
+  });
 });

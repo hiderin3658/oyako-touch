@@ -70,12 +70,15 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
       timersRef.current.push(timerId);
     });
 
-  // 問題が切り替わるたびに設問を自動で読み上げる（初回含む。完了時は読み上げない）
+  // 問題が切り替わるたびに設問を自動で読み上げる（初回含む。完了時は読み上げない）。
+  // トリガーは問題ごとに必ず変わる currentProblemId にする。currentAudioName は
+  // 再利用（audio 指定）で連続する問題間で同値になり得るため、依存の主キーにすると
+  // 「同じ音声を共有する問題が連続したときに再発火せず無音」になる不具合を招く。
   useEffect(() => {
     if (currentSay) {
       playClip(`/audio/q/${currentAudioName}.mp3`, currentSay);
     }
-  }, [currentSay, currentAudioName]);
+  }, [currentProblemId, currentSay, currentAudioName]);
 
   // 完了検知：status==="done" になったら一度だけ onComplete を呼ぶ
   const hasCompletedRef = useRef(false);
