@@ -1,6 +1,6 @@
 // 問題ドメインの型定義（DOM非依存の純粋な型）
 
-/** 問題カテゴリ。「いろあわせ」「かたちはめ」「すうじ」「どうぶつ」「おおきさ」「かず」「かたはめ」の7種目 */
+/** 問題カテゴリ。「いろあわせ」「かたちはめ」「すうじ」「どうぶつ」「おおきさ」「かず」「かたはめ」「なぞり」の8種目 */
 export type Category =
   | "color"
   | "shape"
@@ -8,7 +8,8 @@ export type Category =
   | "animal"
   | "size"
   | "count"
-  | "katahame";
+  | "katahame"
+  | "nazori";
 
 /** 設問文と読み上げテキスト。audio は将来のElevenLabs音声用（今回未使用） */
 export interface PromptData {
@@ -141,11 +142,29 @@ export type Problem =
       target: ShapeKind; // 穴の形。正解ピースの shape と一致する
       choices: KatahameChoice[]; // ピース2〜3個（正解1＋ダミー1〜2）
       reward?: string;
+    }
+  | {
+      id: string;
+      category: "nazori";
+      type: "trace";
+      prompt: PromptData;
+      target: ShapeKind; // なぞる形（道の形）。選択肢は持たない（誤答の概念が無い）
+      reward?: string;
     };
+
+/** カテゴリ C に対応する Problem 分岐を取り出すユーティリティ型。 */
+export type ProblemOf<C extends Category> = Extract<Problem, { category: C }>;
 
 /** 1カテゴリ分のレッスン（問題セット） */
 export interface Lesson {
   category: Category;
   title: string;
   problems: Problem[];
+}
+
+/** カテゴリ C に絞り込んだレッスン（loadLesson の返り値を種目別に型付けする） */
+export interface LessonOf<C extends Category> {
+  category: C;
+  title: string;
+  problems: ProblemOf<C>[];
 }

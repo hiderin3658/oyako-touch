@@ -121,6 +121,18 @@ export default function HomePage() {
           </span>
           <span className={styles.label}>かたはめ</span>
         </button>
+
+        <button
+          type="button"
+          className={`${styles.tile} ${styles.nazori}`}
+          onClick={() => router.push("/game/nazori")}
+          data-testid="tile-nazori"
+        >
+          <span className={styles.emoji}>
+            <span className={styles.icon}>✏️</span>
+          </span>
+          <span className={styles.label}>なぞり</span>
+        </button>
       </div>
 
       <ParentLock />

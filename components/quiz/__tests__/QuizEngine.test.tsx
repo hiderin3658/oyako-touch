@@ -26,7 +26,9 @@ afterEach(() => {
 
 /** 指定問題の正解選択肢のラベルを返す */
 function correctLabel(lesson: Lesson, index: number): string {
-  const choices = lesson.problems[index].choices as Choice[];
+  const problem = lesson.problems[index];
+  // なぞり（choices を持たない）でも安全に参照する
+  const choices = ("choices" in problem ? problem.choices : []) as Choice[];
   const correct = choices.find((choice) => choice.correct);
   if (!correct) {
     throw new Error(`正解選択肢が見つかりません: index=${index}`);
@@ -334,6 +336,105 @@ describe("QuizEngine", () => {
     // 従来の choice が描画され、board のピースは存在しない
     expect(screen.getAllByTestId("choice").length).toBeGreaterThan(0);
     expect(screen.queryAllByTestId("piece").length).toBe(0);
+  });
+
+  it("nazori Lesson で board を完成させると星+1・せいかい！・演出後に次問（NU28）", async () => {
+    const lesson = loadLesson("nazori");
+    render(<QuizEngine lesson={lesson} onComplete={vi.fn()} />);
+
+    // 盤面（道ガイド）が描画され、設問文・星0が表示される
+    expect(screen.getByTestId("trace-board")).toBeInTheDocument();
+    expect(screen.getByText(lesson.problems[0].prompt.text)).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /ほし 0/ })).toBeInTheDocument();
+
+    // jsdom（サンプル不能）では down→up の1セッションで完成成立する
+    const board = screen.getByTestId("trace-board");
+    fireEvent.pointerDown(board);
+    fireEvent.pointerUp(board);
+
+    // 星が1に増え、せいかい！が出る
+    expect(screen.getByRole("img", { name: /ほし 1/ })).toBeInTheDocument();
+    expect(screen.getByText("せいかい！")).toBeInTheDocument();
+
+    // 演出後に次の問題へ進む
+    await advance(1100);
+    expect(screen.queryByText("せいかい！")).toBeNull();
+    expect(screen.getByText(lesson.problems[1].prompt.text)).toBeInTheDocument();
+  });
+
+  it("nazori は未完成で中断しても × やふせいかい・もういちどを出さず、星も増えず同問に留まる（NU29）", () => {
+    const lesson = loadLesson("nazori");
+    render(<QuizEngine lesson={lesson} onComplete={vi.fn()} />);
+    const firstPrompt = lesson.problems[0].prompt.text;
+
+    // なぞりを中断（pointercancel）しても完成通知は発生しない
+    const board = screen.getByTestId("trace-board");
+    fireEvent.pointerDown(board);
+    fireEvent(board, new MouseEvent("pointercancel", { bubbles: true }));
+
+    // 誤答演出（×・ふせいかい・もういちど）は一切出さない
+    expect(screen.queryByText("×")).toBeNull();
+    expect(screen.queryByText(/ふせいかい/)).toBeNull();
+    expect(screen.queryByText("もういちど！")).toBeNull();
+    // 星は増えず、同じ問題に留まる
+    expect(screen.getByRole("img", { name: /ほし 0/ })).toBeInTheDocument();
+    expect(screen.getByText(firstPrompt)).toBeInTheDocument();
+  });
+
+  it("nazori は prompt.audio があれば参照先の音声を再利用する（NU30）", () => {
+    // nazori-006 は nazori-001 の音声を共有する（自身の音声は使わない）。
+    const lesson: Lesson = {
+      category: "nazori",
+      title: "なぞり",
+      problems: [
+        {
+          id: "nazori-006",
+          category: "nazori",
+          type: "trace",
+          prompt: {
+            text: "まるを なぞってね",
+            say: "まるを なぞってね",
+            audio: "nazori-001",
+          },
+          target: "circle",
+          reward: "sticker-circle",
+        },
+      ],
+    } as unknown as Lesson;
+
+    vi.mocked(playClip).mockClear();
+    render(<QuizEngine lesson={lesson} onComplete={vi.fn()} />);
+    // 問題IDの nazori-006.mp3 ではなく、参照先 nazori-001.mp3 を再生する
+    expect(playClip).toHaveBeenCalledWith(
+      "/audio/q/nazori-001.mp3",
+      "まるを なぞってね",
+    );
+  });
+
+  it("nazori 完成直後の演出中ロックで再操作しても星が二重加算されず同問に留まる（NU32）", () => {
+    const lesson = loadLesson("nazori");
+    render(<QuizEngine lesson={lesson} onComplete={vi.fn()} />);
+    const firstPrompt = lesson.problems[0].prompt.text;
+
+    const board = screen.getByTestId("trace-board");
+    fireEvent.pointerDown(board);
+    fireEvent.pointerUp(board);
+    expect(screen.getByRole("img", { name: /ほし 1/ })).toBeInTheDocument();
+
+    // advance せず演出（ロック）窓の内側で再操作しても、盤面が locked かつ完成済みのため
+    // onPlace が発火せず、星は二重加算されない・早送りで次問へ進まない
+    fireEvent.pointerDown(board);
+    fireEvent.pointerUp(board);
+    expect(screen.getByRole("img", { name: /ほし 1/ })).toBeInTheDocument();
+    expect(screen.queryByRole("img", { name: /ほし 2/ })).toBeNull();
+    expect(screen.getByText(firstPrompt)).toBeInTheDocument();
+  });
+
+  it("shape Lesson は従来どおり per-choice 描画で trace-board を出さない（NU31・既存デグレ）", () => {
+    const lesson = loadLesson("shape");
+    render(<QuizEngine lesson={lesson} onComplete={vi.fn()} />);
+    expect(screen.getAllByTestId("choice").length).toBeGreaterThan(0);
+    expect(screen.queryByTestId("trace-board")).toBeNull();
   });
 
   it("katahame は正解設置後の演出中ロックで再設置しても星が二重加算されず同問に留まる（I8）", () => {

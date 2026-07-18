@@ -49,7 +49,8 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
   const currentProblemId = currentProblem.id;
   // audio 指定があれば既存音声を再利用、無ければ問題 ID の音声（従来どおり）
   const currentAudioName = currentProblem.prompt.audio ?? currentProblemId;
-  const choices: Choice[] = currentProblem.choices;
+  // 盤面カテゴリ（なぞり）は choices を持たないため安全に参照する（board 経路では未使用）。
+  const choices: Choice[] = "choices" in currentProblem ? currentProblem.choices : [];
 
   // 保留中の setTimeout をまとめて管理し、unmount 時にクリアして状態更新リークを防ぐ
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);

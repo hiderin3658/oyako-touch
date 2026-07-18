@@ -127,6 +127,25 @@ async function clearKatahame(): Promise<void> {
   throw new Error("ごほうびに到達しませんでした");
 }
 
+/** なぞりの盤面を完成させる（jsdom は down→up の1セッションで成立）。 */
+function completeTraceBoard(): void {
+  const board = screen.getByTestId("trace-board");
+  fireEvent.pointerDown(board);
+  fireEvent.pointerUp(board);
+}
+
+/** なぞりをごほうび到達まで完走する（出題数に依存しない）。 */
+async function clearNazori(): Promise<void> {
+  for (let guard = 0; guard < 100; guard++) {
+    if (screen.queryByTestId("reward")) {
+      return;
+    }
+    completeTraceBoard();
+    await advance(1100);
+  }
+  throw new Error("ごほうびに到達しませんでした");
+}
+
 describe("おうち画面", () => {
   it("「いろ」タイルで /game/color へ遷移する", () => {
     renderWithAuth(<HomePage />);
@@ -168,6 +187,12 @@ describe("おうち画面", () => {
     renderWithAuth(<HomePage />);
     fireEvent.click(screen.getByTestId("tile-katahame"));
     expect(pushMock).toHaveBeenCalledWith("/game/katahame");
+  });
+
+  it("「なぞり」タイルで /game/nazori へ遷移する（NI1）", () => {
+    renderWithAuth(<HomePage />);
+    fireEvent.click(screen.getByTestId("tile-nazori"));
+    expect(pushMock).toHaveBeenCalledWith("/game/nazori");
   });
 });
 
@@ -396,6 +421,47 @@ describe("ゲーム画面（katahame）", () => {
     paramsRef.current = { category: "katahame" };
     renderWithAuth(<GamePage />);
     await clearKatahame();
+
+    fireEvent.click(screen.getByTestId("reward-home"));
+    expect(pushMock).toHaveBeenCalledWith("/home");
+  });
+});
+
+describe("ゲーム画面（nazori）", () => {
+  it("完走でごほうびが表示され、nazori のクリア数とシールが増え、他カテゴリは不変（NI3）", async () => {
+    paramsRef.current = { category: "nazori" };
+    expect(loadProgress().categories.nazori.cleared).toBe(0);
+
+    renderWithAuth(<GamePage />);
+    await clearNazori();
+
+    expect(screen.getByTestId("reward")).toBeInTheDocument();
+    expect(screen.getByText("よく できました！")).toBeInTheDocument();
+    // nazori のクリアが既存カテゴリと独立して記録される
+    expect(loadProgress().categories.nazori.cleared).toBe(1);
+    expect(loadProgress().categories.color.cleared).toBe(0);
+    expect(loadProgress().categories.katahame.cleared).toBe(0);
+    // ごほうびシール（sticker-<形>）が付与される
+    expect(loadProgress().stickers.length).toBeGreaterThan(0);
+  });
+
+  it("「もういちど」で nazori が星0から再開し、盤面が再描画される（NI4）", async () => {
+    paramsRef.current = { category: "nazori" };
+    renderWithAuth(<GamePage />);
+    await clearNazori();
+
+    fireEvent.click(screen.getByTestId("reward-again"));
+
+    expect(screen.queryByTestId("reward")).not.toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /ほし 0/ })).toBeInTheDocument();
+    // なぞり盤面が再出題されている
+    expect(screen.getByTestId("trace-board")).toBeInTheDocument();
+  });
+
+  it("「おうちに もどる」で /home へ遷移する（NI4）", async () => {
+    paramsRef.current = { category: "nazori" };
+    renderWithAuth(<GamePage />);
+    await clearNazori();
 
     fireEvent.click(screen.getByTestId("reward-home"));
     expect(pushMock).toHaveBeenCalledWith("/home");

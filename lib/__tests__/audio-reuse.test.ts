@@ -143,3 +143,49 @@ describe("かたはめの音声再利用（U27・特化）", () => {
     }
   });
 });
+
+// なぞり（nazori）も「5クリップ生成＋共有」を前提に設計されているため、
+// 生成側5・再利用側7・MP3 5枚実在をカテゴリ特化で固定検証する。テスト仕様書 NU33。
+// 注意: nazori-001〜005.mp3 は TTS 生成後に緑になる（未生成の間は MP3 実在チェックが失敗する）。
+describe("なぞりの音声再利用（NU33・特化）", () => {
+  const nazori = allProblems.filter((p) => p.category === "nazori");
+  const generators = nazori.filter((p) => !p.prompt.audio);
+  const reused = nazori.filter((p) => p.prompt.audio);
+
+  it("nazori は12問（生成側5・再利用側7）で構成される", () => {
+    expect(nazori.length).toBe(12);
+    expect(generators.length).toBe(5);
+    expect(reused.length).toBe(7);
+  });
+
+  it("生成側5問に対応する MP3（nazori-001〜005.mp3）が実在する", () => {
+    for (const problem of generators) {
+      expect(
+        existsSync(join(Q_DIR, `${problem.id}.mp3`)),
+        `${problem.id}.mp3 が存在しない`,
+      ).toBe(true);
+    }
+    // 生成側は 001〜005 の5枚ちょうど
+    expect(generators.map((p) => p.id).sort()).toEqual([
+      "nazori-001",
+      "nazori-002",
+      "nazori-003",
+      "nazori-004",
+      "nazori-005",
+    ]);
+  });
+
+  it("再利用側7問の参照先はすべて nazori の生成側で、say が一致する", () => {
+    const genIds = new Set(generators.map((p) => p.id));
+    for (const problem of reused) {
+      const refId = problem.prompt.audio as string;
+      expect(genIds.has(refId), `${problem.id} -> ${refId} が生成側でない`).toBe(
+        true,
+      );
+      const ref = problemById.get(refId)!;
+      const mySay = problem.prompt.say ?? problem.prompt.text;
+      const refSay = ref.prompt.say ?? ref.prompt.text;
+      expect(mySay, `${problem.id} の読みが参照先と不一致`).toBe(refSay);
+    }
+  });
+});

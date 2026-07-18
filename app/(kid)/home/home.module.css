@@ -21,7 +21,7 @@
   margin: 6px 0 2px;
 }
 
-/* 種目タイルは3列固定グリッド（7個なら横3×縦2＋1）。
+/* 種目タイルは3列固定グリッド（8個なら横3×縦3＝3+3+2）。
    タイルが増えても3列で折り返し、崩れない。狭い画面では2列に落とす。 */
 .menu {
   display: grid;
@@ -124,6 +124,10 @@
 
 .katahame .label {
   color: var(--mint);
+}
+
+.nazori .label {
+  color: var(--peach);
 }
 
 .hint {
