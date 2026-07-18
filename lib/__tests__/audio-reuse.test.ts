@@ -98,3 +98,48 @@ describe("出題音声の再利用（audio）整合", () => {
     expect(mp3Count).toBe(generatorIds.size);
   });
 });
+
+// かたはめ（katahame）は「5クリップ生成＋共有」を前提に設計されているため、
+// 生成側5・再利用側7・MP3 5枚実在をカテゴリ特化で固定検証する。テスト仕様書 U27。
+describe("かたはめの音声再利用（U27・特化）", () => {
+  const katahame = allProblems.filter((p) => p.category === "katahame");
+  const generators = katahame.filter((p) => !p.prompt.audio);
+  const reused = katahame.filter((p) => p.prompt.audio);
+
+  it("katahame は12問（生成側5・再利用側7）で構成される", () => {
+    expect(katahame.length).toBe(12);
+    expect(generators.length).toBe(5);
+    expect(reused.length).toBe(7);
+  });
+
+  it("生成側5問に対応する MP3（katahame-001〜005.mp3）が実在する", () => {
+    for (const problem of generators) {
+      expect(
+        existsSync(join(Q_DIR, `${problem.id}.mp3`)),
+        `${problem.id}.mp3 が存在しない`,
+      ).toBe(true);
+    }
+    // 生成側は 001〜005 の5枚ちょうど
+    expect(generators.map((p) => p.id).sort()).toEqual([
+      "katahame-001",
+      "katahame-002",
+      "katahame-003",
+      "katahame-004",
+      "katahame-005",
+    ]);
+  });
+
+  it("再利用側7問の参照先はすべて katahame の生成側で、say が一致する", () => {
+    const genIds = new Set(generators.map((p) => p.id));
+    for (const problem of reused) {
+      const refId = problem.prompt.audio as string;
+      expect(genIds.has(refId), `${problem.id} -> ${refId} が生成側でない`).toBe(
+        true,
+      );
+      const ref = problemById.get(refId)!;
+      const mySay = problem.prompt.say ?? problem.prompt.text;
+      const refSay = ref.prompt.say ?? ref.prompt.text;
+      expect(mySay, `${problem.id} の読みが参照先と不一致`).toBe(refSay);
+    }
+  });
+});

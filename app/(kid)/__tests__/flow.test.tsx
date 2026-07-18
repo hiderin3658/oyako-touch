@@ -102,6 +102,31 @@ async function clearLesson(): Promise<void> {
   throw new Error("ごほうびに到達しませんでした");
 }
 
+/** かたはめの正解ピースをタップ設置する（無移動＝穴中心で判定＝正解）。 */
+function placeCorrectPiece(): void {
+  const pieces = screen.getAllByTestId("piece");
+  const correct = pieces.find(
+    (piece) => piece.getAttribute("data-correct") === "true",
+  );
+  if (!correct) {
+    throw new Error("正解ピースが見つかりません");
+  }
+  fireEvent.pointerDown(correct);
+  fireEvent.pointerUp(correct);
+}
+
+/** かたはめをごほうび到達まで正解ピースで完走する（出題数に依存しない）。 */
+async function clearKatahame(): Promise<void> {
+  for (let guard = 0; guard < 100; guard++) {
+    if (screen.queryByTestId("reward")) {
+      return;
+    }
+    placeCorrectPiece();
+    await advance(1100);
+  }
+  throw new Error("ごほうびに到達しませんでした");
+}
+
 describe("おうち画面", () => {
   it("「いろ」タイルで /game/color へ遷移する", () => {
     renderWithAuth(<HomePage />);
@@ -137,6 +162,12 @@ describe("おうち画面", () => {
     renderWithAuth(<HomePage />);
     fireEvent.click(screen.getByTestId("tile-count"));
     expect(pushMock).toHaveBeenCalledWith("/game/count");
+  });
+
+  it("「かたはめ」タイルで /game/katahame へ遷移する（I1）", () => {
+    renderWithAuth(<HomePage />);
+    fireEvent.click(screen.getByTestId("tile-katahame"));
+    expect(pushMock).toHaveBeenCalledWith("/game/katahame");
   });
 });
 
@@ -323,6 +354,48 @@ describe("ゲーム画面（count）", () => {
     paramsRef.current = { category: "count" };
     renderWithAuth(<GamePage />);
     await clearLesson();
+
+    fireEvent.click(screen.getByTestId("reward-home"));
+    expect(pushMock).toHaveBeenCalledWith("/home");
+  });
+});
+
+describe("ゲーム画面（katahame）", () => {
+  it("完走でごほうびが表示され、katahame のクリア数とシールが増え、他カテゴリは不変（I3）", async () => {
+    paramsRef.current = { category: "katahame" };
+    expect(loadProgress().categories.katahame.cleared).toBe(0);
+
+    renderWithAuth(<GamePage />);
+    await clearKatahame();
+
+    expect(screen.getByTestId("reward")).toBeInTheDocument();
+    expect(screen.getByText("よく できました！")).toBeInTheDocument();
+    // katahame のクリアが既存カテゴリと独立して記録される
+    expect(loadProgress().categories.katahame.cleared).toBe(1);
+    expect(loadProgress().categories.color.cleared).toBe(0);
+    expect(loadProgress().categories.count.cleared).toBe(0);
+    // ごほうびシール（sticker-<形>）が付与される
+    expect(loadProgress().stickers.length).toBeGreaterThan(0);
+  });
+
+  it("「もういちど」で katahame が星0から再開し、盤面が再描画される（I4）", async () => {
+    paramsRef.current = { category: "katahame" };
+    renderWithAuth(<GamePage />);
+    await clearKatahame();
+
+    fireEvent.click(screen.getByTestId("reward-again"));
+
+    expect(screen.queryByTestId("reward")).not.toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /ほし 0/ })).toBeInTheDocument();
+    // 盤面の穴・ピースが再出題されている
+    expect(screen.getByTestId("hole")).toBeInTheDocument();
+    expect(screen.getAllByTestId("piece").length).toBeGreaterThan(0);
+  });
+
+  it("「おうちに もどる」で /home へ遷移する（I4）", async () => {
+    paramsRef.current = { category: "katahame" };
+    renderWithAuth(<GamePage />);
+    await clearKatahame();
 
     fireEvent.click(screen.getByTestId("reward-home"));
     expect(pushMock).toHaveBeenCalledWith("/home");

@@ -1,0 +1,156 @@
+{
+  "category": "katahame",
+  "title": "かたはめ",
+  "problems": [
+    {
+      "id": "katahame-001",
+      "category": "katahame",
+      "type": "shape-fit",
+      "prompt": { "text": "まるを はめてね", "say": "まるを はめてね" },
+      "target": "circle",
+      "choices": [
+        { "id": "p1", "label": "まる", "shape": "circle", "color": "#7FB8E8", "correct": true },
+        { "id": "p2", "label": "さんかく", "shape": "triangle", "color": "#7FB8E8", "correct": false }
+      ],
+      "reward": "sticker-circle"
+    },
+    {
+      "id": "katahame-002",
+      "category": "katahame",
+      "type": "shape-fit",
+      "prompt": { "text": "さんかくを はめてね", "say": "さんかくを はめてね" },
+      "target": "triangle",
+      "choices": [
+        { "id": "p1", "label": "さんかく", "shape": "triangle", "color": "#F2A65A", "correct": true },
+        { "id": "p2", "label": "しかく", "shape": "square", "color": "#F2A65A", "correct": false }
+      ],
+      "reward": "sticker-triangle"
+    },
+    {
+      "id": "katahame-003",
+      "category": "katahame",
+      "type": "shape-fit",
+      "prompt": { "text": "しかくを はめてね", "say": "しかくを はめてね" },
+      "target": "square",
+      "choices": [
+        { "id": "p1", "label": "しかく", "shape": "square", "color": "#8FC97F", "correct": true },
+        { "id": "p2", "label": "まる", "shape": "circle", "color": "#8FC97F", "correct": false }
+      ],
+      "reward": "sticker-square"
+    },
+    {
+      "id": "katahame-004",
+      "category": "katahame",
+      "type": "shape-fit",
+      "prompt": { "text": "ほしを はめてね", "say": "ほしを はめてね" },
+      "target": "star",
+      "choices": [
+        { "id": "p1", "label": "ほし", "shape": "star", "color": "#FFC92E", "correct": true },
+        { "id": "p2", "label": "まる", "shape": "circle", "color": "#FFC92E", "correct": false },
+        { "id": "p3", "label": "しかく", "shape": "square", "color": "#FFC92E", "correct": false }
+      ],
+      "reward": "sticker-star"
+    },
+    {
+      "id": "katahame-005",
+      "category": "katahame",
+      "type": "shape-fit",
+      "prompt": { "text": "ハートを はめてね", "say": "ハートを はめてね" },
+      "target": "heart",
+      "choices": [
+        { "id": "p1", "label": "ハート", "shape": "heart", "color": "#FF5E8A", "correct": true },
+        { "id": "p2", "label": "さんかく", "shape": "triangle", "color": "#FF5E8A", "correct": false },
+        { "id": "p3", "label": "ほし", "shape": "star", "color": "#FF5E8A", "correct": false }
+      ],
+      "reward": "sticker-heart"
+    },
+    {
+      "id": "katahame-006",
+      "category": "katahame",
+      "type": "shape-fit",
+      "prompt": { "text": "まるを はめてね", "say": "まるを はめてね", "audio": "katahame-001" },
+      "target": "circle",
+      "choices": [
+        { "id": "p1", "label": "まる", "shape": "circle", "color": "#9B6DFF", "correct": true },
+        { "id": "p2", "label": "しかく", "shape": "square", "color": "#9B6DFF", "correct": false },
+        { "id": "p3", "label": "ハート", "shape": "heart", "color": "#9B6DFF", "correct": false }
+      ],
+      "reward": "sticker-circle"
+    },
+    {
+      "id": "katahame-007",
+      "category": "katahame",
+      "type": "shape-fit",
+      "prompt": { "text": "さんかくを はめてね", "say": "さんかくを はめてね", "audio": "katahame-002" },
+      "target": "triangle",
+      "choices": [
+        { "id": "p1", "label": "さんかく", "shape": "triangle", "color": "#FF8A3D", "correct": true },
+        { "id": "p2", "label": "ほし", "shape": "star", "color": "#FF8A3D", "correct": false },
+        { "id": "p3", "label": "まる", "shape": "circle", "color": "#FF8A3D", "correct": false }
+      ],
+      "reward": "sticker-triangle"
+    },
+    {
+      "id": "katahame-008",
+      "category": "katahame",
+      "type": "shape-fit",
+      "prompt": { "text": "しかくを はめてね", "say": "しかくを はめてね", "audio": "katahame-003" },
+      "target": "square",
+      "choices": [
+        { "id": "p1", "label": "しかく", "shape": "square", "color": "#4FC3F7", "correct": true },
+        { "id": "p2", "label": "ハート", "shape": "heart", "color": "#4FC3F7", "correct": false }
+      ],
+      "reward": "sticker-square"
+    },
+    {
+      "id": "katahame-009",
+      "category": "katahame",
+      "type": "shape-fit",
+      "prompt": { "text": "ほしを はめてね", "say": "ほしを はめてね", "audio": "katahame-004" },
+      "target": "star",
+      "choices": [
+        { "id": "p1", "label": "ほし", "shape": "star", "color": "#7FB8E8", "correct": true },
+        { "id": "p2", "label": "さんかく", "shape": "triangle", "color": "#7FB8E8", "correct": false },
+        { "id": "p3", "label": "ハート", "shape": "heart", "color": "#7FB8E8", "correct": false }
+      ],
+      "reward": "sticker-star"
+    },
+    {
+      "id": "katahame-010",
+      "category": "katahame",
+      "type": "shape-fit",
+      "prompt": { "text": "ハートを はめてね", "say": "ハートを はめてね", "audio": "katahame-005" },
+      "target": "heart",
+      "choices": [
+        { "id": "p1", "label": "ハート", "shape": "heart", "color": "#66BB6A", "correct": true },
+        { "id": "p2", "label": "まる", "shape": "circle", "color": "#66BB6A", "correct": false }
+      ],
+      "reward": "sticker-heart"
+    },
+    {
+      "id": "katahame-011",
+      "category": "katahame",
+      "type": "shape-fit",
+      "prompt": { "text": "まるを はめてね", "say": "まるを はめてね", "audio": "katahame-001" },
+      "target": "circle",
+      "choices": [
+        { "id": "p1", "label": "まる", "shape": "circle", "color": "#FFC92E", "correct": true },
+        { "id": "p2", "label": "さんかく", "shape": "triangle", "color": "#FFC92E", "correct": false },
+        { "id": "p3", "label": "ほし", "shape": "star", "color": "#FFC92E", "correct": false }
+      ],
+      "reward": "sticker-circle"
+    },
+    {
+      "id": "katahame-012",
+      "category": "katahame",
+      "type": "shape-fit",
+      "prompt": { "text": "さんかくを はめてね", "say": "さんかくを はめてね", "audio": "katahame-002" },
+      "target": "triangle",
+      "choices": [
+        { "id": "p1", "label": "さんかく", "shape": "triangle", "color": "#FF5E8A", "correct": true },
+        { "id": "p2", "label": "しかく", "shape": "square", "color": "#FF5E8A", "correct": false }
+      ],
+      "reward": "sticker-triangle"
+    }
+  ]
+}

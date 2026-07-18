@@ -1,0 +1,81 @@
+/* かたはめ盤面。上部に穴（差し込み口）、下部にピーストレイを縦に並べる。
+   既存 Choice.module.css / QuizEngine.module.css の流儀（clamp・var(--card)・var(--shadow)）に合わせる。 */
+.board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(24px, 5vw, 48px);
+  margin-top: 12px;
+  width: 100%;
+}
+
+/* 穴を置くゾーン。差し込み口だと分かるよう、やわらかく凹んだ台に見せる。 */
+.holeZone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(14px, 3vw, 24px);
+  border-radius: 36px;
+  background: var(--card);
+  box-shadow: inset 0 6px 14px rgba(74, 59, 51, .14);
+}
+
+/* 穴（中抜きの図形）。ピースと同じ描画サイズにして吸い付きを分かりやすくする。 */
+.hole {
+  width: clamp(120px, 26vw, 180px);
+  height: clamp(120px, 26vw, 180px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ピーストレイ。横並び・折り返しで大きめのタップ領域を確保する。 */
+.pieceTray {
+  display: flex;
+  gap: clamp(18px, 4vw, 40px);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ピース（塗り図形のボタン）。ドラッグ中にスクロールしないよう touch-action:none 必須。 */
+.piece {
+  width: clamp(110px, 22vw, 160px);
+  height: clamp(110px, 22vw, 160px);
+  min-width: 80px;
+  min-height: 80px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: grab;
+  touch-action: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .12s;
+}
+
+.piece:active {
+  cursor: grabbing;
+  transform: scale(.96);
+}
+
+/* 穴に収まったピース：ぽよんと吸い付く演出。 */
+.placed {
+  animation: pop .5s ease;
+}
+
+/* 元位置へ戻すピース：やさしく戻す（ノーフェイル）。 */
+.returning {
+  transition: transform .3s ease;
+  transform: translate(0, 0);
+}
+
+/* 動き低減設定では吸着・戻しアニメを無効化する（判定・ノーフェイルは成立する）。 */
+@media (prefers-reduced-motion: reduce) {
+  .piece,
+  .placed,
+  .returning {
+    transition: none;
+    animation: none;
+  }
+}

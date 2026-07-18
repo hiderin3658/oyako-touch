@@ -109,6 +109,18 @@ export default function HomePage() {
           </span>
           <span className={styles.label}>かず</span>
         </button>
+
+        <button
+          type="button"
+          className={`${styles.tile} ${styles.katahame}`}
+          onClick={() => router.push("/game/katahame")}
+          data-testid="tile-katahame"
+        >
+          <span className={styles.emoji}>
+            <span className={styles.icon}>🧩</span>
+          </span>
+          <span className={styles.label}>かたはめ</span>
+        </button>
       </div>
 
       <ParentLock />

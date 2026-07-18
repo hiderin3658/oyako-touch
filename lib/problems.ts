@@ -6,6 +6,7 @@ import numberData from "@/content/problems/number.json";
 import animalData from "@/content/problems/animal.json";
 import sizeData from "@/content/problems/size.json";
 import countData from "@/content/problems/count.json";
+import katahameData from "@/content/problems/katahame.json";
 
 /** カテゴリ → ビルド時importの生データ（カテゴリ追加時はここに追記する） */
 const lessonSources: Record<Category, unknown> = {
@@ -15,7 +16,11 @@ const lessonSources: Record<Category, unknown> = {
   animal: animalData,
   size: sizeData,
   count: countData,
+  katahame: katahameData,
 };
+
+/** 図形種別の有効値（かたはめの target・shape 検証に使う単一情報源） */
+const VALID_SHAPES = ["circle", "square", "triangle", "star", "heart"];
 
 /**
  * 指定カテゴリのレッスンをビルド時importから読み込み、検証して返す。
@@ -35,14 +40,15 @@ export function validateLesson(raw: unknown): Lesson {
   }
   const lesson = raw as Record<string, unknown>;
 
-  // カテゴリは "color" | "shape" | "number" | "animal" | "size" | "count" のみ許可
+  // カテゴリは "color" | "shape" | "number" | "animal" | "size" | "count" | "katahame" のみ許可
   if (
     lesson.category !== "color" &&
     lesson.category !== "shape" &&
     lesson.category !== "number" &&
     lesson.category !== "animal" &&
     lesson.category !== "size" &&
-    lesson.category !== "count"
+    lesson.category !== "count" &&
+    lesson.category !== "katahame"
   ) {
     throw new Error(`レッスンの category が不正です: ${String(lesson.category)}`);
   }
@@ -145,6 +151,61 @@ export function validateLesson(raw: unknown): Lesson {
         if (typeof count !== "number") {
           throw new Error(`problem(${problem.id}) の choice には number 型の count が必要です`);
         }
+      }
+    }
+
+    // かたはめは target(穴の形) と各ピースの shape/color を検証する。
+    // ルール: target は有効な形／各ピースは有効 shape＋非空 color／全ピース同色／
+    // 正解ピース shape は target と一致／ダミー shape は target と異なる。
+    if (category === "katahame") {
+      const target = problem.target;
+      if (typeof target !== "string" || !VALID_SHAPES.includes(target)) {
+        throw new Error(
+          `problem(${problem.id}) の target が不正な形です: ${String(target)}`,
+        );
+      }
+
+      let sharedColor: string | null = null;
+      let correctShape: string | null = null;
+      for (const choiceRaw of problem.choices) {
+        const choice = choiceRaw as Record<string, unknown>;
+        const shape = choice.shape;
+        const color = choice.color;
+
+        if (typeof shape !== "string" || !VALID_SHAPES.includes(shape)) {
+          throw new Error(
+            `problem(${problem.id}) の choice には有効な shape が必要です: ${String(shape)}`,
+          );
+        }
+        if (typeof color !== "string" || color.length === 0) {
+          throw new Error(
+            `problem(${problem.id}) の choice には非空の color が必要です`,
+          );
+        }
+        // 全ピース同色（色ヒントを排除し、形だけで判別させる）
+        if (sharedColor === null) {
+          sharedColor = color;
+        } else if (color !== sharedColor) {
+          throw new Error(
+            `problem(${problem.id}) の choice は全ピース同色である必要があります`,
+          );
+        }
+
+        if (choice.correct === true) {
+          correctShape = shape;
+        } else if (shape === target) {
+          // ダミーピースは target と異なる形にする（迷いなく正解を選べるように）
+          throw new Error(
+            `problem(${problem.id}) のダミーピース shape が target と同じです: ${target}`,
+          );
+        }
+      }
+
+      // 正解ピースの形は必ず target と一致する
+      if (correctShape !== target) {
+        throw new Error(
+          `problem(${problem.id}) の正解ピース shape が target と一致しません: ${String(correctShape)} != ${target}`,
+        );
       }
     }
   }
