@@ -1,5 +1,5 @@
 // レッスン（問題セット）のローダーと検証ロジック
-import type { Category, Lesson, LessonOf } from "@/lib/types";
+import type { Category, Choice, Lesson, LessonOf, Problem } from "@/lib/types";
 import colorData from "@/content/problems/color.json";
 import shapeData from "@/content/problems/shape.json";
 import numberData from "@/content/problems/number.json";
@@ -274,8 +274,90 @@ function shuffle<T>(items: readonly T[], random: () => number): T[] {
 }
 
 /**
+ * 位置の多重集合を「隣り合う要素が同じにならない」よう並べる（純粋関数）。
+ * 各ステップで「残数が最も多く、直前と異なる位置」を選ぶ貪欲法（同数は乱数で選ぶ）。
+ * これで連続同一を避けつつ均等な分布を保つ（最大数 <= ceil(n/2) なら必ず可能）。
+ * 制約を満たせない稀なケースでは直前と同じ位置を許容する（安全側・無限ループ防止）。
+ */
+function arrangeNoAdjacent(
+  positions: readonly number[],
+  random: () => number,
+): number[] {
+  const remaining = new Map<number, number>();
+  for (const pos of positions) {
+    remaining.set(pos, (remaining.get(pos) ?? 0) + 1);
+  }
+
+  const result: number[] = [];
+  let last = -1;
+  for (let step = 0; step < positions.length; step += 1) {
+    // 直前と異なる位置の候補（残数>0）。無ければ制約を外す。
+    let candidates = [...remaining.entries()].filter(
+      ([pos, count]) => count > 0 && pos !== last,
+    );
+    if (candidates.length === 0) {
+      candidates = [...remaining.entries()].filter(([, count]) => count > 0);
+    }
+    // 残数が最大の位置を選ぶ（同数は乱数で選んで並びに変化を出す）。
+    const maxCount = Math.max(...candidates.map(([, count]) => count));
+    const top = candidates.filter(([, count]) => count === maxCount);
+    const [pos] = top[Math.floor(random() * top.length)];
+    result.push(pos);
+    remaining.set(pos, (remaining.get(pos) ?? 0) - 1);
+    last = pos;
+  }
+  return result;
+}
+
+/**
+ * 抽出した各問題の選択肢を並べ替え、正解の位置をセッション内で均等に散らす（純粋関数）。
+ * - 位置をラウンドロビンで割り当ててからシャッフルするため、正解が同じ位置に偏らない
+ *   （例: 5問・3択なら同一位置は最大2回まで。全部同じ位置は起きない）。
+ * - 各問題は割り当て位置に正解が来るよう並べ替え、ダミーは残りにランダム配置する。
+ * - 選択肢を持たない種目（なぞり）や正解がちょうど1つでない問題は並べ替えない。
+ * - 元の problem / choices は破壊せず、新しい配列・オブジェクトを返す。
+ */
+function balanceCorrectPositions(
+  problems: readonly Problem[],
+  random: () => number,
+): Problem[] {
+  // 選択肢数の最大（現状は全種目3択）。目標位置の巡回周期に使う。
+  // なぞりは choices を持たないため、union を跨いで安全にアクセスするキャストで取り出す。
+  const maxChoices = problems.reduce((max, problem) => {
+    const choices = (problem as { choices?: unknown }).choices;
+    return Array.isArray(choices) ? Math.max(max, choices.length) : max;
+  }, 1);
+  // 0..maxChoices-1 を巡回した均等な多重集合を、隣り合う問題で同じ位置にならないよう並べる。
+  const targets = arrangeNoAdjacent(
+    problems.map((_, index) => index % maxChoices),
+    random,
+  );
+
+  return problems.map((problem, index) => {
+    const rawChoices = (problem as { choices?: unknown }).choices;
+    if (!Array.isArray(rawChoices)) {
+      return problem; // なぞり等：選択肢を持たない
+    }
+    const choices = rawChoices as Choice[];
+    const correct = choices.filter((choice) => choice.correct === true);
+    if (correct.length !== 1 || choices.length < 2) {
+      return problem; // 正解が1つでない/選択肢が1つ以下は触らない（安全側）
+    }
+    const distractors = shuffle(
+      choices.filter((choice) => choice !== correct[0]),
+      random,
+    );
+    const target = Math.min(targets[index], choices.length - 1);
+    const reordered = distractors.slice();
+    reordered.splice(target, 0, correct[0]);
+    return { ...problem, choices: reordered } as Problem;
+  });
+}
+
+/**
  * レッスンのプールから n 問をランダムに抽出した新しいレッスンを返す（純粋関数）。
  * - 重複なしで抽出し、毎回シャッフルした順序で出題する。
+ * - 各問題の選択肢も並べ替え、正解の位置をセッション内で均等に散らす（位置での丸暗記防止）。
  * - プールが n 以下なら全件を返す（順序はシャッフルされる）。
  * - n <= 0 の場合は問題0件のレッスンを返す。
  * - seed を渡すと決定論的（テスト用）。未指定時は Math.random（実乱数）を使う。
@@ -289,5 +371,7 @@ export function pickProblems(lesson: Lesson, n: number, seed?: number): Lesson {
   const shuffled = shuffle(lesson.problems, random);
   // プールが n 以下なら全件（slice が上限でクランプする）
   const picked = shuffled.slice(0, Math.min(n, shuffled.length));
-  return { ...lesson, problems: picked };
+  // 選択肢の正解位置を均等に散らして並べ替える。
+  const balanced = balanceCorrectPositions(picked, random);
+  return { ...lesson, problems: balanced };
 }
