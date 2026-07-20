@@ -145,6 +145,150 @@
         { "id": "z3", "label": "ちいさい", "shape": "square", "color": "#7FB8E8", "size": "small", "correct": true }
       ],
       "reward": "sticker-size"
+    },
+    {
+      "id": "size-013",
+      "category": "size",
+      "type": "select-one",
+      "prompt": { "text": "いちばん おおきいのは どれ？", "say": "いちばん おおきいのは どれ", "audio": "size-001" },
+      "choices": [
+        { "id": "z1", "label": "おおきい", "shape": "circle", "color": "#FF5E8A", "size": "large", "correct": true },
+        { "id": "z2", "label": "ちいさい", "shape": "circle", "color": "#FF5E8A", "size": "small", "correct": false },
+        { "id": "z3", "label": "ちゅうくらい", "shape": "circle", "color": "#FF5E8A", "size": "medium", "correct": false }
+      ],
+      "reward": "sticker-size"
+    },
+    {
+      "id": "size-014",
+      "category": "size",
+      "type": "select-one",
+      "prompt": { "text": "いちばん ちいさいのは どれ？", "say": "いちばん ちいさいのは どれ", "audio": "size-002" },
+      "choices": [
+        { "id": "z1", "label": "ちゅうくらい", "shape": "square", "color": "#4CC95E", "size": "medium", "correct": false },
+        { "id": "z2", "label": "ちいさい", "shape": "square", "color": "#4CC95E", "size": "small", "correct": true },
+        { "id": "z3", "label": "おおきい", "shape": "square", "color": "#4CC95E", "size": "large", "correct": false }
+      ],
+      "reward": "sticker-size"
+    },
+    {
+      "id": "size-015",
+      "category": "size",
+      "type": "select-one",
+      "prompt": { "text": "いちばん おおきいのは どれ？", "say": "いちばん おおきいのは どれ", "audio": "size-001" },
+      "choices": [
+        { "id": "z1", "label": "ちいさい", "shape": "triangle", "color": "#FFC92E", "size": "small", "correct": false },
+        { "id": "z2", "label": "おおきい", "shape": "triangle", "color": "#FFC92E", "size": "large", "correct": true },
+        { "id": "z3", "label": "ちゅうくらい", "shape": "triangle", "color": "#FFC92E", "size": "medium", "correct": false }
+      ],
+      "reward": "sticker-size"
+    },
+    {
+      "id": "size-016",
+      "category": "size",
+      "type": "select-one",
+      "prompt": { "text": "いちばん ちいさいのは どれ？", "say": "いちばん ちいさいのは どれ", "audio": "size-002" },
+      "choices": [
+        { "id": "z1", "label": "おおきい", "shape": "star", "color": "#7FB8E8", "size": "large", "correct": false },
+        { "id": "z2", "label": "ちゅうくらい", "shape": "star", "color": "#7FB8E8", "size": "medium", "correct": false },
+        { "id": "z3", "label": "ちいさい", "shape": "star", "color": "#7FB8E8", "size": "small", "correct": true }
+      ],
+      "reward": "sticker-size"
+    },
+    {
+      "id": "size-017",
+      "category": "size",
+      "type": "select-one",
+      "prompt": { "text": "いちばん おおきいのは どれ？", "say": "いちばん おおきいのは どれ", "audio": "size-001" },
+      "choices": [
+        { "id": "z1", "label": "ちゅうくらい", "shape": "heart", "color": "#F2A65A", "size": "medium", "correct": false },
+        { "id": "z2", "label": "おおきい", "shape": "heart", "color": "#F2A65A", "size": "large", "correct": true },
+        { "id": "z3", "label": "ちいさい", "shape": "heart", "color": "#F2A65A", "size": "small", "correct": false }
+      ],
+      "reward": "sticker-size"
+    },
+    {
+      "id": "size-018",
+      "category": "size",
+      "type": "select-one",
+      "prompt": { "text": "いちばん ちいさいのは どれ？", "say": "いちばん ちいさいのは どれ", "audio": "size-002" },
+      "choices": [
+        { "id": "z1", "label": "ちいさい", "shape": "circle", "color": "#9B6DFF", "size": "small", "correct": true },
+        { "id": "z2", "label": "おおきい", "shape": "circle", "color": "#9B6DFF", "size": "large", "correct": false },
+        { "id": "z3", "label": "ちゅうくらい", "shape": "circle", "color": "#9B6DFF", "size": "medium", "correct": false }
+      ],
+      "reward": "sticker-size"
+    },
+    {
+      "id": "size-019",
+      "category": "size",
+      "type": "select-one",
+      "prompt": { "text": "いちばん おおきいのは どれ？", "say": "いちばん おおきいのは どれ", "audio": "size-001" },
+      "choices": [
+        { "id": "z1", "label": "おおきい", "shape": "square", "color": "#E5453C", "size": "large", "correct": true },
+        { "id": "z2", "label": "ちゅうくらい", "shape": "square", "color": "#E5453C", "size": "medium", "correct": false },
+        { "id": "z3", "label": "ちいさい", "shape": "square", "color": "#E5453C", "size": "small", "correct": false }
+      ],
+      "reward": "sticker-size"
+    },
+    {
+      "id": "size-020",
+      "category": "size",
+      "type": "select-one",
+      "prompt": { "text": "いちばん ちいさいのは どれ？", "say": "いちばん ちいさいのは どれ", "audio": "size-002" },
+      "choices": [
+        { "id": "z1", "label": "おおきい", "shape": "triangle", "color": "#3D8BFF", "size": "large", "correct": false },
+        { "id": "z2", "label": "ちいさい", "shape": "triangle", "color": "#3D8BFF", "size": "small", "correct": true },
+        { "id": "z3", "label": "ちゅうくらい", "shape": "triangle", "color": "#3D8BFF", "size": "medium", "correct": false }
+      ],
+      "reward": "sticker-size"
+    },
+    {
+      "id": "size-021",
+      "category": "size",
+      "type": "select-one",
+      "prompt": { "text": "いちばん おおきいのは どれ？", "say": "いちばん おおきいのは どれ", "audio": "size-001" },
+      "choices": [
+        { "id": "z1", "label": "ちいさい", "shape": "star", "color": "#FF8A3D", "size": "small", "correct": false },
+        { "id": "z2", "label": "ちゅうくらい", "shape": "star", "color": "#FF8A3D", "size": "medium", "correct": false },
+        { "id": "z3", "label": "おおきい", "shape": "star", "color": "#FF8A3D", "size": "large", "correct": true }
+      ],
+      "reward": "sticker-size"
+    },
+    {
+      "id": "size-022",
+      "category": "size",
+      "type": "select-one",
+      "prompt": { "text": "いちばん ちいさいのは どれ？", "say": "いちばん ちいさいのは どれ", "audio": "size-002" },
+      "choices": [
+        { "id": "z1", "label": "ちゅうくらい", "shape": "heart", "color": "#8FC97F", "size": "medium", "correct": false },
+        { "id": "z2", "label": "おおきい", "shape": "heart", "color": "#8FC97F", "size": "large", "correct": false },
+        { "id": "z3", "label": "ちいさい", "shape": "heart", "color": "#8FC97F", "size": "small", "correct": true }
+      ],
+      "reward": "sticker-size"
+    },
+    {
+      "id": "size-023",
+      "category": "size",
+      "type": "select-one",
+      "prompt": { "text": "いちばん おおきいのは どれ？", "say": "いちばん おおきいのは どれ", "audio": "size-001" },
+      "choices": [
+        { "id": "z1", "label": "おおきい", "shape": "circle", "color": "#F2A65A", "size": "large", "correct": true },
+        { "id": "z2", "label": "ちいさい", "shape": "circle", "color": "#F2A65A", "size": "small", "correct": false },
+        { "id": "z3", "label": "ちゅうくらい", "shape": "circle", "color": "#F2A65A", "size": "medium", "correct": false }
+      ],
+      "reward": "sticker-size"
+    },
+    {
+      "id": "size-024",
+      "category": "size",
+      "type": "select-one",
+      "prompt": { "text": "いちばん ちいさいのは どれ？", "say": "いちばん ちいさいのは どれ", "audio": "size-002" },
+      "choices": [
+        { "id": "z1", "label": "ちいさい", "shape": "square", "color": "#FF5E8A", "size": "small", "correct": true },
+        { "id": "z2", "label": "ちゅうくらい", "shape": "square", "color": "#FF5E8A", "size": "medium", "correct": false },
+        { "id": "z3", "label": "おおきい", "shape": "square", "color": "#FF5E8A", "size": "large", "correct": false }
+      ],
+      "reward": "sticker-size"
     }
   ]
 }

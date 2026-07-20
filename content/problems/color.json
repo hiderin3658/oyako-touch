@@ -136,6 +136,138 @@
         { "id": "c2", "label": "みどり", "color": "#4CC95E", "correct": false },
         { "id": "c3", "label": "ピンク", "color": "#FF5E8A", "correct": true }
       ]
+    },
+    {
+      "id": "color-008",
+      "category": "color",
+      "type": "select-one",
+      "prompt": { "text": "あかいのは どれかな？", "say": "あかいのは どれかな", "audio": "color-001" },
+      "choices": [
+        { "id": "c1", "label": "むらさき", "color": "#9B6DFF", "correct": false },
+        { "id": "c2", "label": "あか", "color": "#E5453C", "correct": true },
+        { "id": "c3", "label": "おれんじ", "color": "#FF8A3D", "correct": false }
+      ]
+    },
+    {
+      "id": "color-009",
+      "category": "color",
+      "type": "select-one",
+      "prompt": { "text": "あおいのは どれかな？", "say": "あおいのは どれかな", "audio": "color-002" },
+      "choices": [
+        { "id": "c1", "label": "あお", "color": "#3D8BFF", "correct": true },
+        { "id": "c2", "label": "ピンク", "color": "#FF5E8A", "correct": false },
+        { "id": "c3", "label": "きいろ", "color": "#FFC92E", "correct": false }
+      ]
+    },
+    {
+      "id": "color-010",
+      "category": "color",
+      "type": "select-one",
+      "prompt": { "text": "きいろいのは どれかな？", "say": "きいろいのは どれかな", "audio": "color-003" },
+      "choices": [
+        { "id": "c1", "label": "むらさき", "color": "#9B6DFF", "correct": false },
+        { "id": "c2", "label": "おれんじ", "color": "#FF8A3D", "correct": false },
+        { "id": "c3", "label": "きいろ", "color": "#FFC92E", "correct": true }
+      ]
+    },
+    {
+      "id": "color-011",
+      "category": "color",
+      "type": "select-one",
+      "prompt": { "text": "みどりは どれかな？", "say": "みどりは どれかな", "audio": "color-004" },
+      "choices": [
+        { "id": "c1", "label": "ピンク", "color": "#FF5E8A", "correct": false },
+        { "id": "c2", "label": "みどり", "color": "#4CC95E", "correct": true },
+        { "id": "c3", "label": "むらさき", "color": "#9B6DFF", "correct": false }
+      ]
+    },
+    {
+      "id": "color-012",
+      "category": "color",
+      "type": "select-one",
+      "prompt": { "text": "ピンクは どれかな？", "say": "ピンクは どれかな", "audio": "color-005" },
+      "choices": [
+        { "id": "c1", "label": "あか", "color": "#E5453C", "correct": false },
+        { "id": "c2", "label": "あお", "color": "#3D8BFF", "correct": false },
+        { "id": "c3", "label": "ピンク", "color": "#FF5E8A", "correct": true }
+      ]
+    },
+    {
+      "id": "color-013",
+      "category": "color",
+      "type": "select-one",
+      "prompt": { "text": "むらさきは どれかな？", "say": "むらさきは どれかな", "audio": "color-006" },
+      "choices": [
+        { "id": "c1", "label": "むらさき", "color": "#9B6DFF", "correct": true },
+        { "id": "c2", "label": "みどり", "color": "#4CC95E", "correct": false },
+        { "id": "c3", "label": "きいろ", "color": "#FFC92E", "correct": false }
+      ]
+    },
+    {
+      "id": "color-014",
+      "category": "color",
+      "type": "select-one",
+      "prompt": { "text": "おれんじは どれかな？", "say": "おれんじは どれかな", "audio": "color-007" },
+      "choices": [
+        { "id": "c1", "label": "あお", "color": "#3D8BFF", "correct": false },
+        { "id": "c2", "label": "おれんじ", "color": "#FF8A3D", "correct": true },
+        { "id": "c3", "label": "みどり", "color": "#4CC95E", "correct": false }
+      ]
+    },
+    {
+      "id": "color-106",
+      "category": "color",
+      "type": "select-one",
+      "prompt": { "text": "ちがう いろは どれかな？", "say": "ちがう いろは どれかな", "audio": "color-101" },
+      "choices": [
+        { "id": "c1", "label": "おれんじ", "color": "#FF8A3D", "correct": false },
+        { "id": "c2", "label": "むらさき", "color": "#9B6DFF", "correct": true },
+        { "id": "c3", "label": "おれんじ", "color": "#FF8A3D", "correct": false }
+      ]
+    },
+    {
+      "id": "color-107",
+      "category": "color",
+      "type": "select-one",
+      "prompt": { "text": "ちがう いろは どれかな？", "say": "ちがう いろは どれかな", "audio": "color-101" },
+      "choices": [
+        { "id": "c1", "label": "きいろ", "color": "#FFC92E", "correct": true },
+        { "id": "c2", "label": "あお", "color": "#3D8BFF", "correct": false },
+        { "id": "c3", "label": "あお", "color": "#3D8BFF", "correct": false }
+      ]
+    },
+    {
+      "id": "color-108",
+      "category": "color",
+      "type": "select-one",
+      "prompt": { "text": "ちがう いろは どれかな？", "say": "ちがう いろは どれかな", "audio": "color-101" },
+      "choices": [
+        { "id": "c1", "label": "みどり", "color": "#4CC95E", "correct": false },
+        { "id": "c2", "label": "あか", "color": "#E5453C", "correct": true },
+        { "id": "c3", "label": "みどり", "color": "#4CC95E", "correct": false }
+      ]
+    },
+    {
+      "id": "color-109",
+      "category": "color",
+      "type": "select-one",
+      "prompt": { "text": "ちがう いろは どれかな？", "say": "ちがう いろは どれかな", "audio": "color-101" },
+      "choices": [
+        { "id": "c1", "label": "あお", "color": "#3D8BFF", "correct": true },
+        { "id": "c2", "label": "ピンク", "color": "#FF5E8A", "correct": false },
+        { "id": "c3", "label": "ピンク", "color": "#FF5E8A", "correct": false }
+      ]
+    },
+    {
+      "id": "color-110",
+      "category": "color",
+      "type": "select-one",
+      "prompt": { "text": "ちがう いろは どれかな？", "say": "ちがう いろは どれかな", "audio": "color-101" },
+      "choices": [
+        { "id": "c1", "label": "きいろ", "color": "#FFC92E", "correct": false },
+        { "id": "c2", "label": "きいろ", "color": "#FFC92E", "correct": false },
+        { "id": "c3", "label": "おれんじ", "color": "#FF8A3D", "correct": true }
+      ]
     }
   ]
 }

@@ -145,6 +145,150 @@
         { "id": "a3", "label": "かえる", "image": "/images/animals/frog.png", "correct": true }
       ],
       "reward": "sticker-frog"
+    },
+    {
+      "id": "animal-013",
+      "category": "animal",
+      "type": "select-one",
+      "prompt": { "text": "いぬは どれかな？", "say": "いぬは どれかな", "audio": "animal-001" },
+      "choices": [
+        { "id": "a1", "label": "ぶた", "image": "/images/animals/pig.png", "correct": false },
+        { "id": "a2", "label": "いぬ", "image": "/images/animals/dog.png", "correct": true },
+        { "id": "a3", "label": "きりん", "image": "/images/animals/giraffe.png", "correct": false }
+      ],
+      "reward": "sticker-dog"
+    },
+    {
+      "id": "animal-014",
+      "category": "animal",
+      "type": "select-one",
+      "prompt": { "text": "ねこは どれかな？", "say": "ねこは どれかな", "audio": "animal-002" },
+      "choices": [
+        { "id": "a1", "label": "ねこ", "image": "/images/animals/cat.png", "correct": true },
+        { "id": "a2", "label": "うさぎ", "image": "/images/animals/rabbit.png", "correct": false },
+        { "id": "a3", "label": "ライオン", "image": "/images/animals/lion.png", "correct": false }
+      ],
+      "reward": "sticker-cat"
+    },
+    {
+      "id": "animal-015",
+      "category": "animal",
+      "type": "select-one",
+      "prompt": { "text": "うさぎは どれかな？", "say": "うさぎは どれかな", "audio": "animal-003" },
+      "choices": [
+        { "id": "a1", "label": "くま", "image": "/images/animals/bear.png", "correct": false },
+        { "id": "a2", "label": "さる", "image": "/images/animals/monkey.png", "correct": false },
+        { "id": "a3", "label": "うさぎ", "image": "/images/animals/rabbit.png", "correct": true }
+      ],
+      "reward": "sticker-rabbit"
+    },
+    {
+      "id": "animal-016",
+      "category": "animal",
+      "type": "select-one",
+      "prompt": { "text": "くまは どれかな？", "say": "くまは どれかな", "audio": "animal-004" },
+      "choices": [
+        { "id": "a1", "label": "くま", "image": "/images/animals/bear.png", "correct": true },
+        { "id": "a2", "label": "ぞう", "image": "/images/animals/elephant.png", "correct": false },
+        { "id": "a3", "label": "かえる", "image": "/images/animals/frog.png", "correct": false }
+      ],
+      "reward": "sticker-bear"
+    },
+    {
+      "id": "animal-017",
+      "category": "animal",
+      "type": "select-one",
+      "prompt": { "text": "ぞうは どれかな？", "say": "ぞうは どれかな", "audio": "animal-005" },
+      "choices": [
+        { "id": "a1", "label": "ねこ", "image": "/images/animals/cat.png", "correct": false },
+        { "id": "a2", "label": "ぞう", "image": "/images/animals/elephant.png", "correct": true },
+        { "id": "a3", "label": "ぱんだ", "image": "/images/animals/panda.png", "correct": false }
+      ],
+      "reward": "sticker-elephant"
+    },
+    {
+      "id": "animal-018",
+      "category": "animal",
+      "type": "select-one",
+      "prompt": { "text": "ライオンは どれかな？", "say": "ライオンは どれかな", "audio": "animal-006" },
+      "choices": [
+        { "id": "a1", "label": "ひつじ", "image": "/images/animals/sheep.png", "correct": false },
+        { "id": "a2", "label": "いぬ", "image": "/images/animals/dog.png", "correct": false },
+        { "id": "a3", "label": "ライオン", "image": "/images/animals/lion.png", "correct": true }
+      ],
+      "reward": "sticker-lion"
+    },
+    {
+      "id": "animal-019",
+      "category": "animal",
+      "type": "select-one",
+      "prompt": { "text": "さるは どれかな？", "say": "さるは どれかな", "audio": "animal-007" },
+      "choices": [
+        { "id": "a1", "label": "さる", "image": "/images/animals/monkey.png", "correct": true },
+        { "id": "a2", "label": "きりん", "image": "/images/animals/giraffe.png", "correct": false },
+        { "id": "a3", "label": "ぶた", "image": "/images/animals/pig.png", "correct": false }
+      ],
+      "reward": "sticker-monkey"
+    },
+    {
+      "id": "animal-020",
+      "category": "animal",
+      "type": "select-one",
+      "prompt": { "text": "ぶたは どれかな？", "say": "ぶたは どれかな", "audio": "animal-008" },
+      "choices": [
+        { "id": "a1", "label": "うさぎ", "image": "/images/animals/rabbit.png", "correct": false },
+        { "id": "a2", "label": "ぶた", "image": "/images/animals/pig.png", "correct": true },
+        { "id": "a3", "label": "ぞう", "image": "/images/animals/elephant.png", "correct": false }
+      ],
+      "reward": "sticker-pig"
+    },
+    {
+      "id": "animal-021",
+      "category": "animal",
+      "type": "select-one",
+      "prompt": { "text": "きりんは どれかな？", "say": "きりんは どれかな", "audio": "animal-009" },
+      "choices": [
+        { "id": "a1", "label": "ライオン", "image": "/images/animals/lion.png", "correct": false },
+        { "id": "a2", "label": "ねこ", "image": "/images/animals/cat.png", "correct": false },
+        { "id": "a3", "label": "きりん", "image": "/images/animals/giraffe.png", "correct": true }
+      ],
+      "reward": "sticker-giraffe"
+    },
+    {
+      "id": "animal-022",
+      "category": "animal",
+      "type": "select-one",
+      "prompt": { "text": "ぱんだは どれかな？", "say": "ぱんだは どれかな", "audio": "animal-010" },
+      "choices": [
+        { "id": "a1", "label": "ぱんだ", "image": "/images/animals/panda.png", "correct": true },
+        { "id": "a2", "label": "さる", "image": "/images/animals/monkey.png", "correct": false },
+        { "id": "a3", "label": "ひつじ", "image": "/images/animals/sheep.png", "correct": false }
+      ],
+      "reward": "sticker-panda"
+    },
+    {
+      "id": "animal-023",
+      "category": "animal",
+      "type": "select-one",
+      "prompt": { "text": "ひつじは どれかな？", "say": "ひつじは どれかな", "audio": "animal-011" },
+      "choices": [
+        { "id": "a1", "label": "くま", "image": "/images/animals/bear.png", "correct": false },
+        { "id": "a2", "label": "ひつじ", "image": "/images/animals/sheep.png", "correct": true },
+        { "id": "a3", "label": "かえる", "image": "/images/animals/frog.png", "correct": false }
+      ],
+      "reward": "sticker-sheep"
+    },
+    {
+      "id": "animal-024",
+      "category": "animal",
+      "type": "select-one",
+      "prompt": { "text": "かえるは どれかな？", "say": "かえるは どれかな", "audio": "animal-012" },
+      "choices": [
+        { "id": "a1", "label": "ぞう", "image": "/images/animals/elephant.png", "correct": false },
+        { "id": "a2", "label": "いぬ", "image": "/images/animals/dog.png", "correct": false },
+        { "id": "a3", "label": "かえる", "image": "/images/animals/frog.png", "correct": true }
+      ],
+      "reward": "sticker-frog"
     }
   ]
 }

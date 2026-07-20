@@ -145,6 +145,150 @@
         { "id": "k3", "label": "いちご ひとつ", "image": "/images/plates/strawberry-1.png", "fruit": "strawberry", "count": 1, "correct": true }
       ],
       "reward": "sticker-count"
+    },
+    {
+      "id": "count-013",
+      "category": "count",
+      "type": "select-one",
+      "prompt": { "text": "いちばん おおいのは どれ？", "say": "いちばん おおいのは どれ", "audio": "count-001" },
+      "choices": [
+        { "id": "k1", "label": "いちご いつつ", "image": "/images/plates/strawberry-5.png", "fruit": "strawberry", "count": 5, "correct": true },
+        { "id": "k2", "label": "りんご ふたつ", "image": "/images/plates/apple-2.png", "fruit": "apple", "count": 2, "correct": false },
+        { "id": "k3", "label": "ぶどう みっつ", "image": "/images/plates/grape-3.png", "fruit": "grape", "count": 3, "correct": false }
+      ],
+      "reward": "sticker-count"
+    },
+    {
+      "id": "count-014",
+      "category": "count",
+      "type": "select-one",
+      "prompt": { "text": "いちばん すくないのは どれ？", "say": "いちばん すくないのは どれ", "audio": "count-002" },
+      "choices": [
+        { "id": "k1", "label": "バナナ ひとつ", "image": "/images/plates/banana-1.png", "fruit": "banana", "count": 1, "correct": true },
+        { "id": "k2", "label": "みかん みっつ", "image": "/images/plates/orange-3.png", "fruit": "orange", "count": 3, "correct": false },
+        { "id": "k3", "label": "いちご よっつ", "image": "/images/plates/strawberry-4.png", "fruit": "strawberry", "count": 4, "correct": false }
+      ],
+      "reward": "sticker-count"
+    },
+    {
+      "id": "count-015",
+      "category": "count",
+      "type": "select-one",
+      "prompt": { "text": "いちばん おおいのは どれ？", "say": "いちばん おおいのは どれ", "audio": "count-001" },
+      "choices": [
+        { "id": "k1", "label": "みかん いつつ", "image": "/images/plates/orange-5.png", "fruit": "orange", "count": 5, "correct": true },
+        { "id": "k2", "label": "ぶどう よっつ", "image": "/images/plates/grape-4.png", "fruit": "grape", "count": 4, "correct": false },
+        { "id": "k3", "label": "りんご ひとつ", "image": "/images/plates/apple-1.png", "fruit": "apple", "count": 1, "correct": false }
+      ],
+      "reward": "sticker-count"
+    },
+    {
+      "id": "count-016",
+      "category": "count",
+      "type": "select-one",
+      "prompt": { "text": "いちばん すくないのは どれ？", "say": "いちばん すくないのは どれ", "audio": "count-002" },
+      "choices": [
+        { "id": "k1", "label": "りんご ひとつ", "image": "/images/plates/apple-1.png", "fruit": "apple", "count": 1, "correct": true },
+        { "id": "k2", "label": "バナナ ふたつ", "image": "/images/plates/banana-2.png", "fruit": "banana", "count": 2, "correct": false },
+        { "id": "k3", "label": "いちご いつつ", "image": "/images/plates/strawberry-5.png", "fruit": "strawberry", "count": 5, "correct": false }
+      ],
+      "reward": "sticker-count"
+    },
+    {
+      "id": "count-017",
+      "category": "count",
+      "type": "select-one",
+      "prompt": { "text": "いちばん おおいのは どれ？", "say": "いちばん おおいのは どれ", "audio": "count-001" },
+      "choices": [
+        { "id": "k1", "label": "ぶどう いつつ", "image": "/images/plates/grape-5.png", "fruit": "grape", "count": 5, "correct": true },
+        { "id": "k2", "label": "いちご ふたつ", "image": "/images/plates/strawberry-2.png", "fruit": "strawberry", "count": 2, "correct": false },
+        { "id": "k3", "label": "みかん よっつ", "image": "/images/plates/orange-4.png", "fruit": "orange", "count": 4, "correct": false }
+      ],
+      "reward": "sticker-count"
+    },
+    {
+      "id": "count-018",
+      "category": "count",
+      "type": "select-one",
+      "prompt": { "text": "いちばん すくないのは どれ？", "say": "いちばん すくないのは どれ", "audio": "count-002" },
+      "choices": [
+        { "id": "k1", "label": "いちご ひとつ", "image": "/images/plates/strawberry-1.png", "fruit": "strawberry", "count": 1, "correct": true },
+        { "id": "k2", "label": "りんご みっつ", "image": "/images/plates/apple-3.png", "fruit": "apple", "count": 3, "correct": false },
+        { "id": "k3", "label": "バナナ いつつ", "image": "/images/plates/banana-5.png", "fruit": "banana", "count": 5, "correct": false }
+      ],
+      "reward": "sticker-count"
+    },
+    {
+      "id": "count-019",
+      "category": "count",
+      "type": "select-one",
+      "prompt": { "text": "いちばん おおいのは どれ？", "say": "いちばん おおいのは どれ", "audio": "count-001" },
+      "choices": [
+        { "id": "k1", "label": "バナナ いつつ", "image": "/images/plates/banana-5.png", "fruit": "banana", "count": 5, "correct": true },
+        { "id": "k2", "label": "ぶどう みっつ", "image": "/images/plates/grape-3.png", "fruit": "grape", "count": 3, "correct": false },
+        { "id": "k3", "label": "りんご ひとつ", "image": "/images/plates/apple-1.png", "fruit": "apple", "count": 1, "correct": false }
+      ],
+      "reward": "sticker-count"
+    },
+    {
+      "id": "count-020",
+      "category": "count",
+      "type": "select-one",
+      "prompt": { "text": "いちばん すくないのは どれ？", "say": "いちばん すくないのは どれ", "audio": "count-002" },
+      "choices": [
+        { "id": "k1", "label": "みかん ひとつ", "image": "/images/plates/orange-1.png", "fruit": "orange", "count": 1, "correct": true },
+        { "id": "k2", "label": "いちご よっつ", "image": "/images/plates/strawberry-4.png", "fruit": "strawberry", "count": 4, "correct": false },
+        { "id": "k3", "label": "ぶどう いつつ", "image": "/images/plates/grape-5.png", "fruit": "grape", "count": 5, "correct": false }
+      ],
+      "reward": "sticker-count"
+    },
+    {
+      "id": "count-021",
+      "category": "count",
+      "type": "select-one",
+      "prompt": { "text": "いちばん おおいのは どれ？", "say": "いちばん おおいのは どれ", "audio": "count-001" },
+      "choices": [
+        { "id": "k1", "label": "いちご いつつ", "image": "/images/plates/strawberry-5.png", "fruit": "strawberry", "count": 5, "correct": true },
+        { "id": "k2", "label": "バナナ みっつ", "image": "/images/plates/banana-3.png", "fruit": "banana", "count": 3, "correct": false },
+        { "id": "k3", "label": "みかん ひとつ", "image": "/images/plates/orange-1.png", "fruit": "orange", "count": 1, "correct": false }
+      ],
+      "reward": "sticker-count"
+    },
+    {
+      "id": "count-022",
+      "category": "count",
+      "type": "select-one",
+      "prompt": { "text": "いちばん すくないのは どれ？", "say": "いちばん すくないのは どれ", "audio": "count-002" },
+      "choices": [
+        { "id": "k1", "label": "りんご ふたつ", "image": "/images/plates/apple-2.png", "fruit": "apple", "count": 2, "correct": true },
+        { "id": "k2", "label": "みかん よっつ", "image": "/images/plates/orange-4.png", "fruit": "orange", "count": 4, "correct": false },
+        { "id": "k3", "label": "いちご いつつ", "image": "/images/plates/strawberry-5.png", "fruit": "strawberry", "count": 5, "correct": false }
+      ],
+      "reward": "sticker-count"
+    },
+    {
+      "id": "count-023",
+      "category": "count",
+      "type": "select-one",
+      "prompt": { "text": "いちばん おおいのは どれ？", "say": "いちばん おおいのは どれ", "audio": "count-001" },
+      "choices": [
+        { "id": "k1", "label": "みかん よっつ", "image": "/images/plates/orange-4.png", "fruit": "orange", "count": 4, "correct": true },
+        { "id": "k2", "label": "りんご ふたつ", "image": "/images/plates/apple-2.png", "fruit": "apple", "count": 2, "correct": false },
+        { "id": "k3", "label": "バナナ ひとつ", "image": "/images/plates/banana-1.png", "fruit": "banana", "count": 1, "correct": false }
+      ],
+      "reward": "sticker-count"
+    },
+    {
+      "id": "count-024",
+      "category": "count",
+      "type": "select-one",
+      "prompt": { "text": "いちばん すくないのは どれ？", "say": "いちばん すくないのは どれ", "audio": "count-002" },
+      "choices": [
+        { "id": "k1", "label": "バナナ ふたつ", "image": "/images/plates/banana-2.png", "fruit": "banana", "count": 2, "correct": true },
+        { "id": "k2", "label": "ぶどう よっつ", "image": "/images/plates/grape-4.png", "fruit": "grape", "count": 4, "correct": false },
+        { "id": "k3", "label": "みかん いつつ", "image": "/images/plates/orange-5.png", "fruit": "orange", "count": 5, "correct": false }
+      ],
+      "reward": "sticker-count"
     }
   ]
 }

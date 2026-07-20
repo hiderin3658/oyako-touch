@@ -7,9 +7,9 @@ import type { CountChoice } from "@/lib/types";
 describe("count レッスンの読み込み", () => {
   const lesson = loadLesson("count");
 
-  it("category は count で 12問ある", () => {
+  it("category は count で 24問ある", () => {
     expect(lesson.category).toBe("count");
-    expect(lesson.problems.length).toBe(12);
+    expect(lesson.problems.length).toBe(24);
   });
 
   it("全問の category が count", () => {

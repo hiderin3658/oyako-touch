@@ -7,9 +7,9 @@ import type { AnimalChoice } from "@/lib/types";
 describe("animal レッスンの読み込み", () => {
   const lesson = loadLesson("animal");
 
-  it("category は animal で 12問ある", () => {
+  it("category は animal で 24問ある", () => {
     expect(lesson.category).toBe("animal");
-    expect(lesson.problems.length).toBe(12);
+    expect(lesson.problems.length).toBe(24);
   });
 
   it("全問の category が animal", () => {
