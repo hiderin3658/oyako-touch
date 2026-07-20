@@ -10,7 +10,8 @@
       "target": "circle",
       "choices": [
         { "id": "p1", "label": "まる", "shape": "circle", "color": "#7FB8E8", "correct": true },
-        { "id": "p2", "label": "さんかく", "shape": "triangle", "color": "#7FB8E8", "correct": false }
+        { "id": "p2", "label": "さんかく", "shape": "triangle", "color": "#7FB8E8", "correct": false },
+        { "id": "p3", "label": "しかく", "shape": "square", "color": "#7FB8E8", "correct": false }
       ],
       "reward": "sticker-circle"
     },
@@ -22,7 +23,8 @@
       "target": "triangle",
       "choices": [
         { "id": "p1", "label": "さんかく", "shape": "triangle", "color": "#F2A65A", "correct": true },
-        { "id": "p2", "label": "しかく", "shape": "square", "color": "#F2A65A", "correct": false }
+        { "id": "p2", "label": "しかく", "shape": "square", "color": "#F2A65A", "correct": false },
+        { "id": "p3", "label": "まる", "shape": "circle", "color": "#F2A65A", "correct": false }
       ],
       "reward": "sticker-triangle"
     },
@@ -34,7 +36,8 @@
       "target": "square",
       "choices": [
         { "id": "p1", "label": "しかく", "shape": "square", "color": "#8FC97F", "correct": true },
-        { "id": "p2", "label": "まる", "shape": "circle", "color": "#8FC97F", "correct": false }
+        { "id": "p2", "label": "まる", "shape": "circle", "color": "#8FC97F", "correct": false },
+        { "id": "p3", "label": "さんかく", "shape": "triangle", "color": "#8FC97F", "correct": false }
       ],
       "reward": "sticker-square"
     },
@@ -98,7 +101,8 @@
       "target": "square",
       "choices": [
         { "id": "p1", "label": "しかく", "shape": "square", "color": "#4FC3F7", "correct": true },
-        { "id": "p2", "label": "ハート", "shape": "heart", "color": "#4FC3F7", "correct": false }
+        { "id": "p2", "label": "ハート", "shape": "heart", "color": "#4FC3F7", "correct": false },
+        { "id": "p3", "label": "ほし", "shape": "star", "color": "#4FC3F7", "correct": false }
       ],
       "reward": "sticker-square"
     },
@@ -123,7 +127,8 @@
       "target": "heart",
       "choices": [
         { "id": "p1", "label": "ハート", "shape": "heart", "color": "#66BB6A", "correct": true },
-        { "id": "p2", "label": "まる", "shape": "circle", "color": "#66BB6A", "correct": false }
+        { "id": "p2", "label": "まる", "shape": "circle", "color": "#66BB6A", "correct": false },
+        { "id": "p3", "label": "しかく", "shape": "square", "color": "#66BB6A", "correct": false }
       ],
       "reward": "sticker-heart"
     },
@@ -148,7 +153,8 @@
       "target": "triangle",
       "choices": [
         { "id": "p1", "label": "さんかく", "shape": "triangle", "color": "#FF5E8A", "correct": true },
-        { "id": "p2", "label": "しかく", "shape": "square", "color": "#FF5E8A", "correct": false }
+        { "id": "p2", "label": "しかく", "shape": "square", "color": "#FF5E8A", "correct": false },
+        { "id": "p3", "label": "ほし", "shape": "star", "color": "#FF5E8A", "correct": false }
       ],
       "reward": "sticker-triangle"
     }
