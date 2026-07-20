@@ -283,6 +283,32 @@ test("おうちに『かたはめ』を含む7タイルが表示され、クリ�
   await expect(page.locator('[data-testid="piece"]').first()).toBeVisible();
 });
 
+/** 表示中のかたはめ盤面で、正解ピースを穴の中心へ実際にドラッグする（タップ設置は廃止済み）。 */
+async function dragCorrectPieceIntoHole(page: Page): Promise<void> {
+  const hole = page.getByTestId("hole");
+  const piece = page
+    .locator('[data-testid="piece"][data-correct="true"]')
+    .first();
+  await expect(hole).toBeVisible();
+  await expect(piece).toBeVisible();
+  const holeBox = await hole.boundingBox();
+  const pieceBox = await piece.boundingBox();
+  if (!holeBox || !pieceBox) {
+    throw new Error("bounding box を取得できません");
+  }
+  await page.mouse.move(
+    pieceBox.x + pieceBox.width / 2,
+    pieceBox.y + pieceBox.height / 2,
+  );
+  await page.mouse.down();
+  await page.mouse.move(
+    holeBox.x + holeBox.width / 2,
+    holeBox.y + holeBox.height / 2,
+    { steps: 8 },
+  );
+  await page.mouse.up();
+}
+
 test("かたはめで正解ピースを穴へドラッグすると星が1つ点く（I5）", async ({
   page,
 }) => {
@@ -332,18 +358,15 @@ test("かたはめを完走してごほうびに到達する（I6）", async ({ 
   await expect(unlockedChoices(page)).toBeVisible();
   await expect(page.getByTestId("hole")).toBeVisible();
 
-  // ごほうび（reward）が表示されるまで、各問で正解ピースをタップ設置し続ける。
-  // クリック＝タップ設置（穴中心で判定＝正解）。問題数には依存せず到達で判定する。
+  // ごほうび（reward）が表示されるまで、各問で正解ピースを穴へドラッグし続ける。
+  // タップ設置は廃止したため、実際に穴の中心へドラッグして成立させる。問題数には依存せず到達で判定する。
   const reward = page.getByTestId("reward");
   const unlocked = unlockedChoices(page);
   const locked = lockedChoices(page);
   while (!(await reward.isVisible())) {
     await expect(unlocked).toBeVisible();
-    await page
-      .locator('[data-testid="piece"][data-correct="true"]')
-      .first()
-      .click();
-    // クリックが受理されると正解演出に入りロックされる（最終問題ならごほうびへ）
+    await dragCorrectPieceIntoHole(page);
+    // ドラッグが受理されると正解演出に入りロックされる（最終問題ならごほうびへ）
     await expect(locked.or(reward)).toBeVisible();
     // 正解演出後、次の出題（ロック解除）かごほうびのどちらかになるまで待つ
     await expect(unlocked.or(reward)).toBeVisible();

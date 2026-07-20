@@ -12,10 +12,8 @@ interface ShapeFitBoardProps {
   onPlace: (choiceId: string, correct: boolean) => void;
 }
 
-// タップ判定のしきい値（px）。総移動量がこれ未満なら「タップ設置」として穴中心で判定する。
-const TAP_THRESHOLD = 8;
-// スナップ半径は穴半径のこの倍率（実機で微調整前提）。
-const SNAP_RATIO = 1.3;
+// スナップ半径は穴半径のこの倍率。小さいほど穴の中心にきっちり合わせないと成立しない（実機で微調整前提）。
+const SNAP_RATIO = 0.6;
 
 /** ドラッグ中の一時状態（再描画を挟まない値はここに持つ）。 */
 interface DragState {
@@ -23,10 +21,8 @@ interface DragState {
   pointerId: number;
   startX: number;
   startY: number;
-  /** 掴んだ瞬間のピース中心（矩形取得不可なら null＝タップ設置扱い）。 */
+  /** 掴んだ瞬間のピース中心（矩形取得不可なら null＝穴中心にフォールバック）。 */
   startCenter: Point | null;
-  /** これまでの最大移動量（タップかドラッグかの判定に使う）。 */
-  moved: number;
 }
 
 /** 穴・ピース要素の中心座標と半径を返す。矩形取得不可なら null（SSR/jsdom 安全）。 */
@@ -96,7 +92,6 @@ export function ShapeFitBoard({ problem, locked, onPlace }: ShapeFitBoardProps) 
       startX: coord(event.clientX),
       startY: coord(event.clientY),
       startCenter: info ? info.center : null,
-      moved: 0,
     };
     setReturningId(null);
     setPlacedId(null);
@@ -120,7 +115,6 @@ export function ShapeFitBoard({ problem, locked, onPlace }: ShapeFitBoardProps) 
     }
     const dx = coord(event.clientX) - state.startX;
     const dy = coord(event.clientY) - state.startY;
-    state.moved = Math.max(state.moved, Math.hypot(dx, dy));
     setDragTranslate({ id: state.pieceId, dx, dy });
   };
 
@@ -152,13 +146,13 @@ export function ShapeFitBoard({ problem, locked, onPlace }: ShapeFitBoardProps) 
 
     const dx = coord(event.clientX) - state.startX;
     const dy = coord(event.clientY) - state.startY;
-    const movement = Math.max(state.moved, Math.hypot(dx, dy));
 
-    // タップ設置（実質無移動）または矩形不明時は、穴中心で判定＝必ず圏内にする。
-    const pieceCenter: Point =
-      movement < TAP_THRESHOLD || !state.startCenter
-        ? holeCenter
-        : { x: state.startCenter.x + dx, y: state.startCenter.y + dy };
+    // ピースの現在中心。矩形取得不可（jsdom等）のときだけ穴中心にフォールバックする。
+    // 実機ではタップ（無移動）だとピースは元の位置のままになるため、
+    // 実際に穴の近くまでドラッグしないと成立しない（＝きっちり合わせる必要がある）。
+    const pieceCenter: Point = state.startCenter
+      ? { x: state.startCenter.x + dx, y: state.startCenter.y + dy }
+      : holeCenter;
 
     const result = evaluateDrop({
       pieceShape,

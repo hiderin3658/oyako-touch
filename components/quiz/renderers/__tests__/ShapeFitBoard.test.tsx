@@ -106,32 +106,36 @@ describe("ShapeFitBoard 描画（U5・U13）", () => {
   });
 });
 
-describe("ShapeFitBoard タップ設置（U6・U7）", () => {
-  it("U6: 正解ピースをタップ設置すると onPlace(id, true) が1回", () => {
+describe("ShapeFitBoard きっちり判定（U6・U7）", () => {
+  it("U6: タップ（無移動）だけでは成立しない（穴までドラッグが必要）", () => {
     const onPlace = vi.fn();
     render(
       <ShapeFitBoard problem={makeProblem()} locked={false} onPlace={onPlace} />,
     );
+    const hole = screen.getByTestId("hole");
     const piece = correctPiece();
-    fireEvent.pointerDown(piece);
-    fireEvent.pointerUp(piece);
-    expect(onPlace).toHaveBeenCalledTimes(1);
-    expect(onPlace).toHaveBeenCalledWith("p1", true);
+    stubRect(hole, { left: 0, top: 0, width: 100, height: 100 }); // 中心(50,50)・半径50
+    stubRect(piece, { left: 0, top: 200, width: 100, height: 100 }); // 中心(50,250)・穴から遠い
+    // 押して離すだけ（動かさない）＝タップ。ピースは元位置のままで穴から遠い。
+    firePointer(piece, "pointerdown", 50, 250);
+    firePointer(piece, "pointerup", 50, 250);
+    expect(onPlace).not.toHaveBeenCalled();
   });
 
-  it("U7: 誤ピースをタップ設置すると onPlace(id, false) が1回", () => {
+  it("U7: 穴中心から許容半径を超えて落とすと成立しない（きっちり合わせる必要）", () => {
     const onPlace = vi.fn();
     render(
       <ShapeFitBoard problem={makeProblem()} locked={false} onPlace={onPlace} />,
     );
-    const piece = wrongPiece();
-    const pieceId = piece.getAttribute("aria-label");
-    fireEvent.pointerDown(piece);
-    fireEvent.pointerUp(piece);
-    expect(onPlace).toHaveBeenCalledTimes(1);
-    // 誤ピースの id はデータに依存しないよう correct=false 側を検証
-    expect(onPlace.mock.calls[0][1]).toBe(false);
-    expect(pieceId).toBeTruthy();
+    const hole = screen.getByTestId("hole");
+    const piece = correctPiece();
+    // 穴 中心(50,50)・半径50・許容=50*0.8=40。中心から45離すと圏外。
+    stubRect(hole, { left: 0, top: 0, width: 100, height: 100 });
+    stubRect(piece, { left: 0, top: 200, width: 100, height: 100 });
+    firePointer(piece, "pointerdown", 50, 250);
+    firePointer(piece, "pointermove", 50, 95); // pieceCenter=(50,95)・穴中心から45
+    firePointer(piece, "pointerup", 50, 95);
+    expect(onPlace).not.toHaveBeenCalled();
   });
 });
 
@@ -240,9 +244,10 @@ describe("ShapeFitBoard ロック・安全性（U11・U12）", () => {
     fireEvent(piece, new MouseEvent("pointercancel", { bubbles: true }));
     expect(onPlace).not.toHaveBeenCalled();
 
-    // 中断後に改めてタップ設置すると正解として成立する（状態が残っていない）。
-    fireEvent.pointerDown(piece);
-    fireEvent.pointerUp(piece);
+    // 中断後に改めて穴中心までドラッグすると正解として成立する（状態が残っていない）。
+    firePointer(piece, "pointerdown", 130, 230);
+    firePointer(piece, "pointermove", 140, 40); // 穴中心(140,40)へ
+    firePointer(piece, "pointerup", 140, 40);
     expect(onPlace).toHaveBeenCalledWith("p1", true);
   });
 });
