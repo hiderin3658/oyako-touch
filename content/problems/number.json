@@ -54,7 +54,7 @@
       "id": "number-005",
       "category": "number",
       "type": "select-number",
-      "prompt": { "text": "ごは どれかな？", "say": "5、は どれかな" },
+      "prompt": { "text": "ごは どれかな？", "say": "ご、は どれかな？" },
       "choices": [
         { "id": "n1", "label": "いち", "value": 1, "correct": false },
         { "id": "n2", "label": "ご", "value": 5, "correct": true },
