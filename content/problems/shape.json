@@ -145,6 +145,150 @@
         { "id": "s3", "label": "ほし", "shape": "star", "color": "#FFC92E", "correct": true }
       ],
       "reward": "sticker-star"
+    },
+    {
+      "id": "shape-011",
+      "category": "shape",
+      "type": "select-one",
+      "prompt": { "text": "まるは どれかな？", "say": "まるは どれかな", "audio": "shape-001" },
+      "choices": [
+        { "id": "s1", "label": "しかく", "shape": "square", "color": "#F2A65A", "correct": false },
+        { "id": "s2", "label": "まる", "shape": "circle", "color": "#7FB8E8", "correct": true },
+        { "id": "s3", "label": "ハート", "shape": "heart", "color": "#FF5E8A", "correct": false }
+      ],
+      "reward": "sticker-circle"
+    },
+    {
+      "id": "shape-012",
+      "category": "shape",
+      "type": "select-one",
+      "prompt": { "text": "さんかくは どれかな？", "say": "さんかくは どれかな", "audio": "shape-002" },
+      "choices": [
+        { "id": "s1", "label": "さんかく", "shape": "triangle", "color": "#8FC97F", "correct": true },
+        { "id": "s2", "label": "ほし", "shape": "star", "color": "#FFC92E", "correct": false },
+        { "id": "s3", "label": "まる", "shape": "circle", "color": "#7FB8E8", "correct": false }
+      ],
+      "reward": "sticker-triangle"
+    },
+    {
+      "id": "shape-013",
+      "category": "shape",
+      "type": "select-one",
+      "prompt": { "text": "しかくは どれかな？", "say": "しかくは どれかな", "audio": "shape-003" },
+      "choices": [
+        { "id": "s1", "label": "ハート", "shape": "heart", "color": "#FF5E8A", "correct": false },
+        { "id": "s2", "label": "しかく", "shape": "square", "color": "#F2A65A", "correct": true },
+        { "id": "s3", "label": "さんかく", "shape": "triangle", "color": "#8FC97F", "correct": false }
+      ],
+      "reward": "sticker-square"
+    },
+    {
+      "id": "shape-014",
+      "category": "shape",
+      "type": "select-one",
+      "prompt": { "text": "ほしは どれかな？", "say": "ほしは どれかな", "audio": "shape-004" },
+      "choices": [
+        { "id": "s1", "label": "まる", "shape": "circle", "color": "#7FB8E8", "correct": false },
+        { "id": "s2", "label": "しかく", "shape": "square", "color": "#F2A65A", "correct": false },
+        { "id": "s3", "label": "ほし", "shape": "star", "color": "#FFC92E", "correct": true }
+      ],
+      "reward": "sticker-star"
+    },
+    {
+      "id": "shape-015",
+      "category": "shape",
+      "type": "select-one",
+      "prompt": { "text": "ハートは どれかな？", "say": "ハートは どれかな", "audio": "shape-005" },
+      "choices": [
+        { "id": "s1", "label": "さんかく", "shape": "triangle", "color": "#8FC97F", "correct": false },
+        { "id": "s2", "label": "ハート", "shape": "heart", "color": "#FF5E8A", "correct": true },
+        { "id": "s3", "label": "ほし", "shape": "star", "color": "#FFC92E", "correct": false }
+      ],
+      "reward": "sticker-heart"
+    },
+    {
+      "id": "shape-016",
+      "category": "shape",
+      "type": "select-one",
+      "prompt": { "text": "まるは どれかな？", "say": "まるは どれかな", "audio": "shape-001" },
+      "choices": [
+        { "id": "s1", "label": "まる", "shape": "circle", "color": "#7FB8E8", "correct": true },
+        { "id": "s2", "label": "ほし", "shape": "star", "color": "#FFC92E", "correct": false },
+        { "id": "s3", "label": "さんかく", "shape": "triangle", "color": "#8FC97F", "correct": false }
+      ],
+      "reward": "sticker-circle"
+    },
+    {
+      "id": "shape-017",
+      "category": "shape",
+      "type": "select-one",
+      "prompt": { "text": "さんかくは どれかな？", "say": "さんかくは どれかな", "audio": "shape-002" },
+      "choices": [
+        { "id": "s1", "label": "しかく", "shape": "square", "color": "#F2A65A", "correct": false },
+        { "id": "s2", "label": "ハート", "shape": "heart", "color": "#FF5E8A", "correct": false },
+        { "id": "s3", "label": "さんかく", "shape": "triangle", "color": "#8FC97F", "correct": true }
+      ],
+      "reward": "sticker-triangle"
+    },
+    {
+      "id": "shape-018",
+      "category": "shape",
+      "type": "select-one",
+      "prompt": { "text": "しかくは どれかな？", "say": "しかくは どれかな", "audio": "shape-003" },
+      "choices": [
+        { "id": "s1", "label": "しかく", "shape": "square", "color": "#F2A65A", "correct": true },
+        { "id": "s2", "label": "まる", "shape": "circle", "color": "#7FB8E8", "correct": false },
+        { "id": "s3", "label": "ほし", "shape": "star", "color": "#FFC92E", "correct": false }
+      ],
+      "reward": "sticker-square"
+    },
+    {
+      "id": "shape-103",
+      "category": "shape",
+      "type": "select-one",
+      "prompt": { "text": "ちがう かたちは どれかな？", "say": "ちがう かたちは どれかな", "audio": "shape-101" },
+      "choices": [
+        { "id": "s1", "label": "まる", "shape": "circle", "color": "#7FB8E8", "correct": false },
+        { "id": "s2", "label": "さんかく", "shape": "triangle", "color": "#8FC97F", "correct": true },
+        { "id": "s3", "label": "まる", "shape": "circle", "color": "#7FB8E8", "correct": false }
+      ],
+      "reward": "sticker-triangle"
+    },
+    {
+      "id": "shape-104",
+      "category": "shape",
+      "type": "select-one",
+      "prompt": { "text": "ちがう かたちは どれかな？", "say": "ちがう かたちは どれかな", "audio": "shape-101" },
+      "choices": [
+        { "id": "s1", "label": "しかく", "shape": "square", "color": "#F2A65A", "correct": true },
+        { "id": "s2", "label": "ハート", "shape": "heart", "color": "#FF5E8A", "correct": false },
+        { "id": "s3", "label": "ハート", "shape": "heart", "color": "#FF5E8A", "correct": false }
+      ],
+      "reward": "sticker-square"
+    },
+    {
+      "id": "shape-105",
+      "category": "shape",
+      "type": "select-one",
+      "prompt": { "text": "ちがう かたちは どれかな？", "say": "ちがう かたちは どれかな", "audio": "shape-101" },
+      "choices": [
+        { "id": "s1", "label": "ほし", "shape": "star", "color": "#FFC92E", "correct": false },
+        { "id": "s2", "label": "ほし", "shape": "star", "color": "#FFC92E", "correct": false },
+        { "id": "s3", "label": "まる", "shape": "circle", "color": "#7FB8E8", "correct": true }
+      ],
+      "reward": "sticker-circle"
+    },
+    {
+      "id": "shape-106",
+      "category": "shape",
+      "type": "select-one",
+      "prompt": { "text": "ちがう かたちは どれかな？", "say": "ちがう かたちは どれかな", "audio": "shape-101" },
+      "choices": [
+        { "id": "s1", "label": "さんかく", "shape": "triangle", "color": "#8FC97F", "correct": false },
+        { "id": "s2", "label": "ハート", "shape": "heart", "color": "#FF5E8A", "correct": true },
+        { "id": "s3", "label": "さんかく", "shape": "triangle", "color": "#8FC97F", "correct": false }
+      ],
+      "reward": "sticker-heart"
     }
   ]
 }

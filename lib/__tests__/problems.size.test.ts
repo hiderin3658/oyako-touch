@@ -7,9 +7,9 @@ import type { SizeChoice } from "@/lib/types";
 describe("size レッスンの読み込み（U1）", () => {
   const lesson = loadLesson("size");
 
-  it("category は size で 12問ある", () => {
+  it("category は size で 24問ある", () => {
     expect(lesson.category).toBe("size");
-    expect(lesson.problems.length).toBe(12);
+    expect(lesson.problems.length).toBe(24);
   });
 
   it("全問の category が size", () => {

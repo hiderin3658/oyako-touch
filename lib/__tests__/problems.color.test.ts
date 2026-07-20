@@ -7,8 +7,8 @@ import type { ColorChoice } from "@/lib/types";
 describe("color レッスンの拡充", () => {
   const lesson = loadLesson("color");
 
-  it("12問以上ある", () => {
-    expect(lesson.problems.length).toBeGreaterThanOrEqual(12);
+  it("24問以上ある", () => {
+    expect(lesson.problems.length).toBeGreaterThanOrEqual(24);
   });
 
   it("全問の correct はちょうど1つ", () => {
