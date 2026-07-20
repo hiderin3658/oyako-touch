@@ -159,7 +159,7 @@ export function QuizEngine({ lesson, onComplete }: QuizEngineProps) {
   const showRetryHint = state.status === "retry";
 
   return (
-    <div className={styles.game}>
+    <div className={styles.game} data-problem-index={state.index}>
       <div className={styles.qBar}>
         {showCorrectHint && (
           <div

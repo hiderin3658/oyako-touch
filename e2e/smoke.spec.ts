@@ -109,6 +109,11 @@ test("誤答してもフェイル表示が出ず同じ問題に留まり、正�
   const question = page.locator("p").first();
   const firstQuestion = (await question.textContent())?.trim() ?? "";
   expect(firstQuestion.length).toBeGreaterThan(0);
+  // 前進判定は設問文でなく問題インデックスで行う。
+  // いろは同一文言の問題（color-101〜105「ちがう いろは どれかな？」）があり、
+  // 文言比較だと同一文言が連続したとき不安定（フレーク）になるため。
+  const board = page.locator("[data-problem-index]").first();
+  const firstIndex = await board.getAttribute("data-problem-index");
   await expect(correctChoice(page)).toBeVisible();
 
   // 誤答を1つタップ
@@ -128,8 +133,11 @@ test("誤答してもフェイル表示が出ず同じ問題に留まり、正�
   await correctChoice(page).click();
   // 正解が反映され星が1つ点く（総数には依存しない）
   await expect(page.locator('[data-on="true"]')).toHaveCount(1);
-  // 次の問題へ前進すること（設問文が変わる）
-  await expect(question).not.toHaveText(firstQuestion);
+  // 次の問題へ前進すること（設問文は重複し得るので、問題インデックスの変化で判定）
+  await expect(board).not.toHaveAttribute(
+    "data-problem-index",
+    firstIndex ?? "",
+  );
 });
 
 test("かたちレッスンで1問正解できる", async ({ page }) => {
