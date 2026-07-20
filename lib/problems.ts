@@ -274,6 +274,42 @@ function shuffle<T>(items: readonly T[], random: () => number): T[] {
 }
 
 /**
+ * 位置の多重集合を「隣り合う要素が同じにならない」よう並べる（純粋関数）。
+ * 各ステップで「残数が最も多く、直前と異なる位置」を選ぶ貪欲法（同数は乱数で選ぶ）。
+ * これで連続同一を避けつつ均等な分布を保つ（最大数 <= ceil(n/2) なら必ず可能）。
+ * 制約を満たせない稀なケースでは直前と同じ位置を許容する（安全側・無限ループ防止）。
+ */
+function arrangeNoAdjacent(
+  positions: readonly number[],
+  random: () => number,
+): number[] {
+  const remaining = new Map<number, number>();
+  for (const pos of positions) {
+    remaining.set(pos, (remaining.get(pos) ?? 0) + 1);
+  }
+
+  const result: number[] = [];
+  let last = -1;
+  for (let step = 0; step < positions.length; step += 1) {
+    // 直前と異なる位置の候補（残数>0）。無ければ制約を外す。
+    let candidates = [...remaining.entries()].filter(
+      ([pos, count]) => count > 0 && pos !== last,
+    );
+    if (candidates.length === 0) {
+      candidates = [...remaining.entries()].filter(([, count]) => count > 0);
+    }
+    // 残数が最大の位置を選ぶ（同数は乱数で選んで並びに変化を出す）。
+    const maxCount = Math.max(...candidates.map(([, count]) => count));
+    const top = candidates.filter(([, count]) => count === maxCount);
+    const [pos] = top[Math.floor(random() * top.length)];
+    result.push(pos);
+    remaining.set(pos, (remaining.get(pos) ?? 0) - 1);
+    last = pos;
+  }
+  return result;
+}
+
+/**
  * 抽出した各問題の選択肢を並べ替え、正解の位置をセッション内で均等に散らす（純粋関数）。
  * - 位置をラウンドロビンで割り当ててからシャッフルするため、正解が同じ位置に偏らない
  *   （例: 5問・3択なら同一位置は最大2回まで。全部同じ位置は起きない）。
@@ -291,8 +327,8 @@ function balanceCorrectPositions(
     const choices = (problem as { choices?: unknown }).choices;
     return Array.isArray(choices) ? Math.max(max, choices.length) : max;
   }, 1);
-  // 0..maxChoices-1 を巡回した列をシャッフル＝均等に散らした目標位置。
-  const targets = shuffle(
+  // 0..maxChoices-1 を巡回した均等な多重集合を、隣り合う問題で同じ位置にならないよう並べる。
+  const targets = arrangeNoAdjacent(
     problems.map((_, index) => index % maxChoices),
     random,
   );

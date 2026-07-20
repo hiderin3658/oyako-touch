@@ -90,6 +90,18 @@ describe("pickProblems", () => {
     }
   });
 
+  it("隣り合う問題の正解位置は同じにならない（連続同一の回避）", () => {
+    for (const seed of [1, 42, 100, 2024, 7777, 3, 8, 15, 21]) {
+      const positions = correctPositions(pickProblems(lesson, 5, seed));
+      for (let i = 1; i < positions.length; i += 1) {
+        expect(
+          positions[i],
+          `seed=${seed}: ${i}問目と${i + 1}問目が同じ位置`,
+        ).not.toBe(positions[i - 1]);
+      }
+    }
+  });
+
   it("並べ替えても各問の選択肢は保持され、正解はちょうど1つ", () => {
     const pool = loadLesson("shape");
     const picked = pickProblems(pool, 5, 7);
